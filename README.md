@@ -1,4 +1,4 @@
-# Conta Analiz
+# Mühendislik Tasarım Yardımcısı (Conta_Analiz)
 
 Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve üç modül sunar:
 

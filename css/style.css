@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --bg: #f3f4f1;
   --panel: #ffffff;
   --ink: #1d2326;
@@ -317,3 +318,9 @@ svg.cubukg { max-width: 760px; display: block; }
 .ana-kart button { align-items: center; justify-content: center; text-align: center; padding: 48px 24px; min-height: 300px; gap: 18px; }
 .ana-kart b { font-size: 30px; line-height: 1.2; }
 .ana-kart em { margin-top: 0; font-size: 14px; }
+
+/* Karanlık mod / sistem renklerinden bağımsız: tüm düğme ve alanlarda yazı rengi sabit */
+button, input, select, textarea { color: var(--ink); }
+.ana-kart button, .ana-kart button b { color: var(--ink); background: #fff; }
+.ana-kart button em { color: var(--warn); }
+.seg button.on, button.primary, button.mini.on { color: #fff; }
