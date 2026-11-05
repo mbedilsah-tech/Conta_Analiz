@@ -9,7 +9,8 @@ Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve ü�
 | **Cıvatalar ve tork değerleri** | Geliştirme aşamasında | M4–M16; 8.8, 10.9, 12.9 ve paslanmaz (tahmini) sınıflar; sürtünme µ 0,08–0,14. Sıkma torku ve ön yük (VDI 2230 tablosu), tork anahtarı aralığı, diş boyu, uyarılar (hidrojen gevrekliği, sıvama), teknik resim notu |
 
 Malzeme ve kaplama verileri `js/malzeme.js`, modül arayüzleri `js/moduller.js
-js/tolerans.js     – delik/mil toleransları, geçmeler, ISO 2768` dosyasındadır.
+js/tolerans.js     – delik/mil toleransları, geçmeler, ISO 2768
+js/topluluk.js     – yorumlar ve kullanıcı tedarikçileri` dosyasındadır.
 
 Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
 
@@ -45,6 +46,12 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **Genel toleranslar** – ISO 2768-1 f/m/c/v (ince/orta/kaba/çok kaba) ve ISO 2768-2 H/K/L, antet notu
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
+
+## Topluluk (v0.8)
+
+- **Mühendis yorumları** – her modülün altında: isim yazıp tecrübe paylaşma, "Faydalı" beğenisi, en yeni / en faydalı sıralama
+- **Tedarikçi ekleme** – Tedarikçiler sayfasında "＋ Tedarikçi ekle": listede olmayan firmayı ekleme, düzenleme, silme
+- Şimdilik veriler tarayıcıda (localStorage) saklanır; "Verilerimi indir / Dosyadan yükle" ile paylaşılabilir. Ortak veritabanına geçiş için `js/topluluk.js` içindeki `DEPO` değiştirilir.
 
 ## Ayarlar
 

@@ -837,23 +837,52 @@
       turkiye: 'Türkiye genelindeki büyük üreticiler ve global firmaların Türkiye şirketleri. Ankara firmaları da bu listede.',
       dunya: 'Türkiye’ye ürün satan dünyanın en büyük sızdırmazlık firmaları. Türkiye’deki satış kanalı kartlarda yazılı.'
     }[S.tedSekme];
-    const tags = ['Tümü', ...new Set(G.liste.flatMap(t => t.tags))];
+    const benim = window.TOP ? window.TOP.tedarikciler(S.tedSekme) : [];
+    const tags = ['Tümü', ...(benim.length ? ['Eklediklerim'] : []), ...new Set(G.liste.flatMap(t => t.tags))];
     if (!tags.includes(tedFiltre)) tedFiltre = 'Tümü';
     $('#tedarikFiltre').innerHTML = tags.map(t => `<button class="mini ${t === tedFiltre ? 'on' : ''}" data-tf="${esc(t)}">${esc(t)}</button>`).join('');
     $$('[data-tf]').forEach(b => b.addEventListener('click', () => { tedFiltre = b.dataset.tf; renderTedarik(); }));
-    const liste = G.liste.filter(t => tedFiltre === 'Tümü' || t.tags.includes(tedFiltre))
-      .sort((a, b) => (b.olcek - a.olcek) || ((a.kurulus || 9999) - (b.kurulus || 9999)));
-    $('#tedarikListe').innerHTML = liste.map((t, i) => `<div class="card sup">
-      <h3><span class="sira">${i + 1}</span>${esc(t.ad)}</h3><div class="where">${esc(t.bolge)}</div>
+    const uy = t => tedFiltre === 'Tümü' || (tedFiltre === 'Eklediklerim' ? t.kullanici : t.tags.includes(tedFiltre));
+    const liste = [...benim.filter(uy).sort((a, b) => b.tarih - a.tarih), ...G.liste.filter(t => tedFiltre !== 'Eklediklerim' && uy(t))
+      .sort((a, b) => (b.olcek - a.olcek) || ((a.kurulus || 9999) - (b.kurulus || 9999)))];
+    $('#tedarikListe').innerHTML = liste.map((t, i) => `<div class="card sup ${t.kullanici ? 'benim' : ''}">
+      <h3><span class="sira">${t.kullanici ? '＋' : i + 1 - benim.filter(uy).length}</span>${esc(t.ad)}</h3><div class="where">${esc(t.bolge)}${t.kullanici ? ` <span class="rozet">Eklediğiniz${t.ekleyen ? ' · ' + esc(t.ekleyen) : ''}</span>` : ''}</div>
       <div class="pill-row small">${t.kurulus ? `<span class="chip">Kuruluş <b>${t.kurulus}</b></span>` : ''}${t.calisan && t.calisan !== '–' ? `<span class="chip">Çalışan <b>${esc(t.calisan)}</b></span>` : ''}</div>
       <p>${esc(t.odak)}</p>
-      <p>📍 ${esc(t.adres)}</p>
+      ${t.not ? `<p class="small">📝 ${esc(t.not)}</p>` : ''}
+      ${t.adres ? `<p>📍 ${esc(t.adres)}</p>` : ''}
       ${t.tel.length ? `<p>📞 ${t.tel.map(n => `<a href="tel:${n.replace(/\s/g, '')}">${esc(n)}</a>`).join(' · ')}</p>` : ''}
       ${t.eposta ? `<p>✉️ <a href="mailto:${esc(t.eposta)}">${esc(t.eposta)}</a></p>` : ''}
       ${t.web ? `<p>🌐 <a href="${esc(t.web)}" target="_blank" rel="noopener">${esc(t.web.replace(/^https?:\/\//, ''))}</a></p>` : ''}
-      <div class="pill-row">${t.tags.map(x => `<span class="chip">${esc(x)}</span>`).join('')}<a class="ref" href="${esc(t.kaynak)}" target="_blank" rel="noopener">Bilgi kaynağı ↗</a></div>
+      <div class="pill-row">${t.tags.map(x => `<span class="chip">${esc(x)}</span>`).join('')}${t.kullanici ? `<button class="mini" data-tedduz="${t.id}">Düzenle</button><button class="mini" data-tedsil="${t.id}">Sil</button>` : `<a class="ref" href="${esc(t.kaynak)}" target="_blank" rel="noopener">Bilgi kaynağı ↗</a>`}</div>
     </div>`).join('');
+    $$('[data-tedduz]').forEach(b => b.addEventListener('click', () => tedFormAc(window.TOP.tedarikciler().find(x => x.id === b.dataset.tedduz))));
+    $$('[data-tedsil]').forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.onay) { window.TOP.tedarikciSil(b.dataset.tedsil); toast('Tedarikçi silindi'); renderTedarik(); }
+      else { b.dataset.onay = '1'; b.textContent = 'Emin misiniz?'; setTimeout(() => { if (b.isConnected) { delete b.dataset.onay; b.textContent = 'Sil'; } }, 3000); }
+    }));
   }
+  function tedFormAc(t) {
+    const el = $('#tedarikForm');
+    el.innerHTML = window.TOP.tedarikciFormu(t);
+    $('#tedEkleAc').style.display = 'none';
+    const kapat = () => { el.innerHTML = ''; $('#tedEkleAc').style.display = ''; };
+    el.querySelector('[data-tedvazgec]').addEventListener('click', kapat);
+    el.querySelector('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const v = Object.fromEntries(new FormData(e.target));
+      v.id = e.target.dataset.tid || undefined;
+      const hata = window.TOP.tedarikciKaydet(v);
+      if (hata) { toast(hata); return; }
+      kapat();
+      if (v.grup !== S.tedSekme && !(S.tedSekme === 'turkiye' && v.grup === 'ankara')) { S.tedSekme = v.grup; save(); syncControls(); }
+      tedFiltre = 'Tümü';
+      renderTedarik();
+      toast(v.id ? 'Tedarikçi güncellendi' : 'Tedarikçi eklendi');
+    });
+    el.querySelector('input[name="ad"]').focus();
+  }
+  $('#tedEkleAc').addEventListener('click', () => tedFormAc());
 
   // ---------------- Kolay mod ----------------
   const HIZLI = [1.78, 2.0, 2.62, 3.0, 3.53, 4.0, 5.33, 6.99];
@@ -1023,6 +1052,7 @@
   function aktifSayfa() { if (S.modul !== 'conta') return 'modul-' + S.modul; return S.arayuz === 'kolay' ? 'kolay' : ($('.page.active') || {}).dataset?.page; }
   function renderAll(yapisal) {
     syncControls();
+    if (window.TOP) window.TOP.yerlestir(S.modul);
     if (S.modul !== 'conta') { window.MODUL.render(S.modul, yapisal); syncControls(); return; }
     renderOzet();
     const p = aktifSayfa();
