@@ -430,3 +430,7 @@ table.karsi td.num, table.karsi th.num { text-align: center; }
 .egit-metin p { line-height: 1.6; margin: 0 0 10px; }
 .egit-metin ul { padding-left: 20px; line-height: 1.55; margin: 0 0 10px; }
 #nav .egit-nav { margin-top: 6px; }
+/* Yapay zekâ uyarısı – her sayfanın üstünde */
+.ai-uyari { background: #fff4d6; color: #6b4a06; border-bottom: 1px solid #f0d58a; padding: 8px 20px; font-size: 13.5px; line-height: 1.45; text-align: center; }
+.ai-uyari b { color: #5a3d00; }
+@media print { .ai-uyari { display: block !important; } }

@@ -1,5 +1,7 @@
 # Mühendislik Tasarım Yardımcısı (Conta_Analiz)
 
+> ⚠️ Bu uygulama yapay zekâ yardımıyla hazırlanmıştır; değerlerde hata olabilir. Sonuçları kesin tasarım verisi olarak kullanmadan önce ilgili standart, üretici kataloğu ve deneyimli bir mühendisle doğrulayın.
+
 Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve üç modül sunar:
 
 | Modül | Durum | İçerik |
