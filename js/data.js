@@ -28,7 +28,7 @@
     gent: { kisa: 'Gent (1958)', ad: 'A.N. Gent – Shore A sertliğinden Young modülü: E = 0,0981·(56 + 7,62336·S) / (0,137505·(254 − 2,54·S)) MPa', url: '' },
     asme: { kisa: 'ASME VIII-1 App. 2 / TEMA', ad: 'ASME Boiler & Pressure Vessel Code Sec. VIII Div. 1, Appendix 2 (eşitlik 3) ve TEMA – en büyük cıvata aralığı: B_maks = 2·a + 6·t / (m + 0,5). a: nominal cıvata çapı, t: flanş kalınlığı, m: conta faktörü (O-ring gibi kendinden enerjili contalar m = 0; 75 Shore A altı elastomer m = 0,5; 75 Shore A ve üstü m = 1,0). Kökeni Taylor Forge “Modern Flange Design” Bülten 502.', url: 'https://www.eng-tips.com/threads/max-bolt-spacing-design.191936/post-931951' },
     tema: { kisa: 'TEMA Tablo D-5', ad: 'TEMA Standartları Tablo D-5 – anahtar boşluğuna göre en küçük cıvata aralığı (ör. 3/4" cıvata için 1,75" ≈ 2,3·d)', url: 'https://cr4.globalspec.com/thread/40101/Circumferential-Distance-Between-Bolts' },
-    vdi2230: { kisa: 'VDI 2230 tork tablosu', ad: 'VDI 2230 – cıvata bağlantıları hesabı. 8.8 sınıfı, toplam sürtünme µ = 0,12 için sıkma torku (MA) ve montaj ön yükü (FM) tablo değerleri (cıvata akma sınırının %90’ı kullanılarak). Kaynak tablo: Zimmer Group / norelem teknik bilgi.', url: 'https://www.zimmer-group.com/en/td' },
+    vdi2230: { kisa: 'VDI 2230 tork tablosu', ad: 'VDI 2230 – cıvata bağlantıları hesabı. 8.8 sınıfı, toplam sürtünme µ = 0,12 için sıkma torku (MA) ve montaj ön yükü (FM) tablo değerleri (cıvata akma sınırının %90’ı kullanılarak). Kaynak tablo: Marek teknik bilgi (VDI 2230 yöntemi, µG = µK); M3 için Zimmer Group.', url: 'https://www.marek.eu/katalog-obrazku/produkt-24858/58479-technical-information-screws-nuts-en.pdf' },
     amorim: { kisa: 'Amorim – sıkma sırası', ad: 'Amorim Cork Solutions – Gasket Design Guidelines: cıvatalar çapraz sırayla, son torka 3 adımda sıkılır; yağlı cıvata yalnız tork değerlendirmesi yapıldıysa; mümkünse rondela; conta tekrar kullanılmaz.', url: 'https://amorimcorksolutions.com/en-us/about-us/blog/gasket-design-guidelines/' },
     kural: { kisa: 'Genel pratik', ad: 'Genel mühendislik pratiği / temkinli başlangıç değeri – prototip testi veya FEA ile doğrulanmalıdır', url: '' },
     ostim: { kisa: 'OSTİM Firma Rehberi', ad: 'OSTİM OSB firma rehberi (ostim.org.tr/companies) – Kasım 2026 itibarıyla', url: 'https://ostim.org.tr/companies' }
@@ -251,9 +251,10 @@
 
   // ---------------- Cıvata verileri ----------------
   // 8.8, µ = 0,12 (VDI 2230 tablo değerleri): sıkma torku MA (Nm), ön yük FM (kN)
+  // M4–M16: Marek / VDI 2230 tablosu; M3: Zimmer Group tablosu (ön yük tahmini)
   const CIVATA = {
-    M3: { MA: 1.3, FM: 2.3 }, M4: { MA: 3.0, FM: 4.05 }, M5: { MA: 5.9, FM: 6.63 }, M6: { MA: 10.1, FM: 9.35 },
-    M8: { MA: 24.6, FM: 17.2 }, M10: { MA: 47.8, FM: 27.3 }, M12: { MA: 83.6, FM: 39.9 }, M16: { MA: 206, FM: 75.3 }
+    M3: { MA: 1.3, FM: 2.3 }, M4: { MA: 2.8, FM: 4.05 }, M5: { MA: 5.5, FM: 6.63 }, M6: { MA: 9.5, FM: 9.35 },
+    M8: { MA: 23.1, FM: 17.2 }, M10: { MA: 46, FM: 27.3 }, M12: { MA: 80, FM: 39.9 }, M16: { MA: 194, FM: 75.3 }
   };
   // ISO 273 geçiş delikleri: ince / orta / kaba seri
   const DELIK_SERI = { M3: [3.2, 3.4, 3.6], M4: [4.3, 4.5, 4.8], M5: [5.3, 5.5, 5.8], M6: [6.4, 6.6, 7.0], M8: [8.4, 9.0, 10.0], M10: [10.5, 11.0, 12.0], M12: [13.0, 13.5, 14.5], M16: [17.0, 17.5, 18.5] };

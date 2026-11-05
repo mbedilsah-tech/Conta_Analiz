@@ -199,7 +199,7 @@
         ${uzatma(x + 13, 96, x + 60, 96)}${uzatma(x + 13, 96 + p.Lk, x + 60, 96 + p.Lk)}
         ${olcuV(x + 54, 96, 96 + p.Lk, 'Diş boyu ≥ ' + f(p.dis, 0) + ' mm')}
         ${etiket(x - 10, 84, 110, 56, '', 'end')}${txt(108, 52, 'Ön yük FM ≈ ' + f(p.FM, 1) + ' kN', { a: 'end', s: 10.5 })}
-        ${txt(200, 222, p.M + ' 8.8 · µ = 0,12 · ' + p.govdeAd + ' gövde', { s: 10.5, c: THIN })}`, 'Sıkma torku');
+        ${txt(200, 222, p.M + ' ' + (p.sinif || '8.8') + ' · µ = ' + (p.mu || '0,12') + ' · ' + p.govdeAd + ' gövde', { s: 10.5, c: THIN })}`, 'Sıkma torku');
     },
     // Delik merkezi – parça kenarı
     kenarMesafe(p) {

@@ -34,7 +34,14 @@
     // Arayüz
     kkTip: 'oring', kkd: 2.62, kkw: 6, kkh: 2.0, kkb: 3.6,
     arayuz: 'uzman', kolayMod: 'oring', kd: 2.62, kID: null, kh2: 2.0, kb2: 3.6, kolaySev: 1,
-    tedSekme: 'ankara', kvAcik: null
+    tedSekme: 'ankara', kvAcik: null,
+    // Modüller
+    modul: 'ana',
+    mSekme: 'al', alSec: '6082', celikSec: 'S355J2', alOzellik: 'Rp', celikOzellik: 'Rp',
+    agSekil: 'levha', agA: 200, agB: 100, agT: 10, agD: 40, agL: 100, agEt: 3,
+    kTaban: 'al', ist_iletken: false, ist_asinma: false, ist_disOrtam: false, ist_renk: false, ist_boyut: false, ist_ucuz: false,
+    notMalz: '6082', notUrun: 'cubuk', notKap: 'eloksal', notMaske: true, notSonra: true, notTol: true, notKenar: true, notRohs: false, notDil2: 'tr',
+    civM: 'M5', civSinif: '8.8', civMu: '0.12', civKarsi: 'al', civTip: 'ISO 4762', civL: 16, civKap: 'cinko', civKilit: 'LOCTITE 243', civDil: 'tr'
   };
   const KEY = 'contaAnaliz.v1';
   let S = load();
@@ -77,7 +84,9 @@
   document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
 
   // ---------------- Bağlama ----------------
-  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip'];
+  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip',
+    'modul', 'mSekme', 'alSec', 'celikSec', 'alOzellik', 'celikOzellik', 'agSekil', 'kTaban', 'ist_iletken', 'ist_asinma', 'ist_disOrtam', 'ist_renk', 'ist_boyut', 'ist_ucuz',
+    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil'];
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-bind] > button');
     if (!btn || btn.disabled) return;
@@ -112,15 +121,16 @@
     syncControls(); renderOzet();
     if (yapisal) renderGirdiler();
     bekleyenYapisal = bekleyenYapisal || yapisal;
-    $$('.page.active .sonuc').forEach(e => { e.classList.remove('yeni'); e.classList.add('guncel'); });
+    $$(S.modul === 'conta' ? '.page.active .sonuc' : '#modulAlan .sonuc').forEach(e => { e.classList.remove('yeni'); e.classList.add('guncel'); });
     clearTimeout(animZaman);
     animZaman = setTimeout(() => {
       renderAll(false);
       bekleyenYapisal = false;
-      $$('.page.active .sonuc').forEach(e => { e.classList.remove('guncel'); void e.offsetWidth; e.classList.add('yeni'); });
+      $$(S.modul === 'conta' ? '.page.active .sonuc' : '#modulAlan .sonuc').forEach(e => { e.classList.remove('guncel'); void e.offsetWidth; e.classList.add('yeni'); });
     }, parseInt(S.ayarSure, 10) || 350);
   }
   function renderGirdiler() {
+    if (S.modul !== 'conta') { window.MODUL.render(S.modul, true); return; }
     const p = aktifSayfa();
     if (p === 'kanal') renderKanalGirdi();
     if (p === 'not') renderNotGirdi();
@@ -140,6 +150,7 @@
     $$('[data-num]').forEach(el => { if (el !== document.activeElement) el.value = S[el.dataset.num] ?? ''; });
     $$('[data-sel]').forEach(el => { if (S[el.dataset.sel] != null) el.value = S[el.dataset.sel]; });
     $$('[data-chk]').forEach(el => { el.checked = !!S[el.dataset.chk]; });
+    document.body.dataset.modul = S.modul;
     document.body.classList.toggle('kolay', S.arayuz === 'kolay');
     $('#gasketSekil').style.display = S.tip === 'gasket' ? '' : 'none';
     $('#emiAlan').style.display = emi() ? '' : 'none';
@@ -1007,9 +1018,10 @@
   }
 
   // ---------------- Ana render ----------------
-  function aktifSayfa() { return S.arayuz === 'kolay' ? 'kolay' : ($('.page.active') || {}).dataset?.page; }
+  function aktifSayfa() { if (S.modul !== 'conta') return 'modul-' + S.modul; return S.arayuz === 'kolay' ? 'kolay' : ($('.page.active') || {}).dataset?.page; }
   function renderAll(yapisal) {
     syncControls();
+    if (S.modul !== 'conta') { window.MODUL.render(S.modul, yapisal); syncControls(); return; }
     renderOzet();
     const p = aktifSayfa();
     if (p === 'kanal') { if (yapisal || !$('#kanalGirdi').innerHTML) renderKanalGirdi(); renderKanalSonuc(); }
@@ -1030,6 +1042,8 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') panel.classList.remove('acik'); });
   $('#animDene').addEventListener('click', () => { panel.classList.remove('acik'); changed(false); });
 
+  window.UI = { $, $$, f, P, esc, refs, toast, S: () => S, save, changed, syncControls };
+  $('#anaMenu').addEventListener('click', () => { S.modul = 'ana'; changed(true); });
   renderOrtamlar();
   renderAll(true);
 })();

@@ -1,5 +1,15 @@
 # Conta Analiz
 
+Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve üç modül sunar:
+
+| Modül | Durum | İçerik |
+|---|---|---|
+| **Conta** | Hazır | Aşağıda ayrıntılı anlatılan conta tasarım uygulaması (Kolay / Uzman mod) |
+| **Malzeme seçimi ve kaplama/boya** | Geliştirme aşamasında | Alüminyum serileri (1xxx–7xxx) ve alaşımlar (1050A, 2024, 5083, 6060, 6061, 6082, 7075); çelikler (S235JR, S355J2, C45, 42CrMo4, 1.4301, 1.4404, 1.4305, 1.4542). Yoğunluk, akma/çekme, E, ısıl iletkenlik, sıcaklık; işlenebilirlik, kaynak, korozyon ve eloksal puanları; karşılaştırma grafiği; temper kodları; ağırlık hesabı. Kaplamalar: alodin (MIL-DTL-5541 Class 1A/3), eloksal ve sert eloksal (MIL-PRF-8625 Tip II/III), akımsız nikel, yaş ve toz boya, çinko, Zn-Ni, galvaniz, fosfat, brünür, pasivasyon. "Ne istiyorum?" ile sıralı öneri ve teknik resim notu oluşturucu |
+| **Cıvatalar ve tork değerleri** | Geliştirme aşamasında | M4–M16; 8.8, 10.9, 12.9 ve paslanmaz (tahmini) sınıflar; sürtünme µ 0,08–0,14. Sıkma torku ve ön yük (VDI 2230 tablosu), tork anahtarı aralığı, diş boyu, uyarılar (hidrojen gevrekliği, sıvama), teknik resim notu |
+
+Malzeme ve kaplama verileri `js/malzeme.js`, modül arayüzleri `js/moduller.js` dosyasındadır.
+
 Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
 
 ## Kolay mod / Uzman mod
