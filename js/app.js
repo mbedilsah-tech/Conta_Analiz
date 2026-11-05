@@ -9,7 +9,8 @@
 
   // ---------------- Durum ----------------
   const VARSAYILAN = {
-    hareket: 'statik', tip: 'oring', sekil: 'oring', emi: 'hayir', fGHz: 1, mod: 'conta',
+    hareket: 'statik', dHareket: 'oteleme', dKonum: 'mil', dAkiskan: 'hidrolik', dYon: 'tek', dShore: '70', dCs: '2.62', dCap: 20, dP: 50, dHiz: 0.2, dRpm: 300, dE: null, dBU: 'auto',
+    tip: 'oring', sekil: 'oring', emi: 'hayir', fGHz: 1, mod: 'conta',
     Tmin: -20, Tmax: 85, P: 1, yon: 'ic', ortam: ['hava', 'su'], govde: 'al', kapakZayif: false, metalTemas: true,
     siralama: 'bul', malz: null, shore: null,
     // O-ring → kanal
@@ -37,7 +38,7 @@
     tedSekme: 'ankara', kvAcik: null,
     // Modüller
     modul: 'ana',
-    mSekme: 'al', alSec: '6082', celikSec: 'S355J2', alOzellik: 'Rp', celikOzellik: 'Rp',
+    mSekme: 'al', alSeri: '6', celikGrup: 'yapi', alSec: '6082', celikSec: 'S355J2', alOzellik: 'Rp', celikOzellik: 'Rp',
     agSekil: 'levha', agA: 200, agB: 100, agT: 10, agD: 40, agL: 100, agEt: 3,
     kTaban: 'al', ist_iletken: false, ist_asinma: false, ist_disOrtam: false, ist_renk: false, ist_boyut: false, ist_ucuz: false,
     notMalz: '6082', notUrun: 'cubuk', notKap: 'eloksal', notMaske: true, notSonra: true, notTol: true, notKenar: true, notRohs: false, notDil2: 'tr',
@@ -85,8 +86,8 @@
   document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
 
   // ---------------- Bağlama ----------------
-  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip',
-    'modul', 'mSekme', 'alSec', 'celikSec', 'alOzellik', 'celikOzellik', 'agSekil', 'kTaban', 'ist_iletken', 'ist_asinma', 'ist_disOrtam', 'ist_renk', 'ist_boyut', 'ist_ucuz',
+  const YAPISAL = ['dHareket', 'dKonum', 'tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip',
+    'modul', 'mSekme', 'alSeri', 'celikGrup', 'alSec', 'celikSec', 'alOzellik', 'celikOzellik', 'agSekil', 'kTaban', 'ist_iletken', 'ist_asinma', 'ist_disOrtam', 'ist_renk', 'ist_boyut', 'ist_ucuz',
     'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil', 'tSekme', 'tTip', 'tHarf', 'tKalite', 'gelSinif', 'gelGeo'];
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-bind] > button');
@@ -153,6 +154,7 @@
     $$('[data-sel]').forEach(el => { if (S[el.dataset.sel] != null) el.value = S[el.dataset.sel]; });
     $$('[data-chk]').forEach(el => { el.checked = !!S[el.dataset.chk]; });
     document.body.dataset.modul = S.modul;
+    document.body.dataset.hareket = dinamikMi() ? 'dinamik' : 'statik';
     document.body.classList.toggle('kolay', S.arayuz === 'kolay');
     $('#gasketSekil').style.display = S.tip === 'gasket' ? '' : 'none';
     $('#emiAlan').style.display = emi() ? '' : 'none';
@@ -163,7 +165,7 @@
     const m = mat();
     const sekilAd = { oring: 'O-ring', yuvarlak: 'Dolu kordon', D: 'D-profil', tup: 'Tüp/P-profil', duz: 'Düz conta', sunger: 'Sünger' }[S.sekil];
     $('#ozet').innerHTML = [
-      `<span class="chip"><b>Statik</b></span>`,
+      `<span class="chip"><b>${dinamikMi() ? (S.dHareket === 'doner' ? 'Dinamik · döner' : 'Dinamik · öteleme') : 'Statik'}</b></span>`,
       `<span class="chip"><b>${sekilAd}</b></span>`,
       `<span class="chip">EMI <b>${emi() ? 'var' : 'yok'}</b></span>`,
       `<span class="chip"><b>${S.mod === 'conta' ? 'Conta → kanal' : 'Kanal → conta'}</b></span>`,
@@ -224,9 +226,15 @@
     return seg + `<div class="row4 mt">${num('Dm', 'Kanal eksen çapı Dm (mm)', 0.1, 'placeholder="opsiyonel"')}<div class="small" style="grid-column: span 3">Kanal orta çizgisinin çapı (çizimdeki kanal merkez çapı). Boş bırakırsanız yalnız kanal kesiti (derinlik/genişlik) hesaplanır. Girerseniz kanal iç/dış çapı ve gerekli O-ring iç çapı da verilir.</div></div>`;
   }
 
+  function dinamikMi() { return S.hareket === 'dinamik' && S.arayuz !== 'kolay'; }
   function renderKanalGirdi() {
     const el = $('#kanalGirdi');
     const lead = $('#kanalLead');
+    if (dinamikMi()) {
+      lead.textContent = 'Dinamik O-ring (öteleme veya döner mil): kanal ölçüleri, ekstrüzyon, hız ve malzeme kontrolü. Değerler Parker ORD 5700 dinamik tablolarına dayanır.';
+      el.innerHTML = window.DIN.girdi(S);
+      return;
+    }
     const tolSatir = `<div class="row4">${num('hTol', 'Derinlik toleransı ± (mm)')}${num('bTol', 'Genişlik toleransı + (mm)')}${num('g', 'Flanş boşluğu g (mm, temas=0)')}<div></div></div>`;
     if (S.tip === 'oring' && S.mod === 'conta') {
       lead.textContent = `O-ring kesitini seçin; 3 sıkıştırma oranı için yüz contası kanalı (${yonAd()}) hesaplanır.`;
@@ -322,6 +330,7 @@
 
   function renderKanalSonuc() {
     const el = $('#kanalSonuc');
+    if (dinamikMi()) { el.innerHTML = window.DIN.sonuc(S); return; }
     if (S.tip === 'oring' && S.mod === 'conta') {
       if (!(S.cs > 0)) { el.innerHTML = ''; return; }
       const r = C.contadanKanal({ sekil: 'oring', t: S.cs, tTol: S.csTol, g: S.g, hTol: S.hTol, bTol: S.bTol, emi: emi() });

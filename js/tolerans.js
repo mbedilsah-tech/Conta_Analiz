@@ -168,19 +168,40 @@
   // ---------- Arayüz ----------
   const mm = v => U().f(v / 1000, 3);
   const sg = v => (v > 0 ? '+' : v < 0 ? '−' : '') + U().f(Math.abs(v) / 1000, 3);
+  // İşleme seviyesine göre tıklanabilir tolerans sınıfları
+  const SEVIYE = [
+    { ad: 'İnce işleme', it: 'IT5–IT7', yontem: 'taşlama, raybalama, hassas tornalama',
+      delik: [['H6', 'çok hassas yuva'], ['H7', 'en yaygın delik'], ['G7', 'hassas kayar'], ['F7', 'yağlı yatak'], ['JS7', 'simetrik'], ['K7', 'ara geçme'], ['M7', 'sıkıca ara'], ['N7', 'hafif sıkı'], ['P7', 'pres'], ['R7', 'sıkı pres'], ['S7', 'çok sıkı pres']],
+      mil: [['h6', 'hassas mil'], ['g6', 'kayar'], ['f6', 'hassas dönen'], ['js6', 'simetrik'], ['k6', 'rulman iç bilezik'], ['m6', 'sıkıca ara'], ['n6', 'hafif sıkı'], ['p6', 'pres'], ['r6', 'sıkı pres'], ['s6', 'çok sıkı pres'], ['h5', 'çok hassas']] },
+    { ad: 'Orta işleme', it: 'IT8–IT10', yontem: 'normal tornalama, frezeleme',
+      delik: [['H8', 'genel yatak'], ['H9', 'serbest yuva'], ['H10', 'genel'], ['F8', 'boşluklu yatak'], ['E8', 'geniş boşluk'], ['E9', 'geniş boşluk'], ['D9', 'çok boşluklu'], ['D10', 'çok boşluklu']],
+      mil: [['h7', 'genel mil'], ['h8', 'genel'], ['h9', 'serbest mil'], ['f7', 'dönen mil'], ['f8', 'dönen mil'], ['e8', 'geniş boşluk'], ['e9', 'geniş boşluk'], ['d9', 'çok boşluklu']] },
+    { ad: 'Kaba işleme', it: 'IT11–IT12', yontem: 'delme, kaba tornalama, sac',
+      delik: [['H11', 'serbest delik'], ['H12', 'kaba delik'], ['D11', 'çok gevşek']],
+      mil: [['h11', 'kaba mil'], ['h12', 'çekme çubuk'], ['d11', 'çok gevşek']] }
+  ];
   function delikMilGirdi(s) {
     const { esc } = U();
     const delik = s.tTip === 'delik';
     const harfler = delik ? DELIK_HARF : MIL_HARF;
-    return `<div class="card"><h3>Delik mi, mil mi?</h3>
-      <div class="seg" data-bind="tTip"><button data-v="delik">Delik (iç çap) – BÜYÜK harf</button><button data-v="mil">Mil (dış çap) – küçük harf</button></div>
-      <div class="row4 mt">
-        <label class="buyuk">Nominal çap (mm)<input type="number" step="0.1" data-num="tCap"></label>
-        <label>Tolerans harfi<select data-sel="tHarf">${harfler.map(h => `<option value="${h}" ${h === s.tHarf ? 'selected' : ''}>${h}</option>`).join('')}</select></label>
-        <label>Kalite (IT)<select data-sel="tKalite">${KALITE.map(k => `<option value="${k}" ${String(k) === String(s.tKalite) ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
-        <div class="small">Harf: tolerans bölgesinin <b>yeri</b>. Sayı: tolerans bölgesinin <b>genişliği</b>. ${delik ? 'H deliğin alt sınırı tam nominaldir.' : 'h milin üst sınırı tam nominaldir.'}</div>
+    const secili = (delik ? s.tHarf.toUpperCase() : s.tHarf.toLowerCase()) + s.tKalite;
+    return `<div class="card"><h3>1 · Delik mi, mil mi?</h3>
+      <div class="row-inline">
+        <div class="seg" data-bind="tTip"><button data-v="delik">Delik (iç çap) – BÜYÜK harf</button><button data-v="mil">Mil (dış çap) – küçük harf</button></div>
+        <label class="buyuk" style="max-width:220px">Nominal çap (mm)<input type="number" step="0.1" data-num="tCap"></label>
       </div>
-      <div class="hizli">${(delik ? ['H7', 'H8', 'H9', 'H11', 'G7', 'F8', 'K7', 'N7', 'P7'] : ['h6', 'h7', 'h9', 'g6', 'f7', 'k6', 'n6', 'p6', 's6']).map(c => `<button class="mini" data-tsinif="${c}">${c}</button>`).join('')}</div>
+      <h3 class="mt">2 · İşleme hassasiyetine göre toleransı seçin</h3>
+      <div class="tsev">${SEVIYE.map((v, i) => `<div class="tsev-k s${i}">
+        <div class="tsev-bas"><b>${v.ad}</b><span>${v.it} · ${esc(v.yontem)}</span></div>
+        <div class="tsev-btn">${(delik ? v.delik : v.mil).map(([c, a]) => `<button class="${c === secili ? 'on' : ''}" data-tsinif="${c}" title="${esc(a)}"><b>${c}</b><small>${esc(a)}</small></button>`).join('')}</div>
+      </div>`).join('')}</div>
+      <details class="mt"><summary>Başka bir harf / kalite seç</summary>
+        <div class="row4 mt">
+          <label>Tolerans harfi<select data-sel="tHarf">${harfler.map(h => `<option value="${h}" ${h === s.tHarf ? 'selected' : ''}>${h}</option>`).join('')}</select></label>
+          <label>Kalite (IT)<select data-sel="tKalite">${KALITE.map(k => `<option value="${k}" ${String(k) === String(s.tKalite) ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
+          <div class="small" style="grid-column: span 2">Harf: tolerans bölgesinin <b>yeri</b>. Sayı: tolerans bölgesinin <b>genişliği</b>. ${delik ? 'H deliğin alt sınırı tam nominaldir.' : 'h milin üst sınırı tam nominaldir.'}</div>
+        </div>
+      </details>
     </div><div id="tolSonuc" class="sonuc"></div>`;
   }
   function delikMilSonuc(s) {

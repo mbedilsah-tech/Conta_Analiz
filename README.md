@@ -10,7 +10,8 @@ Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve ü�
 
 Malzeme ve kaplama verileri `js/malzeme.js`, modül arayüzleri `js/moduller.js
 js/tolerans.js     – delik/mil toleransları, geçmeler, ISO 2768
-js/topluluk.js     – yorumlar ve kullanıcı tedarikçileri` dosyasındadır.
+js/topluluk.js     – yorumlar ve kullanıcı tedarikçileri
+js/dinamik.js      – dinamik O-ring hesabı` dosyasındadır.
 
 Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
 
@@ -46,6 +47,12 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **Genel toleranslar** – ISO 2768-1 f/m/c/v (ince/orta/kaba/çok kaba) ve ISO 2768-2 H/K/L, antet notu
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
+
+## v0.9
+
+- **Dinamik conta (yalnız uzman mod)** – Proje girdilerinde "Dinamik" seçilince 2. sayfa: öteleme (mil/piston) ve döner mil; Parker ORD 5700 Design Chart 5-2 kanal ölçüleri, destek halkasına göre genişlik, FST ekstrüzyon kontrolü, döner hız–kesit sınırı, AS568 halka önerisi, dinamik malzeme tablosu, yüzey ve montaj kuralları
+- **Malzeme** – 19 alüminyum ve 18 çelik; seri / grup kartına tıklayınca altında o serinin malzemeleri
+- **Tolerans** – ince / orta / kaba işleme sütunlarında tıklanabilir tolerans sınıfları
 
 ## Topluluk (v0.8)
 

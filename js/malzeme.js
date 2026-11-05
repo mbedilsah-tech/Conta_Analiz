@@ -32,6 +32,9 @@
     roymech286: { kisa: 'Roymech ISO toleranslar', ad: 'Roymech – ISO 286 kullanım örnekleri (Ø40 H7 = +25/0, Ø40 g6 = −9/−25, 300 K7 = +16/−36), tipik geçmeler ve işleme yöntemi ↔ IT tablosu', url: 'https://www.roymech.co.uk/Useful_Tables/ISO_Tolerances/how-to-use-iso-tolerances/' },
     iso2768: { kisa: 'ISO 2768-1', ad: 'ISO 2768-1 – Ayrıca tolerans verilmemiş doğrusal ve açısal ölçüler için genel toleranslar: f (ince), m (orta), c (kaba), v (çok kaba)', url: 'https://amesweb.info/fits-tolerances/iso-2768-linear-dimensions-tolerances.aspx' },
     iso27682: { kisa: 'ISO 2768-2', ad: 'ISO 2768-2 – Geometrik genel toleranslar H, K, L (doğrusallık/düzlemsellik, diklik, simetri, salgı); geri çekilmiş, yerini ISO 22081 almıştır', url: 'https://www.modulusmetal.com/iso-2768-1-and-iso-2768-2-tolerances' },
+    en10087: { kisa: 'EN 10087', ad: 'EN 10087 – Otomat çelikleri (11SMn30, 11SMnPb30 …): kimyasal bileşim ve mekanik özellikler', url: '' },
+    iso4957: { kisa: 'ISO 4957', ad: 'ISO 4957 – Takım çelikleri (1.2312, 1.2379 …)', url: '' },
+    en1563: { kisa: 'EN 1563', ad: 'EN 1563 – Küresel grafitli (sünek) dökme demir: EN-GJS-400-15 vb.', url: '' },
     iso1101: { kisa: 'ISO 1101', ad: 'ISO 1101 – Geometrik ürün spesifikasyonu (GPS): form, yönelim, konum ve salgı toleransları', url: '' },
     loctiteTL: { kisa: 'Loctite vida sabitleyiciler', ad: 'Henkel Loctite vida sabitleyiciler: 222 (düşük mukavemet, küçük vidalar), 243 (orta mukavemet, elle sökülebilir), 270 (yüksek mukavemet, kalıcı)', url: 'https://www.henkel-adhesives.com/' }
   };
@@ -72,7 +75,7 @@
     { s: '1xxx', el: 'Saf Al (≥ %99)', isil: false, ozet: 'İletken, kolay şekillenir, korozyona çok dayanıklı; dayanımı çok düşük.', ornek: '1050A, 1100' },
     { s: '2xxx', el: 'Bakır (Cu)', isil: true, ozet: 'Yüksek dayanım ve yorulma; korozyona zayıf, kaynaklanmaz.', ornek: '2024, 2014, 2017' },
     { s: '3xxx', el: 'Mangan (Mn)', isil: false, ozet: 'Orta-düşük dayanım; iyi şekillendirme. Kaplar, ısı eşanjörleri.', ornek: '3003, 3103' },
-    { s: '4xxx', el: 'Silisyum (Si)', isil: false, ozet: 'Kaynak teli ve döküm alaşımları.', ornek: '4043, 4047' },
+    { s: '4xxx', el: 'Silisyum (Si)', isil: false, ozet: 'Kaynak teli, döküm ve dövme piston alaşımları; düşük ısıl genleşme. (4032 ısıl işlemle sertleşir.)', ornek: '4043, 4047, 4032' },
     { s: '5xxx', el: 'Magnezyum (Mg)', isil: false, ozet: 'Deniz suyu korozyonu ve kaynak çok iyi; soğuk işlemle sertleşir.', ornek: '5083, 5754, 5052' },
     { s: '6xxx', el: 'Mg + Si', isil: true, ozet: 'Dengeli: iyi dayanım, işleme, kaynak, eloksal. Ekstrüzyon alaşımı.', ornek: '6060, 6061, 6082' },
     { s: '7xxx', el: 'Çinko (Zn)', isil: true, ozet: 'En yüksek dayanım, çok iyi işlenir; kaynaklanmaz, SCC riski.', ornek: '7075, 7050, 7020' }
@@ -103,12 +106,83 @@
       p: { isl: 3, kay: 3, kor: 4, ist: 5, sek: 2 }, bul: 3, mal: 4, manyetik: true, kullanim: 'Yüksek dayanım + paslanmazlık gereken mil, valf, havacılık bağlantı parçası. 17-4PH.', not: 'Yaşlandırma ile 800–1000 MPa akma. Manyetiktir. Isıl işlem durumu (ör. P800, H1150) çizimde belirtilmelidir.' }
   ];
   const CELIK_GRUP = [
-    { g: 'Yapı çelikleri', ozet: 'Ucuz, kaynaklı konstrüksiyon. Paslanır, kaplama ister.', ornek: 'S235JR, S355J2' },
-    { g: 'Islah çelikleri', ozet: 'Isıl işlemle yüksek dayanım ve sertlik; mil, dişli, pim.', ornek: 'C45, 42CrMo4' },
-    { g: 'Ostenitik paslanmaz', ozet: 'Paslanmaz, manyetik değil, kaynaklanır; işlemesi zordur.', ornek: '1.4301 (304), 1.4404 (316L)' },
-    { g: 'Kolay işlenen paslanmaz', ozet: 'Seri talaşlı imalat için; kaynaklanmaz.', ornek: '1.4305 (303)' },
-    { g: 'Çökelme sertleşmeli paslanmaz', ozet: 'Paslanmaz + yüksek dayanım; yaşlandırma ile sertleşir.', ornek: '1.4542 (17-4PH)' }
+    { id: 'yapi', g: 'Yapı çelikleri', ozet: 'Ucuz, kaynaklı konstrüksiyon. Paslanır, kaplama ister.', ornek: 'S235JR, S275JR, S355J2' },
+    { id: 'islah', g: 'Islah çelikleri', ozet: 'Isıl işlemle yüksek dayanım ve sertlik; mil, dişli, pim.', ornek: 'C45, 42CrMo4, 34CrNiMo6' },
+    { id: 'sement', g: 'Sementasyon çelikleri', ozet: 'Yüzeyi sert (58–62 HRC), çekirdeği tok; dişli, kam, pim.', ornek: '16MnCr5' },
+    { id: 'otomat', g: 'Otomat çelikleri', ozet: 'Seri talaşlı imalat için en kolay işlenen çelikler; kaynaklanmaz.', ornek: '11SMnPb30' },
+    { id: 'takim', g: 'Takım ve kalıp çelikleri', ozet: 'Kalıp, zımba, kesici; sertleştirilerek kullanılır.', ornek: '1.2312, 1.2379' },
+    { id: 'ostenitik', g: 'Ostenitik paslanmaz', ozet: 'Paslanmaz, manyetik değil, kaynaklanır; işlemesi zordur.', ornek: '1.4301 (304), 1.4307 (304L), 1.4404 (316L)' },
+    { id: 'kolay', g: 'Kolay işlenen paslanmaz', ozet: 'Seri talaşlı imalat için; kaynaklanmaz.', ornek: '1.4305 (303)' },
+    { id: 'martenzit', g: 'Martenzitik paslanmaz', ozet: 'Sertleştirilebilir paslanmaz: bıçak, valf, pompa mili. Manyetiktir.', ornek: '1.4021 (420)' },
+    { id: 'dubleks', g: 'Dubleks paslanmaz', ozet: '304/316’nın yaklaşık 2 katı akma, klorüre çok dayanıklı.', ornek: '1.4462 (2205)' },
+    { id: 'cokelme', g: 'Çökelme sertleşmeli paslanmaz', ozet: 'Paslanmaz + yüksek dayanım; yaşlandırma ile sertleşir.', ornek: '1.4542 (17-4PH)' },
+    { id: 'dokme', g: 'Dökme demir', ozet: 'Karmaşık gövdeler için döküm; titreşim sönümü iyi, ucuz.', ornek: 'EN-GJS-400-15' }
   ];
+  const GID = { 'S235JR': 'yapi', 'S355J2': 'yapi', 'C45': 'islah', '42CrMo4': 'islah', '1.4301': 'ostenitik', '1.4404': 'ostenitik', '1.4305': 'kolay', '1.4542': 'cokelme' };
+  CELIK.forEach(c => { c.gid = GID[c.kod]; });
+  CELIK.push(
+    { kod: 'S275JR', wnr: '1.0044', gid: 'yapi', grup: 'Yapı çeliği', std: 'EN 10025-2', ref: 'en10025', rho: 7.85, E: 210, Rm: 480, Rp: 275, A: 23, k: 50, cte: 12, tMax: 350,
+      p: { isl: 3, kay: 5, kor: 1, ist: 1, sek: 5 }, bul: 4, mal: 1, manyetik: true, kullanim: 'S235 ile S355 arası yük taşıyan kaynaklı şase, kolon, kiriş.', not: 'Eski St44 karşılığı. S235 yetmeyip S355 gerekmeyen yerlerde.' },
+    { kod: '34CrNiMo6', wnr: '1.6582', gid: 'islah', grup: 'Islah çeliği', std: 'EN ISO 683-2', ref: 'en683', rho: 7.85, E: 210, Rm: 1100, Rp: 900, A: 10, k: 38, cte: 12, tMax: 400,
+      p: { isl: 2, kay: 1, kor: 1, ist: 5, sek: 2 }, bul: 3, mal: 3, manyetik: true, kullanim: 'Büyük kesitli, çok yüksek yüklü mil, krank, dişli ve savunma parçaları.', not: 'Nikel sayesinde büyük çaplarda da çekirdeğe kadar sertleşir; 42CrMo4’ün yetmediği kalın kesitlerde. AISI 4340 benzeri.' },
+    { kod: '16MnCr5', wnr: '1.7131', gid: 'sement', grup: 'Sementasyon çeliği', std: 'EN ISO 683-3', ref: 'en683', rho: 7.85, E: 210, Rm: 1000, Rp: 700, A: 10, k: 44, cte: 12, tMax: 200,
+      p: { isl: 4, kay: 2, kor: 1, ist: 5, sek: 3 }, bul: 5, mal: 2, manyetik: true, kullanim: 'Dişli, kam, pim, aşınmaya maruz miller; yüzeyi sert çekirdeği tok olması gereken parçalar.', not: 'Değerler sementasyon + sertleştirme sonrası çekirdek içindir; yüzey 58–62 HRC. Çizimde sertlik derinliği (ör. CHD 0,8–1,0 mm) yazılmalı.' },
+    { kod: '11SMnPb30', wnr: '1.0718', gid: 'otomat', grup: 'Otomat çeliği', std: 'EN 10087', ref: 'en10087', rho: 7.85, E: 210, Rm: 460, Rp: 375, A: 8, k: 52, cte: 12, tMax: 300,
+      p: { isl: 5, kay: 1, kor: 1, ist: 1, sek: 2 }, bul: 5, mal: 1, manyetik: true, kullanim: 'Otomat tornada seri üretilen burç, pim, ara parça, bağlantı parçaları.', not: 'Kükürt ve kurşun talaşı kırar: en kolay işlenen çelik. Kaynaklanmaz, yüksek yük için uygun değil. Kurşun RoHS istisnalı; kurşunsuz muadili 11SMn30.' },
+    { kod: '1.2312', wnr: '40CrMnMoS8-6', gid: 'takim', grup: 'Takım/kalıp çeliği', std: 'ISO 4957', ref: 'iso4957', rho: 7.85, E: 210, Rm: 1000, Rp: 850, A: 12, k: 34, cte: 12.5, tMax: 300,
+      p: { isl: 4, kay: 2, kor: 1, ist: 4, sek: 2 }, bul: 4, mal: 3, manyetik: true, kullanim: 'Plastik enjeksiyon kalıp gövdeleri, fikstür ve kalıp plakaları.', not: 'Ön sertleştirilmiş (~300 HB) satılır, ısıl işlem gerektirmeden işlenir. Kükürtlü olduğu için iyi işlenir, parlatma sınırlıdır. P20+S karşılığı.' },
+    { kod: '1.2379', wnr: 'X153CrMoV12', gid: 'takim', grup: 'Takım/kalıp çeliği', std: 'ISO 4957', ref: 'iso4957', rho: 7.7, E: 210, Rm: 850, Rp: 600, A: 10, k: 20, cte: 10.5, tMax: 425,
+      p: { isl: 2, kay: 1, kor: 2, ist: 5, sek: 1 }, bul: 4, mal: 4, manyetik: true, kullanim: 'Kesme ve zımbalama kalıbı, zımba, ovalama, aşınma plakası.', not: 'Mekanik değerler tavlı haldedir; sertleştirilince 58–62 HRC. Aşınma dayanımı çok yüksek, tokluğu düşük. Sertleştirme sonrası taşlama veya tel erozyon gerekir. AISI D2.' },
+    { kod: '1.4307', wnr: 'X2CrNi18-9', gid: 'ostenitik', grup: 'Paslanmaz (ostenitik)', std: 'EN 10088-3', ref: 'en10088', rho: 7.9, E: 200, Rm: 600, Rp: 220, A: 45, k: 15, cte: 16.5, tMax: 800,
+      p: { isl: 2, kay: 5, kor: 4, ist: 1, sek: 5 }, bul: 5, mal: 3, manyetik: false, kullanim: 'Kaynaklı paslanmaz konstrüksiyon, tank, boru. AISI 304L.', not: 'Düşük karbonlu 304: kaynak sonrası taneler arası korozyona dayanıklı. Kaynaklı parçalarda 1.4301 yerine tercih edin.' },
+    { kod: '1.4021', wnr: 'X20Cr13', gid: 'martenzit', grup: 'Paslanmaz (martenzitik)', std: 'EN 10088-3', ref: 'en10088', rho: 7.7, E: 215, Rm: 750, Rp: 550, A: 12, k: 30, cte: 10.5, tMax: 450,
+      p: { isl: 3, kay: 1, kor: 2, ist: 5, sek: 2 }, bul: 4, mal: 2, manyetik: true, kullanim: 'Pompa ve valf milleri, kesici, cerrahi alet, aşınan paslanmaz parçalar. AISI 420.', not: 'Değerler ıslah (+QT) halde. Sertleştirilebilir ama korozyon dayanımı 304’ten belirgin şekilde düşük. Manyetiktir; kaynaklanmaz.' },
+    { kod: '1.4462', wnr: 'X2CrNiMoN22-5-3', gid: 'dubleks', grup: 'Paslanmaz (dubleks)', std: 'EN 10088-3', ref: 'en10088', rho: 7.8, E: 200, Rm: 750, Rp: 500, A: 25, k: 15, cte: 13, tMax: 280,
+      p: { isl: 2, kay: 4, kor: 5, ist: 1, sek: 3 }, bul: 3, mal: 4, manyetik: true, kullanim: 'Deniz suyu, kimya ve petrol ekipmanı, yüksek yüklü paslanmaz parçalar. 2205.', not: '316L’nin yaklaşık 2 katı akma; klorür ve gerilmeli korozyona çok dayanıklı. ~280 °C üzerinde gevrekleşme riski. İşlemesi 316L’den zor.' },
+    { kod: 'EN-GJS-400-15', wnr: '5.3106', gid: 'dokme', grup: 'Küresel grafitli dökme demir', std: 'EN 1563', ref: 'en1563', rho: 7.1, E: 169, Rm: 400, Rp: 250, A: 15, k: 36, cte: 12.5, tMax: 350,
+      p: { isl: 4, kay: 1, kor: 2, ist: 2, sek: 1 }, bul: 4, mal: 1, manyetik: true, kullanim: 'Pompa, valf ve dişli kutusu gövdeleri, makine tezgâhı parçaları, karmaşık döküm gövdeler.', not: 'Sünek döküm: gri dökme demire göre çok daha tok. İyi işlenir, titreşim sönümü iyidir. Kaynak önerilmez. Eski GGG40.' }
+  );
+  // Ek alüminyum alaşımları
+  ALUMINYUM.push(
+    { kod: '2011', temper: 'T3', en: 'EN AW-2011', sembol: 'AlCu6BiPb', wnr: '3.1655', seri: 2, rho: 2.83, E: 70, Rm: 379, Rp: 296, A: 15, k: 151, cte: 22.9, tMax: 150,
+      p: { isl: 5, kay: 1, kor: 1, elk: 2, sek: 2 }, bul: 4, mal: 3, urun: 'Çekme çubuk',
+      kullanim: 'Otomat tornada seri üretilen vida, burç, pim, bağlantı parçaları.', not: 'Alüminyumun “otomat” alaşımı: talaş kırılır, en kolay işlenen Al. Korozyona zayıf, kaynaklanmaz, eloksal kalitesi düşük. Kurşunlu; kurşunsuz muadili 2033/6026.', sicak: '~150 °C üzerinde dayanım düşer.' },
+    { kod: '2014', temper: 'T6 / T651', en: 'EN AW-2014', sembol: 'AlCu4SiMg', wnr: '3.1255', seri: 2, rho: 2.80, E: 73, Rm: 483, Rp: 414, A: 13, k: 154, cte: 23.0, tMax: 150,
+      p: { isl: 4, kay: 1, kor: 1, elk: 2, sek: 2 }, bul: 3, mal: 4, urun: 'Dövme, çubuk, plaka',
+      kullanim: 'Dövme havacılık ve otomotiv parçaları, ağır yüklü braketler, jant.', not: 'Yüksek dayanım ve sertlik; dövmeye çok uygun. Bakır nedeniyle mutlaka koruyucu kaplama ister.', sicak: '~150 °C’ye kadar dayanımını iyi korur.' },
+    { kod: '2017A', temper: 'T4 / T451', en: 'EN AW-2017A', sembol: 'AlCu4MgSi(A)', wnr: '3.1325', seri: 2, rho: 2.79, E: 72, Rm: 425, Rp: 275, A: 13, k: 134, cte: 23.6, tMax: 150,
+      p: { isl: 4, kay: 1, kor: 2, elk: 3, sek: 3 }, bul: 4, mal: 3, urun: 'Çubuk, plaka',
+      kullanim: 'Genel yüksek dayanımlı makine parçaları, perçin, cıvata; “Avional / Dural”.', not: 'Türkiye’de çubukta sık bulunan 2xxx alaşımı. 6082’den belirgin şekilde dayanıklı, iyi işlenir; korozyona zayıf.', sicak: '~150 °C üzerinde dayanım düşer.' },
+    { kod: '3003', temper: 'H14', en: 'EN AW-3003', sembol: 'AlMn1Cu', wnr: '3.0517', seri: 3, rho: 2.73, E: 69, Rm: 150, Rp: 145, A: 8, k: 159, cte: 23.2, tMax: 150,
+      p: { isl: 2, kay: 5, kor: 5, elk: 4, sek: 5 }, bul: 4, mal: 1, urun: 'Levha, şerit, folyo',
+      kullanim: 'Isı eşanjörü, radyatör, çatı ve cephe kaplama, kap, depo, sac kutu.', not: '1xxx’ten yaklaşık %20 daha dayanıklı, şekillendirmesi çok iyi. Isıl işlemle sertleşmez.', sicak: 'Isıl işlemsiz; dayanım zaten düşüktür.' },
+    { kod: '4032', temper: 'T6', en: 'EN AW-4032', sembol: 'AlSi12,5MgCuNi', wnr: '–', seri: 4, rho: 2.68, E: 79, Rm: 380, Rp: 315, A: 9, k: 154, cte: 19.4, tMax: 200,
+      p: { isl: 3, kay: 1, kor: 3, elk: 1, sek: 1 }, bul: 2, mal: 3, urun: 'Dövme, çubuk',
+      kullanim: 'Dövme piston, kompresör parçaları; düşük ısıl genleşme ve aşınma dayanımı gereken yerler.', not: 'Yüksek silisyum: ısıl genleşmesi en düşük Al alaşımlarından, aşınmaya dayanıklı. Eloksal gri ve kalitesiz; takım aşındırır.', sicak: 'Yüksek sıcaklıkta dayanımını iyi korur (~200 °C).' },
+    { kod: '5005', temper: 'H14', en: 'EN AW-5005', sembol: 'AlMg1(B)', wnr: '3.3315', seri: 5, rho: 2.70, E: 69, Rm: 159, Rp: 152, A: 6, k: 200, cte: 23.8, tMax: 65,
+      p: { isl: 2, kay: 5, kor: 5, elk: 5, sek: 4 }, bul: 4, mal: 1, urun: 'Levha',
+      kullanim: 'Dekoratif eloksallı sac, cephe paneli, ön panel, isim plakası.', not: 'Eloksal kalitesi en iyi sac alaşımlarından; renk tonu homojen. Dayanım düşük.', sicak: 'Isıl işlemsiz.' },
+    { kod: '5052', temper: 'H32', en: 'EN AW-5052', sembol: 'AlMg2,5', wnr: '3.3523', seri: 5, rho: 2.68, E: 70, Rm: 228, Rp: 193, A: 12, k: 138, cte: 23.8, tMax: 65,
+      p: { isl: 2, kay: 5, kor: 5, elk: 4, sek: 4 }, bul: 4, mal: 2, urun: 'Levha',
+      kullanim: 'Büküm sac muhafaza, elektronik kutu, yakıt tankı, deniz ortamı sac parçaları.', not: 'Bükülebilen sacta en yaygın tercih: iyi dayanım, çok iyi korozyon ve büküm. 6061 sac bükümde çatlarken 5052 çatlamaz.', sicak: '65 °C üzerinde uzun süre kalırsa gerilmeli korozyona hassaslaşabilir.' },
+    { kod: '5754', temper: 'H111', en: 'EN AW-5754', sembol: 'AlMg3', wnr: '3.3535', seri: 5, rho: 2.67, E: 70, Rm: 215, Rp: 100, A: 18, k: 147, cte: 23.9, tMax: 65,
+      p: { isl: 2, kay: 5, kor: 5, elk: 4, sek: 5 }, bul: 5, mal: 2, urun: 'Levha, gözyaşı sac',
+      kullanim: 'Avrupa’da 5052’nin muadili: sac muhafaza, araç üst yapısı, tank, gözyaşı (baklava) sac.', not: 'Türkiye’de sacta en kolay bulunan 5xxx alaşımı. Çok iyi kaynak, büküm ve korozyon.', sicak: '65 °C üzerinde uzun süre kalırsa gerilmeli korozyona hassaslaşabilir.' },
+    { kod: '6063', temper: 'T6', en: 'EN AW-6063', sembol: 'AlMg0,7Si', wnr: '–', seri: 6, rho: 2.70, E: 69, Rm: 241, Rp: 214, A: 12, k: 200, cte: 23.4, tMax: 150,
+      p: { isl: 3, kay: 4, kor: 5, elk: 5, sek: 4 }, bul: 5, mal: 1, urun: 'Ekstrüzyon profil, boru',
+      kullanim: 'Mimari profil, soğutucu (heatsink), boru, karmaşık kesitli ince cidarlı profiller.', not: '6060’tan biraz daha dayanıklı ekstrüzyon alaşımı; ısıl iletkenliği yüksek, eloksal görünümü çok iyi.', sicak: '~150 °C üzerinde T6 dayanımı düşmeye başlar.' },
+    { kod: '6005A', temper: 'T6', en: 'EN AW-6005A', sembol: 'AlSiMg(A)', wnr: '3.3210', seri: 6, rho: 2.70, E: 69, Rm: 270, Rp: 225, A: 8, k: 180, cte: 23.5, tMax: 150,
+      p: { isl: 3, kay: 4, kor: 4, elk: 4, sek: 3 }, bul: 3, mal: 2, urun: 'Ekstrüzyon profil',
+      kullanim: 'Yapısal ince cidarlı profiller: raylı araç, merdiven, iskele, sanayi profilleri.', not: '6063 ile 6082 arası dayanım; ince cidarlı karmaşık profilleri 6082’den kolay ekstrüde edilir.', sicak: '~150 °C üzerinde T6 dayanımı düşmeye başlar.' },
+    { kod: '7020', temper: 'T6', en: 'EN AW-7020', sembol: 'AlZn4,5Mg1', wnr: '3.4335', seri: 7, rho: 2.78, E: 70, Rm: 350, Rp: 280, A: 10, k: 140, cte: 23.1, tMax: 120,
+      p: { isl: 4, kay: 4, kor: 3, elk: 3, sek: 3 }, bul: 3, mal: 3, urun: 'Plaka, profil',
+      kullanim: 'Kaynaklı yüksek dayanımlı yapılar: askeri köprü, zırhlı araç gövdesi, bisiklet kadrosu.', not: 'Kaynaklanabilen tek yaygın 7xxx alaşımı; kaynak bölgesi oda sıcaklığında kendiliğinden kısmen yaşlanıp dayanım kazanır.', sicak: '~120 °C üzerinde dayanım düşer.' },
+    { kod: '7050', temper: 'T7451', en: 'EN AW-7050', sembol: 'AlZn6CuMgZr', wnr: '3.4144', seri: 7, rho: 2.83, E: 72, Rm: 524, Rp: 469, A: 11, k: 157, cte: 23.5, tMax: 120,
+      p: { isl: 5, kay: 1, kor: 3, elk: 3, sek: 1 }, bul: 2, mal: 5, urun: 'Kalın plaka',
+      kullanim: 'Kalın kesitli havacılık parçaları: kanat bağlantıları, gövde çerçeveleri.', not: 'Kalın plakada 7075’ten daha iyi dayanım–tokluk–SCC dengesi. T7451 aşırı yaşlandırılmış ve gerilim giderilmiştir.', sicak: '~120 °C üzerinde dayanım düşer.' }
+  );
+  ALUMINYUM.sort((a, b) => a.seri - b.seri || a.kod.localeCompare(b.kod));
+
 
   // ---------- Kaplama / boya ----------
   // taban: al | celik | paslanmaz ; puanlar 1–5: kor (korozyon), asi (aşınma), mal (maliyet: 1 ucuz)

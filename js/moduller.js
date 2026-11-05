@@ -117,15 +117,23 @@
     const s = S();
     const L = al ? V.ALUMINYUM : V.CELIK;
     const secKey = al ? 'alSec' : 'celikSec', ozKey = al ? 'alOzellik' : 'celikOzellik';
-    const m = L.find(x => x.kod === s[secKey]) || L[0];
+    const grpKey = al ? 'alSeri' : 'celikGrup';
+    const uyeMi = x => al ? String(x.seri) === String(s.alSeri) : x.gid === s.celikGrup;
+    let m = L.find(x => x.kod === s[secKey]) || L[0];
+    if (!s[grpKey] || !L.some(uyeMi)) { s[grpKey] = al ? String(m.seri) : m.gid; }
+    if (!uyeMi(m)) { m = L.find(uyeMi) || m; s[secKey] = m.kod; U().save(); }
     const OZ = al ? AL_OZ : CE_OZ;
     const oz = OZ[s[ozKey]] ? s[ozKey] : 'Rp';
+    const grup = al ? V.AL_SERI.find(x => x.s[0] === String(s.alSeri)) : V.CELIK_GRUP.find(x => x.id === s.celikGrup);
+    const uyeler = L.filter(uyeMi);
     const rehber = al
-      ? `<div class="seri">${V.AL_SERI.map(x => `<div class="seri-k ${String(m.seri) === x.s[0] ? 'on' : ''}"><b>${x.s}</b><span class="el">${esc(x.el)}</span><span class="small">${esc(x.ozet)}</span><span class="isil">${x.isil ? 'Isıl işlemle sertleşir' : 'Isıl işlem yok'}</span><span class="small">ör. ${esc(x.ornek)}</span></div>`).join('')}</div>`
-      : `<div class="seri">${V.CELIK_GRUP.map(x => `<div class="seri-k ${m.grup.startsWith(x.g.split(' ')[0]) || (x.g.startsWith('Ostenitik') && m.grup === 'Paslanmaz (ostenitik)') || (x.g.startsWith('Kolay') && m.grup.includes('kolay')) || (x.g.startsWith('Çökelme') && m.grup.includes('çökelme')) ? 'on' : ''}"><b>${esc(x.g)}</b><span class="small">${esc(x.ozet)}</span><span class="small">ör. ${esc(x.ornek)}</span></div>`).join('')}</div>`;
-    return `<div class="card"><h3>${al ? 'Alüminyum serileri – ilk rakam ana alaşım elementini gösterir' : 'Çelik grupları'}</h3>${rehber}</div>
-      <div class="card"><h3>${al ? 'Alaşım seçin' : 'Çelik seçin'}</h3>
-        <div class="seg wrap" data-bind="${secKey}">${L.map(x => `<button data-v="${x.kod}">${esc(x.kod)}</button>`).join('')}</div>
+      ? `<div class="seri" data-bind="alSeri">${V.AL_SERI.map(x => { const n = L.filter(a => String(a.seri) === x.s[0]).length; return `<button class="seri-k" data-v="${x.s[0]}" ${n ? '' : 'disabled'}><b>${x.s}</b><span class="el">${esc(x.el)}</span><span class="small">${esc(x.ozet)}</span><span class="isil">${x.isil ? 'Isıl işlemle sertleşir' : 'Isıl işlem yok'}</span><span class="small sayi">${n ? n + ' alaşım ›' : 'listede yok'}</span></button>`; }).join('')}</div>`
+      : `<div class="seri" data-bind="celikGrup">${V.CELIK_GRUP.map(x => `<button class="seri-k" data-v="${x.id}"><b>${esc(x.g)}</b><span class="small">${esc(x.ozet)}</span><span class="small sayi">${L.filter(c => c.gid === x.id).length} çelik ›</span></button>`).join('')}</div>`;
+    return `<div class="card"><h3>${al ? 'Alüminyum serileri – ilk rakam ana alaşım elementini gösterir' : 'Çelik grupları'} <span class="small">(birine tıklayın)</span></h3>${rehber}
+        <div class="seri-alt">
+          <div class="seri-alt-bas"><b>${al ? esc(grup.s) + ' serisi · ' + esc(grup.el) : esc(grup.g)}</b> <span class="small">– ${uyeler.length} ${al ? 'alaşım' : 'çelik'}, birini seçin</span></div>
+          <div class="seg wrap" data-bind="${secKey}">${uyeler.map(x => `<button data-v="${x.kod}">${esc(x.kod)}${al ? `<small> ${esc(x.temper.split(' ')[0])}</small>` : ''}</button>`).join('')}</div>
+        </div>
       </div>
       ${malzemeSecimKart(m, al)}
       <div class="card"><h3>Karşılaştır</h3>
