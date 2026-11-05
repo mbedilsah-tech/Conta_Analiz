@@ -6,7 +6,9 @@ Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalış
 
 1. **Proje girdileri**: Statik/dinamik (dinamik sonraki sürümde), O-ring / gasket (dolu kordon, D-profil, tüp, düz, sünger), EMI var/yok, tasarım yönü, sıcaklık, basınç ve yönü, ortam, gövde malzemesi.
 2. **Kanal & sıkıştırma**
-   - *Contayı biliyorum → kanal öner*: 3 sıkıştırma oranı (düşük / nominal / yüksek) için kanal derinliği, genişliği, kanal çapları, toleranslı en kötü durum sıkıştırması ve kanal doluluğu.
+   - *Contayı biliyorum → kanal öner*: Yalnızca O-ring kesiti girilir; 3 sıkıştırma oranı (düşük / nominal / yüksek) için kanal derinliği, genişliği, toleranslı en kötü durum sıkıştırması ve kanal doluluğu hesaplanır.
+   - **Kanal yolu**: *Dairesel kanal* için eksen çapı Dm, *şekilli kanal* için A×B ölçüleri ve köşe radyüsü R girilir. Uygulama gerekli O-ring iç çapını hesaplar. R için 3d alt sınır, 6d öneri olarak verilir.
+   - **Detaylar (opsiyonel)**: AS568 numarası veya belirli bir O-ring iç çapı, kesit/kanal toleransları, flanş boşluğu ve montaj gerilmesi bu bölümdedir. AS568 karşılığı yalnızca bilgi amaçlı gösterilir.
    - *Kanalı biliyorum → conta öner*: uygun O-ring kesitleri ve en yakın AS568 ölçüsü; gasket için gerekli kalınlık ve en yakın stok kalınlık.
    - Sıkıştırma limiti (compression limit): izin verilen en yüksek ve en düşük sıkıştırma, metal-metal temas veya stoper/burç önerisi.
 3. **Malzeme & Shore A**: Sıcaklık ve ortam uyumuna göre filtreleme. Sıralama ölçütü seçilebilir: piyasada bulunurluk, ortam uyumu veya maliyet. Basınç ve kapak rijitliğine göre Shore A önerisi verilir. EMI seçiliyse iletken elastomerler (Ag/Al, Ni/C, Ni/Al, Ag/Cu) listelenir.
@@ -15,6 +17,12 @@ Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalış
 6. **Teknik resim notu**: ASTM D2000 kod oluşturucu ve TR/EN not metni (ISO 3601, ISO 3302-1, ISO 2230, MIL-DTL-83528, MIL-DTL-5541, yağlayıcı ve yapıştırma notları).
 7. **Ankara tedarikçileri**: OSTİM firma rehberi ve distribütör sayfalarından derlenen iletişim bilgileri.
 8. **Referanslar**: Parker ORD 5700, Parker Chomerics el kitapları, ASTM D2000, AS568, ISO 3601, SAE ARP1231 ve diğer kaynaklar.
+
+## Ayarlar
+
+Sağ üstteki ⚙ **Ayarlar** panelinden:
+- Değer değiştirildiğinde ölçüler yenilenirken dönen halka animasyonu açılıp kapatılabilir; süresi de seçilebilir.
+- "Detaylar" bölümlerinin her zaman açık gelmesi sağlanabilir.
 
 ## Dosya yapısı
 

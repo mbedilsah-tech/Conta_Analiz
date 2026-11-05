@@ -15,7 +15,7 @@
         <span class="sub">Statik conta tasarım yardımcısı · v0.1</span>
       </div>
     </div>
-    <div class="ozet" id="ozet"></div>
+    <div class="topright"><div class="ozet" id="ozet"></div><button class="gear" id="ayarAc" title="Ayarlar">⚙ Ayarlar</button></div>
   </header>
 
   <div class="layout">
@@ -133,7 +133,7 @@
         <h2>Kanal &amp; sıkıştırma</h2>
         <p class="lead" id="kanalLead"></p>
         <div class="card" id="kanalGirdi"></div>
-        <div id="kanalSonuc"></div>
+        <div id="kanalSonuc" class="sonuc"></div>
       </section>
 
       <!-- 3. MALZEME -->
@@ -150,8 +150,8 @@
           </label>
           <label class="chk"><input type="checkbox" id="uygunsuzGoster"> Uygun olmayanları da göster</label>
         </div>
-        <div id="malzemeListe"></div>
-        <div id="shoreKart"></div>
+        <div id="malzemeListe" class="sonuc"></div>
+        <div id="shoreKart" class="sonuc"></div>
       </section>
 
       <!-- 4. KURALLAR -->
@@ -167,9 +167,9 @@
             <label>Conta çevre uzunluğu (mm)<input type="number" data-num="cevre"></label>
             <label>Kapak kalınlığı (mm)<input type="number" step="0.5" data-num="kapakT"></label>
           </div>
-          <div id="civataSonuc"></div>
+          <div id="civataSonuc" class="sonuc"></div>
         </div>
-        <div id="kuralListe"></div>
+        <div id="kuralListe" class="sonuc"></div>
       </section>
 
       <!-- 5. YAPIŞTIRMA -->
@@ -182,7 +182,7 @@
           <label>Maks. sıcaklık (°C)<input type="number" data-num="Tmax"></label>
           <label class="chk"><input type="checkbox" data-chk="iletkenYap"> Elektriksel iletken bağ gerekli (EMI)</label>
         </div>
-        <div id="yapListe"></div>
+        <div id="yapListe" class="sonuc"></div>
         <div class="card info">
           <h3>Uygulama ipuçları</h3>
           <ul>
@@ -215,7 +215,7 @@
               <button class="primary" id="kopyala">Kopyala</button>
             </div>
           </div>
-          <pre id="notCikti" class="notbox"></pre>
+          <div class="sonuc"><pre id="notCikti" class="notbox"></pre></div>
         </div>
       </section>
 
@@ -224,7 +224,7 @@
         <h2>Ankara’da conta tedarikçileri</h2>
         <p class="lead">OSTİM firma rehberi ve distribütör sayfalarından derlenmiştir (Kasım 2026). Aramadan önce bilgilerin güncelliğini teyit edin.</p>
         <div class="filters" id="tedarikFiltre"></div>
-        <div class="cards" id="tedarikListe"></div>
+        <div class="cards sonuc" id="tedarikListe"></div>
         <div class="card info">
           <h3>Global markaların yetkili satıcıları</h3>
           <p>Parker (O-ring &amp; Chomerics), Freudenberg (Simrit), Trelleborg ve SKF için Türkiye’deki yetkili distribütörleri üreticilerin resmi “distribütör bulucu” sayfalarından kontrol edin. OSTİM’deki pek çok firma bu markaların ürünlerini stoktan sağlayabilir; orijinal ürün ve sertifika (CoC, kür tarihi) isteyin.</p>
@@ -240,6 +240,29 @@
     </main>
   </div>
 
+  <div id="ayarPanel" class="drawer">
+    <div class="drawer-bg" data-kapat></div>
+    <aside class="drawer-ic" role="dialog" aria-label="Ayarlar">
+      <div class="row-inline space"><h2>Ayarlar</h2><button class="ghost" data-kapat>Kapat ✕</button></div>
+      <div class="card">
+        <h3>Görünüm</h3>
+        <label class="chk"><input type="checkbox" data-chk="ayarAnim"> Değişiklikte halka animasyonu</label>
+        <p class="hint">Bir değeri değiştirdiğinizde küçük bir O-ring döner, ardından yeni ölçüler görünür.</p>
+        <label class="mt">Animasyon süresi
+          <select data-sel="ayarSure">
+            <option value="250">Kısa (0,25 s)</option>
+            <option value="350">Orta (0,35 s)</option>
+            <option value="700">Uzun (0,7 s)</option>
+          </select></label>
+        <button class="mini mt" id="animDene">Animasyonu dene</button>
+      </div>
+      <div class="card">
+        <h3>Giriş alanları</h3>
+        <label class="chk"><input type="checkbox" data-chk="ayarDetay"> “Detaylar” bölümlerini her zaman açık göster</label>
+        <p class="hint">Standart ölçü (AS568), toleranslar ve flanş boşluğu bu bölümdedir; kapalıyken varsayılan değerler kullanılır.</p>
+      </div>
+    </aside>
+  </div>
   <div id="toast" class="toast"></div>
   <script src="js/as568.js"></script>
   <script src="js/data.js"></script>

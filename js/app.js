@@ -13,7 +13,13 @@
     Tmin: -20, Tmax: 85, P: 1, yon: 'ic', ortam: ['hava', 'su'], govde: 'al', kapakZayif: false, metalTemas: true,
     siralama: 'bul', malz: null, shore: null,
     // O-ring → kanal
-    as568: '-136', cs: 2.62, csTol: 0.08, ID: 50.47, hTol: 0.05, bTol: 0.10, g: 0,
+    cs: 2.62, csTol: 0.08, hTol: 0.05, bTol: 0.10, g: 0,
+    // Kanal yolu: 'daire' (eksen çapı Dm) veya 'sekilli' (A×B, köşe R)
+    oYol: 'daire', Dm: 52.9, A: 80, Bk: 50, Rk: null, ger: 1,
+    // Detay: belirli bir O-ring (opsiyonel)
+    ozelOring: false, as568: '', ID: null, detayAcik: false,
+    // Ayarlar
+    ayarAnim: true, ayarSure: '350', ayarDetay: false,
     // Gasket → kanal
     gt: 3.0, gw: 10, gs: 0.8, gtTol: 0.15, kanalda: true,
     // Kanal → conta
@@ -55,7 +61,7 @@
   document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
 
   // ---------------- Bağlama ----------------
-  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil'];
+  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay'];
   document.addEventListener('click', e => {
     const btn = e.target.closest('.seg[data-bind] button');
     if (!btn || btn.disabled) return;
@@ -81,7 +87,32 @@
   // Aynı değişkene bağlı diğer alanları güncelle (yazılan alan hariç)
   function syncSame(src) { $$(`[data-num="${src.dataset.num}"]`).forEach(el => { if (el !== src) el.value = S[src.dataset.num] ?? ''; }); }
 
-  function changed(yapisal) { save(); renderAll(yapisal); }
+  // Değişiklikte halka animasyonu (Ayarlar'dan kapatılabilir)
+  let animZaman = null, bekleyenYapisal = false;
+  function changed(yapisal) {
+    save();
+    if (!S.ayarAnim) { renderAll(yapisal); return; }
+    syncControls(); renderOzet();
+    if (yapisal) renderGirdiler();
+    bekleyenYapisal = bekleyenYapisal || yapisal;
+    $$('.page.active .sonuc').forEach(e => { e.classList.remove('yeni'); e.classList.add('guncel'); });
+    clearTimeout(animZaman);
+    animZaman = setTimeout(() => {
+      renderAll(false);
+      bekleyenYapisal = false;
+      $$('.page.active .sonuc').forEach(e => { e.classList.remove('guncel'); void e.offsetWidth; e.classList.add('yeni'); });
+    }, parseInt(S.ayarSure, 10) || 350);
+  }
+  function renderGirdiler() {
+    const p = aktifSayfa();
+    if (p === 'kanal') renderKanalGirdi();
+    if (p === 'not') renderNotGirdi();
+  }
+  // Detay bölümünün açık/kapalı durumunu hatırla
+  document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('detay')) { S.detayAcik = e.target.open; save(); } }, true);
+  function detay(icerik, baslik = 'Detaylar (opsiyonel) – standart ölçü, toleranslar, boşluk') {
+    return `<details class="detay" ${S.detayAcik || S.ayarDetay ? 'open' : ''}><summary>${baslik}</summary><div class="detay-ic">${icerik}</div></details>`;
+  }
 
   function syncControls() {
     $$('.seg[data-bind]').forEach(seg => {
@@ -131,31 +162,66 @@
   }
   const yonAd = () => S.yon === 'ic' ? 'iç basınç' : 'dış basınç / vakum';
 
+  const rAktif = d => S.Rk > 0 ? S.Rk : Math.round(6 * d * 2) / 2;
+  // Conta modunda O-ring iç çapı: belirli O-ring (detay) > dairesel kanal > şekilli kanal
+  function oringSecim(b) {
+    if (S.ozelOring && S.ID > 0) {
+      const as = S.as568 ? C.as568Bul(S.as568) : null;
+      const ok = as && Math.abs(as.cs - S.cs) < 0.02 && Math.abs(as.id - S.ID) < 0.05;
+      return { kaynak: 'ozel', ID: S.ID, as568: ok ? { ...as, ok: true } : null };
+    }
+    if (S.oYol === 'sekilli') {
+      if (!(S.A > 0 && S.Bk > 0)) return null;
+      const R = rAktif(S.cs), L = C.yolUzunlugu(S.A, S.Bk, R);
+      const r = C.sekilliOring(L, S.cs, (S.ger ?? 1) / 100);
+      return { kaynak: 'sekilli', L: r.L, R, ID: r.hedefID, as568: r.as568 };
+    }
+    if (S.Dm > 0 && b) { const r = C.daireselOring(S.Dm, S.cs, b, S.yon); return { kaynak: 'daire', ...r, ID: r.hedefID }; }
+    return null;
+  }
+
+  function yolGirdi(d, kanalModu) {
+    const seg = `<h3 class="mt">Kanal yolu</h3>
+      <div class="seg" data-bind="oYol"><button data-v="daire">Dairesel kanal</button><button data-v="sekilli">Şekilli kanal (dikdörtgen, köşe radyüslü)</button></div>`;
+    if (S.oYol === 'sekilli') {
+      return seg + `<div class="row4 mt">${num('A', 'Eksen ölçüsü A (mm)', 0.5)}${num('Bk', 'Eksen ölçüsü B (mm)', 0.5)}${num('Rk', 'Köşe radyüsü R – eksende (mm)', 0.5, 'placeholder="boş = 6d"')}
+        <div class="small">${d ? `Önerilen: R ≥ 3d = <b>${f(3 * d, 1)}</b> mm, tercihen 6d = <b>${f(6 * d, 1)}</b> mm.` : 'R kesite göre önerilir (≥ 3d).'}</div></div>
+        <p class="hint">Ölçüler kanalın orta çizgisinden alınır. O-ring bu yola hafifçe gerdirilerek takılır; dar köşe yarıçapında O-ring katlanır veya kanaldan taşar.</p>`;
+    }
+    if (kanalModu) return seg + `<p class="hint">Dairesel kanalda O-ring iç çapı için yukarıdaki kanal ${S.yon === 'ic' ? 'dış' : 'iç'} çapını girin (opsiyonel).</p>`;
+    return seg + `<div class="row4 mt">${num('Dm', 'Kanal eksen çapı Dm (mm)', 0.1, 'placeholder="opsiyonel"')}<div class="small" style="grid-column: span 3">Kanal orta çizgisinin çapı (çizimdeki kanal merkez çapı). Boş bırakırsanız yalnız kanal kesiti (derinlik/genişlik) hesaplanır. Girerseniz kanal iç/dış çapı ve gerekli O-ring iç çapı da verilir.</div></div>`;
+  }
+
   function renderKanalGirdi() {
     const el = $('#kanalGirdi');
     const lead = $('#kanalLead');
-    const tolSatir = `<div class="row4 mt">${num('hTol', 'Derinlik toleransı ± (mm)')}${num('bTol', 'Genişlik toleransı + (mm)')}${num('g', 'Flanş boşluğu g (mm, temas=0)')}<div></div></div>`;
+    const tolSatir = `<div class="row4">${num('hTol', 'Derinlik toleransı ± (mm)')}${num('bTol', 'Genişlik toleransı + (mm)')}${num('g', 'Flanş boşluğu g (mm, temas=0)')}<div></div></div>`;
     if (S.tip === 'oring' && S.mod === 'conta') {
-      lead.textContent = `O-ring ölçüsünü girin; 3 sıkıştırma oranı için yüz contası kanalı (${yonAd()}) hesaplanır.`;
-      el.innerHTML = `<h3>O-ring ölçüsü</h3>
+      lead.textContent = `O-ring kesitini seçin; 3 sıkıştırma oranı için yüz contası kanalı (${yonAd()}) hesaplanır.`;
+      el.innerHTML = `<h3>O-ring kesiti</h3>
         <div class="row4">
-          <label>AS568 numarası (ops.)<input type="text" id="as568In" value="${esc(S.as568 || '')}" placeholder="ör. 136 veya -214"></label>
-          <label>Standart kesit<select id="csSel">${D.CS_LISTE.map(c => `<option value="${c.d}" ${Math.abs(c.d - S.cs) < 0.005 ? 'selected' : ''}>${f(c.d)} – ${c.std}</option>`).join('')}<option value="ozel" ${D.CS_LISTE.some(c => Math.abs(c.d - S.cs) < 0.005) ? '' : 'selected'}>Özel…</option></select></label>
+          <label>Standart kesit<select id="csSel">${D.CS_LISTE.map(c => `<option value="${c.d}" ${Math.abs(c.d - S.cs) < 0.005 ? 'selected' : ''}>${f(c.d)} mm</option>`).join('')}<option value="ozel" ${D.CS_LISTE.some(c => Math.abs(c.d - S.cs) < 0.005) ? '' : 'selected'}>Özel…</option></select></label>
           ${num('cs', 'Kesit d (mm)')}
-          ${num('csTol', 'Kesit toleransı ± (mm)')}
+          <div class="small" style="grid-column: span 2">Kanal derinliği ve genişliği yalnız kesitten hesaplanır. İç çap ve standart ölçü opsiyoneldir.</div>
         </div>
-        <div class="row4 mt">${num('ID', 'İç çap ID (mm)')}<div class="small" id="as568Bilgi"></div></div>
-        ${tolSatir}`;
-      $('#as568In').addEventListener('change', e => {
+        ${yolGirdi(S.cs, false)}
+        ${detay(`
+          <label class="chk"><input type="checkbox" data-chk="ozelOring" ${S.ozelOring ? 'checked' : ''}> Elimde belirli bir O-ring var – iç çap veya AS568 numarası ile gireceğim</label>
+          ${S.ozelOring ? `<div class="row4 mt"><label>AS568 numarası<input type="text" id="as568In" value="${esc(S.as568 || '')}" placeholder="ör. 136"></label>${num('ID', 'O-ring iç çapı ID (mm)')}<div class="small" id="as568Bilgi" style="grid-column: span 2"></div></div>` : ''}
+          <div class="row4 mt">${num('csTol', 'Kesit toleransı ± (mm)')}${S.oYol === 'sekilli' ? num('ger', 'Montaj gerilmesi (%)', 0.5) : '<div></div>'}<div></div><div></div></div>
+          <div class="mt">${tolSatir}</div>`)}`;
+      const a = $('#as568In');
+      if (a) a.addEventListener('change', e => {
         const r = C.as568Bul(e.target.value);
         if (r) { S.as568 = r.dash; S.cs = r.cs; S.csTol = r.csTol; S.ID = r.id; save(); renderAll(true); toast(`AS568${r.dash}: Ø${f(r.id)} × ${f(r.cs)} mm`); }
         else { S.as568 = ''; save(); toast('AS568 numarası bulunamadı'); }
       });
     } else if (S.tip === 'oring') {
-      lead.textContent = 'Kanal ölçülerini girin; uygun O-ring kesitleri ve AS568 ölçüsü önerilir.';
-      el.innerHTML = `<h3>Kanal ölçüleri</h3>
-        <div class="row4">${num('kh', 'Kanal derinliği h (mm)')}${num('kb', 'Kanal genişliği b (mm)')}${num('kcap', S.yon === 'ic' ? 'Kanal DIŞ çapı (mm)' : 'Kanal İÇ çapı (mm)')}<div class="small">Basınç yönü: <b>${yonAd()}</b>. ${S.yon === 'ic' ? 'O-ring kanalın dış duvarına yaslanır.' : 'O-ring kanalın iç duvarına yaslanır.'}</div></div>
-        ${tolSatir}`;
+      lead.textContent = 'Kanal ölçülerini girin; uygun O-ring kesitleri ve gerekli iç çap önerilir.';
+      el.innerHTML = `<h3>Kanal kesiti</h3>
+        <div class="row4">${num('kh', 'Kanal derinliği h (mm)')}${num('kb', 'Kanal genişliği b (mm)')}${S.oYol === 'daire' ? num('kcap', S.yon === 'ic' ? 'Kanal DIŞ çapı (mm)' : 'Kanal İÇ çapı (mm)', 0.1, 'placeholder="opsiyonel"') : '<div></div>'}<div class="small">Basınç yönü: <b>${yonAd()}</b>. ${S.yon === 'ic' ? 'O-ring kanalın dış duvarına yaslanır.' : 'O-ring kanalın iç duvarına yaslanır.'}</div></div>
+        ${yolGirdi(null, true)}
+        ${detay(`${tolSatir}${S.oYol === 'sekilli' ? `<div class="row4 mt">${num('ger', 'Montaj gerilmesi (%)', 0.5)}</div>` : ''}`, 'Detaylar (opsiyonel) – toleranslar, boşluk')}`;
     } else if (S.mod === 'conta') {
       const sk = S.sekil;
       lead.textContent = 'Conta kesit ölçülerini girin; 3 sıkıştırma oranı için kanal / sıkıştırma limiti hesaplanır.';
@@ -164,20 +230,19 @@
           ${num('gt', sk === 'tup' ? 'Dış çap (mm)' : sk === 'yuvarlak' ? 'Kordon çapı (mm)' : 'Yükseklik / kalınlık t (mm)')}
           ${sk === 'yuvarlak' || sk === 'tup' ? '' : num('gw', 'Genişlik w (mm)')}
           ${sk === 'tup' ? num('gs', 'Et kalınlığı (mm)') : ''}
-          ${num('gtTol', 'Yükseklik toleransı ± (mm)')}
         </div>
         ${sk === 'duz' || sk === 'sunger' ? `<label class="chk mt"><input type="checkbox" data-chk="kanalda" ${S.kanalda ? 'checked' : ''}> Conta bir kanal içinde (işaretsiz: iki düz flanş arasında, burç/stoperle sınırlı)</label>` : ''}
-        ${tolSatir}`;
+        ${detay(`<div class="row4">${num('gtTol', 'Conta yükseklik toleransı ± (mm)')}</div><div class="mt">${tolSatir}</div>`, 'Detaylar (opsiyonel) – toleranslar, boşluk')}`;
     } else {
       lead.textContent = 'Kanal (veya flanş arası) ölçülerini girin; 3 sıkıştırma oranı için conta kalınlığı önerilir.';
       el.innerHTML = `<h3>Kanal ölçüleri</h3>
         <div class="row4">${num('kh', S.kanalda || !(S.sekil === 'duz' || S.sekil === 'sunger') ? 'Kanal derinliği h (mm)' : 'Stoper/burç yüksekliği (mm)')}${num('kb', 'Kanal genişliği b (mm)')}${S.sekil === 'yuvarlak' || S.sekil === 'tup' ? '' : num('kw', 'Conta genişliği w (mm, boş=0,6·b)')}${S.sekil === 'tup' ? num('gs', 'Tüp et kalınlığı (mm)') : '<div></div>'}</div>
         ${S.sekil === 'duz' || S.sekil === 'sunger' ? `<label class="chk mt"><input type="checkbox" data-chk="kanalda" ${S.kanalda ? 'checked' : ''}> Conta bir kanal içinde</label>` : ''}
-        <div class="row4 mt">${num('g', 'Flanş boşluğu g (mm, temas=0)')}</div>`;
+        ${detay(`<div class="row4">${num('g', 'Flanş boşluğu g (mm, temas=0)')}</div>`, 'Detaylar (opsiyonel) – boşluk')}`;
     }
-    // Kesit seçimi
     const cs = $('#csSel');
-    if (cs) cs.addEventListener('change', e => { if (e.target.value !== 'ozel') { const c = D.CS_LISTE.find(x => String(x.d) === e.target.value); S.cs = c.d; S.csTol = c.tol; S.as568 = ''; save(); renderAll(true); } });
+    if (cs) cs.addEventListener('change', e => { if (e.target.value !== 'ozel') { const c = D.CS_LISTE.find(x => String(x.d) === e.target.value); S.cs = c.d; S.csTol = c.tol; S.as568 = ''; changed(true); } });
+    syncControls();
   }
 
   function svgKesit(b, h, g, d, Hc, yon, sekil, w) {
@@ -228,25 +293,28 @@
     if (S.tip === 'oring' && S.mod === 'conta') {
       if (!(S.cs > 0)) { el.innerHTML = ''; return; }
       const r = C.contadanKanal({ sekil: 'oring', t: S.cs, tTol: S.csTol, g: S.g, hTol: S.hTol, bTol: S.bTol, emi: emi() });
-      const as = S.as568 ? C.as568Bul(S.as568) : null;
-      $('#as568Bilgi') && ($('#as568Bilgi').innerHTML = as && Math.abs(as.cs - S.cs) < 0.02 ? `Seçili: <b>AS568${as.dash}</b> (Ø${f(as.id)} × ${f(as.cs)})` : 'AS568 dışı / metrik ölçü');
+      const nom = r.satirlar[1];
+      const sec = oringSecim(nom.b);
+      const bilgi = $('#as568Bilgi');
+      if (bilgi) bilgi.innerHTML = sec && sec.as568 ? `Standart karşılığı: <b>AS568${sec.as568.dash}</b> (Ø${f(sec.as568.id)} × ${f(sec.as568.cs)})` : 'Standart dışı / metrik ölçü';
       const kart = r.satirlar.map((s, i) => {
-        const cap = S.ID > 0 ? C.oringdenKanalCap(S.ID, S.cs, s.b, S.yon) : null;
+        let cap = '';
+        if (sec && sec.kaynak === 'ozel') { const c = C.oringdenKanalCap(S.ID, S.cs, s.b, S.yon); cap = `<dt>Kanal dış çapı</dt><dd>Ø${f(c.kanalDis)}</dd><dt>Kanal iç çapı</dt><dd>Ø${f(c.kanalIc)}</dd>`; }
+        else if (S.oYol === 'daire' && S.Dm > 0) cap = `<dt>Kanal dış çapı</dt><dd>Ø${f(S.Dm + s.b)}</dd><dt>Kanal iç çapı</dt><dd>Ø${f(S.Dm - s.b)}</dd>`;
+        else if (sec && sec.kaynak === 'sekilli') cap = `<dt>Kanal eksen yolu</dt><dd>${f(sec.L, 1)} mm</dd>`;
         return levelKart(s, i, `
           <dt>Kanal derinliği h</dt><dd>${f(s.h)} ±${f(S.hTol)}</dd>
           <dt>Kanal genişliği b</dt><dd>${f(s.b)} +${f(S.bTol)}/0</dd>
-          ${cap ? `<dt>Kanal dış çapı</dt><dd>Ø${f(cap.kanalDis)}</dd><dt>Kanal iç çapı</dt><dd>Ø${f(cap.kanalIc)}</dd>` : ''}
+          ${cap}
           <dt>Sıkıştırma aralığı</dt><dd>${P(s.cMin)} – ${P(s.cMax)}</dd>
           <dt>Doluluk nom / maks</dt><dd>${P(s.dolNom)} / ${P(s.dolMaks)}</dd>`);
       }).join('');
-      const nom = r.satirlar[1];
-      const cap = S.ID > 0 ? C.oringdenKanalCap(S.ID, S.cs, nom.b, S.yon) : null;
       el.innerHTML = `<div class="levels">${kart}</div>
+        ${oringKart(sec, nom)}
         <div class="card"><h3>Nominal tasarım kesiti</h3>
           <div class="sketch">${svgKesit(nom.b, nom.h, S.g, S.cs, nom.H, S.yon, 'oring')}
           <div>
             <p><b>${r.bant.ad}</b> için kabul bandı (en kötü tolerans dahil): <b>${P(r.bant.bant[0])} – ${P(r.bant.bant[1])}</b> sıkıştırma, en fazla <b>${P(r.bant.dolMaks)}</b> kanal doluluğu.</p>
-            ${cap ? `<p>${esc(cap.aciklama)} Nominal: O-ring dış çapı Ø${f(cap.OD)} → kanal ${S.yon === 'ic' ? 'dış çapı Ø' + f(cap.kanalDis) + ' (çevresel sıkışma ' + P(cap.cevreSikisma) + ')' : 'iç çapı Ø' + f(cap.kanalIc) + ' (gerilme ' + P(cap.gerilme) + ')'}.</p>` : ''}
             <p class="small">Doluluk hesabı oda sıcaklığındadır. Ortamda %10’dan fazla şişme veya yüksek sıcaklıkta ısıl genleşme bekleniyorsa kanalı genişletin.</p>
           </div></div>
           ${refs(r.bant.ref)}
@@ -256,31 +324,34 @@
       if (!(S.kh > 0 && S.kb > 0)) { el.innerHTML = ''; return; }
       const k = C.kanaldanOring({ h: S.kh, b: S.kb, g: S.g, hTol: S.hTol, emi: emi() });
       const uygunlar = k.list.filter(x => x.uygun).slice(0, 3);
-      const satir = k.list.slice(0, 6).map((x, i) => {
+      const idBul = x => {
+        if (S.oYol === 'sekilli' && S.A > 0 && S.Bk > 0) { const m = C.sekilliOring(C.yolUzunlugu(S.A, S.Bk, rAktif(x.d)), x.d, (S.ger ?? 1) / 100); return { ID: m.hedefID, as: m.as568 }; }
+        if (S.oYol === 'daire' && S.kcap > 0) { const m = C.kanalCapindanOring(S.kcap, x.d, S.yon); return { ID: m.hedefID, as: m.as568 }; }
+        return null;
+      };
+      const satir = k.list.slice(0, 6).map(x => {
         const best = uygunlar[0] === x;
-        let idHucre = '–';
-        if (S.kcap > 0) {
-          const m = C.kanalCapindanOring(S.kcap, x.d, S.yon);
-          if (m.as568 && x.std.startsWith('AS568')) idHucre = `<b>AS568${m.as568.dash}</b> Ø${f(m.as568.id)} <span class="badge ${m.as568.ok ? 'ok' : 'warn'}">${S.yon === 'ic' ? 'çevre sık.' : 'gerilme'} ${P(m.as568.oran)}</span>`;
-          else idHucre = `ID ≈ Ø${f(m.hedefID)} <span class="small">(metrik, tedarikçiye sorun)</span>`;
-        }
+        const m = idBul(x);
+        const idHucre = m ? `ID ≈ <b>Ø${f(m.ID)}</b>${m.as && m.as.ok && x.std.startsWith('AS568') ? `<div class="small">standart karşılığı AS568${m.as.dash} (Ø${f(m.as.id)})</div>` : ''}` : '<span class="small">kanal yolu girilirse</span>';
         return `<tr class="${best ? 'best' : ''} ${x.uygun ? '' : 'dim'}">
-          <td><b>${f(x.d)}</b> ±${f(x.tol)}<div class="small">${x.std}</div></td>
+          <td><b>${f(x.d)}</b> ±${f(x.tol)}</td>
           <td class="num">${P(x.c)}</td><td class="num">${P(x.cMin)} – ${P(x.cMax)}</td><td class="num">${P(x.dolMaks)}</td>
           <td>${x.uygun ? `<span class="badge ok">${best ? 'En iyi' : 'Uygun'}</span>` : '<span class="badge bad">Uygun değil</span>'}</td>
           <td>${idHucre}</td></tr>`;
       }).join('');
       const b0 = uygunlar[0];
+      const rUyari = S.oYol === 'sekilli' && b0 && S.Rk > 0 && S.Rk < 3 * b0.d ? `<div class="warnbox">Köşe radyüsü R${f(S.Rk, 1)} &lt; 3d = ${f(3 * b0.d, 1)} mm: O-ring köşede katlanabilir.</div>` : '';
       el.innerHTML = `<div class="card"><h3>Uygun O-ring kesitleri</h3>
-        <table><thead><tr><th>Kesit d (mm)</th><th class="num">Sıkıştırma</th><th class="num">Tolerans aralığı</th><th class="num">Maks. doluluk</th><th>Durum</th><th>Önerilen ölçü</th></tr></thead><tbody>${satir}</tbody></table>
+        <table><thead><tr><th>Kesit d (mm)</th><th class="num">Sıkıştırma</th><th class="num">Tolerans aralığı</th><th class="num">Maks. doluluk</th><th>Durum</th><th>Gerekli iç çap</th></tr></thead><tbody>${satir}</tbody></table>
         ${uygunlar.length ? '' : '<div class="warnbox">Bu kanal ölçüsü için standart kesitlerden hiçbiri bandın içinde değil. Kanal derinliği ≈ 0,77 × d, genişliği ≈ 1,35–1,45 × d olacak şekilde düzenleyin.</div>'}
-        ${refs(k.bant.ref.concat(['as568']))}</div>
-        ${b0 ? `<div class="card"><h3>Seçilen kesitle montaj görünümü</h3><div class="sketch">${svgKesit(S.kb, S.kh, S.g, b0.d, k.H, S.yon, 'oring')}<div><p>Önerilen kesit <b>${f(b0.d)} mm</b>: nominal sıkıştırma ${P(b0.c)}, en kötü durumda doluluk ${P(b0.dolMaks)}.</p><p class="small">3 farklı sıkıştırma oranı için kanalı yeniden boyutlandırmak isterseniz Proje girdilerinde “Contayı biliyorum” moduna geçin – kesit otomatik aktarılır.</p><button class="mini" id="aktar">Bu kesiti “conta → kanal” moduna aktar</button></div></div></div>` : ''}
+        ${rUyari}
+        ${refs(k.bant.ref)}</div>
+        ${b0 ? `<div class="card"><h3>Seçilen kesitle montaj görünümü</h3><div class="sketch">${svgKesit(S.kb, S.kh, S.g, b0.d, k.H, S.yon, 'oring')}<div><p>Önerilen kesit <b>${f(b0.d)} mm</b>: nominal sıkıştırma ${P(b0.c)}, en kötü durumda doluluk ${P(b0.dolMaks)}.</p><p class="small">3 farklı sıkıştırma oranıyla kanalı yeniden boyutlandırmak için bu kesiti “conta → kanal” moduna aktarabilirsiniz.</p><button class="mini" id="aktar">Bu kesiti “conta → kanal” moduna aktar</button></div></div></div>` : ''}
         ${limitKart(b0 ? b0.d : S.kh / 0.77, k.bant, true)}`;
       const ak = $('#aktar');
       if (ak) ak.addEventListener('click', () => {
-        S.cs = b0.d; S.csTol = b0.tol; S.mod = 'conta';
-        if (S.kcap > 0) { const m = C.kanalCapindanOring(S.kcap, b0.d, S.yon); if (m.as568 && b0.std.startsWith('AS568')) { S.as568 = m.as568.dash; S.ID = m.as568.id; } else { S.as568 = ''; S.ID = m.hedefID; } }
+        S.cs = b0.d; S.csTol = b0.tol; S.mod = 'conta'; S.ozelOring = false;
+        if (S.oYol === 'daire' && S.kcap > 0) S.Dm = S.yon === 'ic' ? S.kcap - S.kb : S.kcap + S.kb;
         save(); renderAll(true); toast('Kesit aktarıldı');
       });
     } else if (S.mod === 'conta') {
@@ -319,6 +390,30 @@
         <div class="card info"><p>Stok kalınlık seçildiğinde gerçek sıkıştırma değişir: <b>c = 1 − ${f(r.H)} / t<sub>stok</sub></b>. Seçtiğiniz stok kalınlığını “Contayı biliyorum” moduna girerek toleranslı kontrol yapın.</p>${refs(r.bant.ref)}</div>
         ${limitKart(r.satirlar[1].t, r.bant, kanalda)}`;
     }
+  }
+
+  function oringKart(sec, nom) {
+    const neden = `<details class="detay"><summary>İç çap neden önemli?</summary><div class="detay-ic small">
+      Kanal derinliği ve genişliği yalnız kesitten çıkar. İç çap ise O-ring’in kanalda <b>hangi duvara yaslanacağını</b> ve ne kadar <b>gerileceğini veya çevresel sıkışacağını</b> belirler.
+      <ul><li>O-ring çok gerilirse (&gt; %5) kesiti incelir, sıkıştırma düşer ve sızdırma riski artar.</li>
+      <li>Çevresel olarak çok sıkışırsa (&gt; %3) kanal içinde dalgalanır, montajda kanaldan taşar ve kapak arasına sıkışır.</li>
+      <li>Basınç O-ring’i kanalın karşı duvarına iterse her basınç çevriminde hareket eder ve zamanla aşınır.</li></ul>
+      Bu yüzden iç çabı doğrudan girmek yerine <b>kanal yolunu</b> (dairesel kanalda eksen çapını, şekilli kanalda A×B ve köşe R değerini) girmeniz yeterlidir; gerekli iç çapı uygulama hesaplar. Standart ölçü (AS568) yalnız bilgi amaçlı karşılık olarak gösterilir.</div></details>`;
+    if (!sec) return `<div class="card info"><h3>O-ring iç çapı</h3><p class="small">Kanal yolu girilmedi: yalnız kesit hesaplandı. İç çap önerisi için yukarıda <b>kanal eksen çapı</b> veya <b>şekilli kanal ölçüleri</b> girin.</p>${neden}</div>`;
+    const d = S.cs;
+    const as = sec.as568;
+    const etiket = sec.kaynak === 'sekilli' ? 'gerilme' : S.yon === 'ic' ? 'çevresel sıkışma' : 'gerilme';
+    const rUyari = sec.kaynak === 'sekilli' && sec.R < 3 * d ? `<div class="warnbox">Köşe radyüsü R${f(sec.R, 1)} &lt; 3d = ${f(3 * d, 1)} mm: O-ring köşede katlanabilir. R ≥ ${f(3 * d, 1)} mm (tercihen ${f(6 * d, 1)}) yapın.</div>` : '';
+    return `<div class="card"><h3>${sec.kaynak === 'ozel' ? 'Seçtiğiniz O-ring' : 'Önerilen O-ring'}</h3>
+      <div class="kv">
+        <div><b>Ø${f(sec.ID)}</b><span>iç çap ID ${sec.kaynak === 'ozel' ? '(girilen)' : '(hesaplanan)'}</span></div>
+        <div><b>Ø${f(sec.ID + 2 * d)}</b><span>dış çap</span></div>
+        <div><b>${f(d)} mm</b><span>kesit d</span></div>
+        ${sec.kaynak === 'sekilli' ? `<div><b>${f(sec.L, 1)} mm</b><span>kanal eksen yolu (R = ${f(sec.R, 1)} mm${S.Rk > 0 ? '' : ', otomatik 6d'})</span></div>` : ''}
+        ${sec.kaynak === 'daire' ? `<div><b>Ø${f(sec.kanalDis)} / Ø${f(sec.kanalIc)}</b><span>nominal kanal dış / iç çapı</span></div>` : ''}
+      </div>
+      ${as ? `<p class="small mt">Opsiyonel standart karşılığı: <b>AS568${as.dash}</b> – Ø${f(as.id)} × ${f(as.cs)} mm ${as.oran != null ? `<span class="badge ${as.ok ? 'ok' : 'warn'}">${etiket} ${P(as.oran)}</span>` : ''}${as.ok ? '' : ' – bu kesitte uygun standart iç çap yok, metrik/özel ölçü isteyin.'}</p>` : '<p class="small mt">Bu kesitte AS568 karşılığı yok; metrik (ISO 3601) veya özel ölçü olarak sipariş edilir.</p>'}
+      ${rUyari}${neden}${refs(['parker', 'as568'])}</div>`;
   }
 
   function limitKart(t, bant, kanalda) {
@@ -514,9 +609,14 @@
     const L = [];
     // 1. Tanım
     if (S.tip === 'oring') {
-      const as = S.as568 ? C.as568Bul(S.as568) : null;
-      const boyut = as && Math.abs(as.cs - S.cs) < 0.02 && Math.abs(as.id - S.ID) < 0.05 ? `AS568${as.dash} (Ø${f(as.id)} × ${f(as.cs)} mm)` : `Ø${f(S.ID)} × ${f(S.cs)} mm`;
+      const nomB = C.contadanKanal({ sekil: 'oring', t: S.cs, tTol: S.csTol, g: S.g, hTol: S.hTol, bTol: S.bTol, emi: emi() }).satirlar[1].b;
+      const sec = S.mod === 'conta' ? oringSecim(nomB) : null;
+      let boyut;
+      if (sec && sec.as568 && sec.as568.ok) boyut = `Ø${f(sec.as568.id)} × ${f(sec.as568.cs)} mm (AS568${sec.as568.dash})`;
+      else if (sec) boyut = `Ø${f(sec.ID)} × ${f(S.cs)} mm`;
+      else boyut = `Ø____ × ${f(S.cs)} mm`;
       L.push(en ? `SEAL: O-RING ${boyut}.` : `CONTA: O-RING ${boyut}.`);
+      if (sec && sec.kaynak === 'sekilli') L.push(en ? `O-RING SHALL BE INSTALLED INTO THE NON-CIRCULAR GROOVE WITH APPROX. ${f(S.ger ?? 1, 1)} % STRETCH; GROOVE CORNER RADIUS AT CENTERLINE R${f(sec.R, 1)} MIN.` : `O-RING DAİRESEL OLMAYAN KANALA YAKLAŞIK %${f(S.ger ?? 1, 1)} GERDİRİLEREK YERLEŞTİRİLECEKTİR; KANAL KÖŞE RADYÜSÜ (EKSENDE) EN AZ R${f(sec.R, 1)}.`);
     } else {
       const ad = { yuvarlak: ['DOLU YUVARLAK KORDON', 'SOLID ROUND CORD'], D: ['D-PROFİL', 'D-PROFILE'], tup: ['BOŞLUKLU TÜP PROFİL', 'HOLLOW TUBE PROFILE'], duz: ['DÜZ CONTA (LEVHADAN KESİM)', 'FLAT GASKET (CUT FROM SHEET)'], sunger: ['SÜNGER CONTA (KAPALI HÜCRE)', 'CLOSED-CELL SPONGE GASKET'] }[S.sekil];
       const olc = S.sekil === 'yuvarlak' ? `Ø${f(S.gt)} mm` : S.sekil === 'tup' ? `Ø${f(S.gt)} × ${f(S.gs)} mm` : `${f(S.gt)} × ${f(S.gw)} mm`;
@@ -604,6 +704,12 @@
     syncControls();
   }
   $('#uygunsuzGoster').addEventListener('change', renderMalzeme);
+  // Ayarlar paneli
+  const panel = $('#ayarPanel');
+  $('#ayarAc').addEventListener('click', () => { panel.classList.add('acik'); syncControls(); });
+  $$('[data-kapat]').forEach(b => b.addEventListener('click', () => panel.classList.remove('acik')));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') panel.classList.remove('acik'); });
+  $('#animDene').addEventListener('click', () => { panel.classList.remove('acik'); changed(false); });
 
   renderOrtamlar();
   renderAll(true);

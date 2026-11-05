@@ -146,6 +146,33 @@
     return { hedefID: r2(hedefID), as568: enIyi };
   }
 
+  // ---- Kanal yolu (dairesel / şekilli) ----
+  // Dikdörtgen kanal, eksen ölçüleri A×B, köşe radyüsü R (eksende) → eksen uzunluğu
+  function yolUzunlugu(A, B, R) {
+    const r = Math.max(0, Math.min(R || 0, A / 2, B / 2));
+    return 2 * (A + B) - 8 * r + 2 * PI * r;
+  }
+  // Şekilli kanal: O-ring eksen çevresi kanal yolundan %s kadar kısa (gerdirilerek takılır)
+  function sekilliOring(L, d, s) {
+    const ger = s ?? 0.01;
+    const hedefID = L / (PI * (1 + ger)) - d;
+    const ayni = AS.filter(x => Math.abs(x.cs - d) < 0.03);
+    let enIyi = null;
+    for (const x of ayni) {
+      const oran = L / (PI * (x.id + x.cs)) - 1;
+      const ok = oran >= 0 && oran <= 0.05;
+      const skor = Math.abs(oran - ger) + (ok ? 0 : 1);
+      if (!enIyi || skor < enIyi.skor) enIyi = { ...x, oran, ok, skor };
+    }
+    return { L: r2(L), hedefID: r2(hedefID), as568: enIyi };
+  }
+  // Dairesel kanal: eksen çapı Dm, genişlik b → kanal iç/dış çapı ve gerekli O-ring iç çapı
+  function daireselOring(Dm, d, b, yon) {
+    const kanalDis = Dm + b, kanalIc = Dm - b;
+    const m = kanalCapindanOring(yon === 'dis' ? kanalIc : kanalDis, d, yon);
+    return { kanalDis: r2(kanalDis), kanalIc: r2(kanalIc), hedefID: m.hedefID, as568: m.as568 };
+  }
+
   function as568Bul(dash) {
     const norm = '-' + String(dash).replace(/\D/g, '').padStart(3, '0');
     return AS.find(x => x.dash === norm) || null;
@@ -260,7 +287,7 @@
     return `M = metrik birim, Grade ${o.grade}; Tip ${o.type} = ${D.D2000_TIP[o.type]} °C ısıl yaşlandırma; Sınıf ${o.cls} = IRM 903 yağında hacimsel şişme ${D.D2000_SINIF[o.cls]}; sertlik ${o.sert * 10} ± 5 Shore A; min. çekme dayanımı ${parseInt(o.ceki, 10)} MPa.`;
   }
 
-  const out = { kesitAlan, contadanKanal, kanaldanOring, kanaldanConta, oringdenKanalCap, kanalCapindanOring, as568Bul, shoreOneri, malzemeSirala, yapistiriciSirala, civataKurallari, d2000Kod, d2000Acikla, pct, r2 };
+  const out = { yolUzunlugu, sekilliOring, daireselOring, kesitAlan, contadanKanal, kanaldanOring, kanaldanConta, oringdenKanalCap, kanalCapindanOring, as568Bul, shoreOneri, malzemeSirala, yapistiriciSirala, civataKurallari, d2000Kod, d2000Acikla, pct, r2 };
   g.CALC = out;
   if (typeof module !== 'undefined') module.exports = out;
 })(typeof window !== 'undefined' ? window : globalThis);
