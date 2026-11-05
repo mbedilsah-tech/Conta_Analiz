@@ -32,6 +32,7 @@
     notDil: 'tr', spec: 'd2000', tolSinif: 'B', yuzeyKalite: 'N', depolama: true, gres: true, yuzeyNot: true, yapNot: false, rohs: false, iso3302: 'M2',
     d2: null,
     // Arayüz
+    kkTip: 'oring', kkd: 2.62, kkw: 6, kkh: 2.0, kkb: 3.6,
     arayuz: 'uzman', kolayMod: 'oring', kd: 2.62, kID: null, kh2: 2.0, kb2: 3.6, kolaySev: 1,
     tedSekme: 'ankara', kvAcik: null
   };
@@ -76,7 +77,7 @@
   document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
 
   // ---------------- Bağlama ----------------
-  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme'];
+  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip'];
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-bind] > button');
     if (!btn || btn.disabled) return;
@@ -845,7 +846,16 @@
   const HIZLI = [1.78, 2.0, 2.62, 3.0, 3.53, 4.0, 5.33, 6.99];
   function renderKolayGirdi() {
     const el = $('#kolayGirdi');
-    if (S.kolayMod === 'oring') {
+    if (S.kolayMod === 'kontrol') {
+      el.innerHTML = `<h3>2 · Conta ve kanal ölçüleriniz</h3>
+        <div class="seg" data-bind="kkTip"><button data-v="oring">O-ring / yuvarlak kordon</button><button data-v="gasket">Dikdörtgen kesitli conta (gasket)</button></div>
+        <div class="row-inline mt">
+          ${S.kkTip === 'oring' ? '<label class="buyuk">O-ring kalınlığı (mm)<input type="number" step="0.01" data-num="kkd"></label>' : '<label class="buyuk">Conta yüksekliği (mm)<input type="number" step="0.01" data-num="kkd"></label><label class="buyuk">Conta genişliği (mm)<input type="number" step="0.1" data-num="kkw"></label>'}
+          <label class="buyuk">Kanal derinliği (mm)<input type="number" step="0.01" data-num="kkh"></label>
+          <label class="buyuk">Kanal genişliği (mm)<input type="number" step="0.01" data-num="kkb"></label>
+        </div>
+        <p class="hint">${S.kkTip === 'oring' ? 'O-ring kalınlığı: halkanın et kalınlığı (kumpasla yandan).' : 'Conta yüksekliği: sıkışma yönündeki kalınlık. Genişlik: kanalın içine yatan ölçü.'} Kanal derinliği: tabandan yüzeye; kapak metal metale oturuyorsa conta tam bu yüksekliğe ezilir.</p>`;
+    } else if (S.kolayMod === 'oring') {
       el.innerHTML = `<h3>2 · O-ring’inizin ölçüsü</h3>
         <div class="row-inline">
           <label class="buyuk">O-ring kalınlığı (mm)<input type="number" step="0.01" data-num="kd"></label>
@@ -883,6 +893,7 @@
   }
   function renderKolaySonuc() {
     const el = $('#kolaySonuc');
+    if (S.kolayMod === 'kontrol') { renderKontrol(el); return; }
     const sevAd = [['Az sıkı', 'Kapak inceyse / plastikse; az kuvvet ister'], ['Önerilen', 'Çoğu uygulama için en iyisi'], ['Sıkı', 'Gaz, vakum veya çok soğuk ortam']];
     if (S.kolayMod === 'oring') {
       if (!(S.kd > 0)) { el.innerHTML = ''; return; }
@@ -927,6 +938,64 @@
       S.arayuz = 'uzman'; S.tip = 'oring'; S.sekil = 'oring';
       if (S.kolayMod === 'oring') { S.mod = 'conta'; S.cs = S.kd; S.ozelOring = S.kID > 0; S.ID = S.kID; }
       else { S.mod = 'kanal'; S.kh = S.kh2; S.kb = S.kb2; }
+      save(); go('kanal'); toast('Ölçüler uzman moduna aktarıldı');
+    });
+  }
+
+  // Kolay mod – uyum kontrolü
+  function renderKontrol(el) {
+    const oring = S.kkTip === 'oring';
+    const t = S.kkd, h = S.kkh, b = S.kkb, w = oring ? t : S.kkw;
+    if (!(t > 0 && h > 0 && b > 0 && w > 0)) { el.innerHTML = ''; return; }
+    const c = (t - h) / t;
+    const A = oring ? Math.PI * t * t / 4 : t * w;
+    const dol = A / (h * b);
+    // Sıkışmış genişlik: hacim korunur (O-ring ≈ elips, dikdörtgen ≈ w·t/h)
+    const genis = c > 0 ? (oring ? t * t / h : w * t / h) : w;
+    const bant = oring ? { kAlt: 0.12, iAlt: 0.18, iUst: 0.28, kUst: 0.35 } : { kAlt: 0.10, iAlt: 0.15, iUst: 0.25, kUst: 0.30 };
+    const M = [];
+    let seviye = 0; // 0 iyi, 1 dikkat, 2 kötü
+    const ekle = (sv, msg) => { M.push([sv, msg]); seviye = Math.max(seviye, sv); };
+    // Sıkıştırma
+    if (c <= 0) ekle(2, `Conta hiç sıkışmıyor: kanal derinliği (${f(h)}) conta ${oring ? 'kalınlığından' : 'yüksekliğinden'} (${f(t)}) büyük veya eşit. Kesinlikle sızdırır.`);
+    else if (c < bant.kAlt) ekle(2, `Sıkıştırma çok düşük (%${f(c * 100, 1)}). Contada yeterli baskı oluşmaz, sızdırma riski yüksek. En az %${f(bant.iAlt * 100, 0)} olmalı.`);
+    else if (c < bant.iAlt) ekle(1, `Sıkıştırma biraz düşük (%${f(c * 100, 1)}). Sıvıda genelde yeterlidir; gaz, vakum veya soğuk ortamda sızdırabilir.`);
+    else if (c <= bant.iUst) ekle(0, `Sıkıştırma ideal aralıkta (%${f(c * 100, 1)}; iyi aralık %${f(bant.iAlt * 100, 0)}–${f(bant.iUst * 100, 0)}).`);
+    else if (c <= bant.kUst) ekle(1, `Sıkıştırma yüksek (%${f(c * 100, 1)}). Sızdırmaz ama kapağı kapatmak zorlaşır ve conta zamanla kalıcı ezilir.`);
+    else ekle(2, `Sıkıştırma çok yüksek (%${f(c * 100, 1)}). Conta aşırı ezilir, çatlayabilir veya kanaldan taşar; kapak da tam kapanmayabilir. En fazla %${f(bant.kUst * 100, 0)} olmalı.`);
+    // Doluluk
+    if (dol > 1) ekle(2, `Kanal doluluğu %${f(dol * 100, 0)}: conta kanala sığmıyor. Kanalı genişletin veya derinleştirin.`);
+    else if (dol > 0.90) ekle(2, `Kanal doluluğu çok yüksek (%${f(dol * 100, 0)}). Sıcakta veya sıvıyla şiştiğinde conta kanaldan taşar ya da kapak kapanmaz. En fazla %85 olmalı.`);
+    else if (dol > 0.85) ekle(1, `Kanal doluluğu sınırda (%${f(dol * 100, 0)}). Şişme payı az; en fazla %85 önerilir.`);
+    else if (dol < 0.55) ekle(1, `Kanal doluluğu düşük (%${f(dol * 100, 0)}). Kanal gereğinden geniş; conta montajda kayabilir. Sakıncalı değil ama %65–85 daha iyidir.`);
+    else ekle(0, `Kanal doluluğu uygun (%${f(dol * 100, 0)}; iyi aralık %65–85).`);
+    // Genişlik
+    if (c > 0 && genis > b) ekle(dol > 0.85 ? 2 : 1, `Kanal genişliği yetersiz: conta sıkışınca yaklaşık ${f(genis, 2)} mm genişliyor, kanal ise ${f(b, 2)} mm. Conta duvara dayanır, sıkışma kuvveti artar.`);
+    else if (c > 0) ekle(0, `Kanal genişliği yeterli: sıkışmış conta ≈ ${f(genis, 2)} mm, kanal ${f(b, 2)} mm.`);
+    // Öneri ölçüleri
+    const hOn = Math.round(t * (1 - (oring ? 0.23 : 0.20)) * 20) / 20;
+    const bOn = Math.ceil(Math.max(A / (0.75 * hOn), (oring ? t * t / hOn : w * t / hOn) * 1.05) * 20) / 20;
+    const karar = [['iyi', '✔', 'Uygun', 'Bu ölçüler birbirine uyuyor.'], ['dikkat', '⚠', 'Dikkat', 'Çalışabilir ama sınırda olan değerler var.'], ['kotu', '✖', 'Uygun değil', 'Bu ölçülerle sızdırma veya montaj sorunu beklenir.']][seviye];
+    el.innerHTML = `<div class="card"><h3>3 · Sonuç</h3>
+      <div class="karar ${karar[0]}"><span class="ikon">${karar[1]}</span><div><b>${karar[2]}</b>${karar[3]}</div></div>
+      ${CIZIM.gosterge({ baslik: 'Sıkıştırma oranı', deger: c * 100, maks: 45, birim: '%', cizgiler: [0, 10, 20, 30, 40],
+        bolgeler: [[0, bant.kAlt * 100, 'k', 'sızdırır'], [bant.kAlt * 100, bant.iAlt * 100, 's', ''], [bant.iAlt * 100, bant.iUst * 100, 'y', 'ideal'], [bant.iUst * 100, bant.kUst * 100, 's', ''], [bant.kUst * 100, 45, 'k', 'aşırı ezilir']] })}
+      ${CIZIM.gosterge({ baslik: 'Kanal doluluğu', deger: dol * 100, maks: 110, birim: '%', cizgiler: [0, 25, 50, 75, 100],
+        bolgeler: [[0, 55, 's', 'geniş'], [55, 65, 's', ''], [65, 85, 'y', 'ideal'], [85, 90, 's', ''], [90, 110, 'k', 'taşar']] })}
+      <div class="rule-govde mt" style="padding-left:0; grid-template-columns: minmax(320px, 560px) 1fr">
+        ${CIZIM.kolayKesit({ b, h, d: t, w, sekil: oring ? 'oring' : 'duz' })}
+        <div>${M.map(([sv, m]) => `<div class="madde ${['iyi', 'dikkat', 'kotu'][sv]}">${['✔', '⚠', '✖'][sv]} ${esc(m)}</div>`).join('')}
+          ${seviye > 0 ? `<div class="okbox mt"><b>Önerilen kanal</b> (bu ${oring ? 'O-ring' : 'conta'} için, %${oring ? 23 : 20} sıkıştırma): derinlik <b>${f(hOn)} mm</b>, genişlik <b>${f(bOn)} mm</b>.</div>` : ''}
+          <p class="small mt">Hesap nominal ölçülerledir ve kapağın metal metale oturduğu kabul edilir. Toleranslı (en kötü durum) kontrol için Uzman mod’a geçin.</p>
+          ${refs([['parker', 'Statik conta sıkıştırma aralığı ve kanal doluluğu (≤ %85).'], ['arp1231', 'Kanal doluluğu ve şişme payı.']])}
+        </div>
+      </div></div>
+      <div class="card info"><p>Toleranslarla kontrol için <button class="primary" id="uzmanaAktar">Uzman moduna aktar →</button></p></div>`;
+    const ua = $('#uzmanaAktar');
+    if (ua) ua.addEventListener('click', () => {
+      S.arayuz = 'uzman';
+      if (oring) { S.tip = 'oring'; S.sekil = 'oring'; S.mod = 'kanal'; S.kh = h; S.kb = b; }
+      else { S.tip = 'gasket'; S.sekil = 'duz'; S.mod = 'conta'; S.gt = t; S.gw = w; S.kanalda = true; }
       save(); go('kanal'); toast('Ölçüler uzman moduna aktarıldı');
     });
   }

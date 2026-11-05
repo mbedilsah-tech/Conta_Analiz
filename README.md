@@ -6,6 +6,8 @@ Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalış
 
 Sağ üstten seçilir. **Kolay mod** yeni başlayanlar içindir: yalnızca O-ring kalınlığı (isteğe bağlı iç çap) ya da kanal derinliği ve genişliği girilir. Uygulama açıklamalı bir kesit çizimi üzerinde kanal ölçüsünü veya uygun O-ring'i, 3 sıkıştırma seçeneğini, malzemeyi ve Shore A sertliğini sade bir dille verir. "Uzman moduna aktar" düğmesi ölçüleri ayrıntılı hesaba taşır.
 
+Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığı (veya gasket yüksekliği ve genişliği) ile kanal derinliği ve genişliği girilir. Uygulama sıkıştırma oranını ve kanal doluluğunu renkli göstergelerle verir, sonucu "Uygun / Dikkat / Uygun değil" diye değerlendirir. Çok sıkı, çok gevşek, kanala sığmıyor, kanal genişliği yetersiz gibi uyarılar gösterir ve uymayan durumda doğru kanal ölçüsünü önerir.
+
 ## Sayfalar
 
 1. **Proje girdileri**: Statik/dinamik (dinamik sonraki sürümde), O-ring / gasket (dolu kordon, D-profil, tüp, düz, sünger), EMI var/yok, tasarım yönü, sıcaklık, basınç ve yönü, ortam, gövde malzemesi.

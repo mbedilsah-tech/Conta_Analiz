@@ -242,7 +242,7 @@ body.kolay .sidebar, body.kolay .page, body.kolay .ozet { display: none !importa
 body.kolay .layout { grid-template-columns: 1fr; }
 body.kolay main { max-width: 980px; margin: 0 auto; }
 body.kolay .kolay-sayfa { display: block; }
-.kolay-sec { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.kolay-sec { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .kolay-sec button { font: inherit; text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 16px; cursor: pointer; display: grid; grid-template-columns: 46px 1fr; grid-template-rows: auto auto; column-gap: 12px; }
 .kolay-sec button .ik { grid-row: span 2; font-size: 32px; color: var(--accent); line-height: 1; }
 .kolay-sec button b { font-size: 17px; }
@@ -262,3 +262,16 @@ body.kolay .kolay-sayfa { display: block; }
 .sozluk dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
 .sira { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--side); color: #fff; font-size: 12px; font-weight: 700; margin-right: 6px; }
 @media (max-width: 900px) { .kolay-sec, .secenek { grid-template-columns: 1fr; } }
+
+.karar { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; }
+.karar .ikon { font-size: 30px; line-height: 1; }
+.karar b { font-size: 19px; display: block; }
+.karar.iyi { background: var(--ok-soft); color: var(--ok); }
+.karar.dikkat { background: var(--warn-soft); color: #7a5112; }
+.karar.kotu { background: var(--bad-soft); color: var(--bad); }
+.madde { padding: 8px 10px; border-radius: 8px; margin: 6px 0; font-size: 14px; }
+.madde.iyi { background: var(--ok-soft); color: var(--ok); }
+.madde.dikkat { background: var(--warn-soft); color: #7a5112; }
+.madde.kotu { background: var(--bad-soft); color: var(--bad); }
+
+svg.gosterge { max-width: 720px; display: block; }

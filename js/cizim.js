@@ -229,7 +229,9 @@
       const W = 560, H = 300;
       const k = Math.min(55, 250 / Math.max(p.b * 1.6, p.d * 2));
       const x0 = W / 2 - p.b * k / 2, yTop = 110, yBot = yTop + p.h * k;
-      const cw = Math.min(p.b, p.d * p.d / p.h), cx = x0 + p.b * k - cw * k / 2, cy = yBot - p.h * k / 2;
+      const dik = p.sekil === 'duz';
+      const hc = Math.min(p.h, p.d);
+      const cw = dik ? (p.w || p.d) * p.d / hc : Math.min(p.b * 1.15, p.d * p.d / hc), cx = dik ? x0 + Math.min(p.b, cw) * k / 2 : x0 + p.b * k - Math.min(cw, p.b) * k / 2, cy = yBot - hc * k / 2;
       const bgTxt = (x, y, t, a, c) => { const w = t.length * 6.4 + 8; const rx = a === 'end' ? x - w + 4 : a === 'middle' ? x - w / 2 : x - 4; return `<rect x="${rx}" y="${y - 12}" width="${w}" height="16" rx="3" fill="#fff" opacity=".95"/>${txt(x, y, t, { a, c: c || DIM, s: 12 })}`; };
       return `<svg class="cizim" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kanal kesiti">${defs}
         <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" fill="#fff" stroke="#c9cec7"/>
@@ -237,8 +239,11 @@
         ${bgTxt(30, yTop - 28, 'KAPAK', 'start', THIN)}
         <path d="M20 ${yTop} H${x0} V${yBot} H${x0 + p.b * k} V${yTop} H${W - 20} V${H - 50} H20 Z" fill="url(#tr-hat)" stroke="${INK}" stroke-width="1.4"/>
         ${bgTxt(30, H - 62, 'GÖVDE', 'start', THIN)}
-        <circle cx="${cx}" cy="${yBot - p.d * k / 2}" r="${p.d * k / 2}" fill="none" stroke="${SEAL}" stroke-width="1.5" stroke-dasharray="5 4"/>
-        <ellipse cx="${cx}" cy="${cy}" rx="${cw * k / 2}" ry="${p.h * k / 2}" fill="${SEAL}" opacity=".9"/>
+        ${dik ? `<rect x="${x0 + 1}" y="${yBot - p.d * k}" width="${(p.w || p.d) * k}" height="${p.d * k}" fill="none" stroke="${SEAL}" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <rect x="${x0 + 1}" y="${yBot - hc * k}" width="${cw * k}" height="${hc * k}" rx="3" fill="${SEAL}" opacity="${cw > p.b ? '.6' : '.9'}"/>`
+        : `<circle cx="${cx}" cy="${yBot - p.d * k / 2}" r="${p.d * k / 2}" fill="none" stroke="${SEAL}" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <ellipse cx="${cx}" cy="${cy}" rx="${cw * k / 2}" ry="${hc * k / 2}" fill="${SEAL}" opacity="${cw > p.b ? '.6' : '.9'}"/>`}
+        ${cw > p.b ? `<rect x="${x0 + p.b * k - 2}" y="${yBot - hc * k}" width="4" height="${hc * k}" fill="#b23a3a"/>` : ''}
         ${uzatma(x0, yBot, x0, yBot + 30)}${uzatma(x0 + p.b * k, yBot, x0 + p.b * k, yBot + 30)}
         <line x1="${x0}" y1="${yBot + 24}" x2="${x0 + p.b * k}" y2="${yBot + 24}" stroke="${DIM}" stroke-width="1" marker-start="url(#ok-a)" marker-end="url(#ok-a)"/>
         ${bgTxt(x0 + p.b * k / 2, yBot + 44, 'Kanal genişliği ' + f(p.b, 2) + ' mm', 'middle')}
@@ -247,9 +252,24 @@
         ${bgTxt(x0 + p.b * k + 42, (yTop + yBot) / 2 + 4, 'Derinlik ' + f(p.h, 2) + ' mm', 'start')}
         ${uzatma(x0, yBot - p.d * k, x0 - 40, yBot - p.d * k)}
         <line x1="${x0 - 34}" y1="${yBot - p.d * k}" x2="${x0 - 34}" y2="${yBot}" stroke="${SEAL}" stroke-width="1" marker-start="url(#ok-a)" marker-end="url(#ok-a)"/>
-        ${bgTxt(x0 - 42, yBot - p.d * k / 2 + 4, 'O-ring ' + f(p.d, 2) + ' mm', 'end', SEAL)}
-        <ellipse cx="40" cy="${H - 24}" rx="9" ry="6" fill="${SEAL}"/>${txt(54, H - 20, 'Takılı O-ring', { a: 'start', s: 11 })}
+        ${bgTxt(x0 - 42, yBot - p.d * k / 2 + 4, (dik ? 'Conta ' : 'O-ring ') + f(p.d, 2) + ' mm', 'end', SEAL)}
+        <ellipse cx="40" cy="${H - 24}" rx="9" ry="6" fill="${SEAL}"/>${txt(54, H - 20, dik ? 'Takılı conta' : 'Takılı O-ring', { a: 'start', s: 11 })}
         <circle cx="170" cy="${H - 24}" r="7" fill="none" stroke="${SEAL}" stroke-dasharray="4 3"/>${txt(184, H - 20, 'Takmadan önceki hali', { a: 'start', s: 11 })}
+      </svg>`;
+    },
+    // Gösterge çubuğu: bolgeler = [[bas, son, renk, etiket], ...], deger (aynı birim), maks
+    gosterge(p) {
+      const W = 560, H = 92, x0 = 20, x1 = W - 20, y = 34, h = 18;
+      const X = v => x0 + (x1 - x0) * Math.max(0, Math.min(1, v / p.maks));
+      const renk = { k: '#e9a3a3', s: '#f3d38b', y: '#9fd3b0' };
+      const dv = Math.max(0, Math.min(p.maks, p.deger));
+      return `<svg class="cizim gosterge" viewBox="0 0 ${W} ${H}" role="img" aria-label="${p.baslik}">
+        ${p.bolgeler.map(([a, b, c, t]) => `<rect x="${X(a)}" y="${y}" width="${X(b) - X(a)}" height="${h}" fill="${renk[c]}"/>${t ? txt((X(a) + X(b)) / 2, y + h + 14, t, { s: 10, c: THIN }) : ''}`).join('')}
+        <rect x="${x0}" y="${y}" width="${x1 - x0}" height="${h}" fill="none" stroke="${THIN}" stroke-width="0.8"/>
+        ${p.cizgiler.map(v => `${line(X(v), y + h, X(v), y + h + 4, { c: THIN, w: 0.8 })}${txt(X(v), y + h + 26, v + p.birim, { s: 9.5, c: THIN })}`).join('')}
+        <path d="M${X(dv)} ${y - 2} l-7 -12 h14 z" fill="${INK}"/>
+        <line x1="${X(dv)}" y1="${y - 2}" x2="${X(dv)}" y2="${y + h}" stroke="${INK}" stroke-width="2.5"/>
+        ${txt(Math.min(Math.max(X(dv), 110), W - 110), 14, p.baslik + ': ' + f(p.deger, 1) + p.birim, { b: 1, s: 12 })}
       </svg>`;
     },
     // Cıvata aralığı – kapak eğilmesi (yandan görünüş, abartılı)
