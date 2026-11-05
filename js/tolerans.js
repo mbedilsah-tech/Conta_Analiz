@@ -355,12 +355,12 @@
   function render(yap) {
     const { $, S, syncControls } = U(); const s = S();
     const sek = s.tSekme || 'delikmil';
-    const sonuc = () => sek === 'delikmil' ? delikMilSonuc(s) : sek === 'gecme' ? gecmeSonuc(s) : sek === 'genel' ? genelSonuc(s) : '';
+    const sonuc = () => sek === 'resim' ? g.TRESIM.sonuc(s) : sek === 'delikmil' ? delikMilSonuc(s) : sek === 'gecme' ? gecmeSonuc(s) : sek === 'genel' ? genelSonuc(s) : '';
     if (!yap && $('#modulAlan .tmodul') && $('#tolSonuc')) { $('#tolSonuc').innerHTML = sonuc(); return; }
     $('#modulAlan').innerHTML = `<div class="tmodul">
       <div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Geometrik toleranslandırma <span class="gelis">(geliştirme aşamasında)</span></h2></div>
-      <div class="seg wrap" data-bind="tSekme"><button data-v="delikmil">Delik / mil toleransı</button><button data-v="gecme">Geçme hesabı</button><button data-v="genel">Genel toleranslar (ince / orta / kaba)</button><button data-v="islem">İşleme yöntemi ve IT</button><button data-v="sembol">GD&amp;T sembolleri</button></div>
-      <div class="mt">${sek === 'delikmil' ? delikMilGirdi(s) : sek === 'gecme' ? gecmeGirdi(s) : sek === 'genel' ? genelGirdi(s) : sek === 'islem' ? islemSekme() : sembolSekme()}</div>
+      <div class="seg wrap" data-bind="tSekme"><button data-v="delikmil">Delik / mil toleransı</button><button data-v="gecme">Geçme hesabı</button><button data-v="resim">Örnek teknik resim (GD&amp;T)</button><button data-v="genel">Genel toleranslar (ince / orta / kaba)</button><button data-v="islem">İşleme yöntemi ve IT</button><button data-v="sembol">GD&amp;T sembolleri</button></div>
+      <div class="mt">${sek === 'resim' ? g.TRESIM.girdi(s) : sek === 'delikmil' ? delikMilGirdi(s) : sek === 'gecme' ? gecmeGirdi(s) : sek === 'genel' ? genelGirdi(s) : sek === 'islem' ? islemSekme() : sembolSekme()}</div>
     </div>`;
     syncControls();
     const el = $('#tolSonuc'); if (el) el.innerHTML = sonuc();
@@ -378,5 +378,6 @@
     if (el.dataset && el.dataset.txt) { U().S()[el.dataset.txt] = el.value; U().changed(false); }
   });
 
-  g.TOL = { render, sapma };
+  const itDeger = (cap, k) => { const i = ind(cap); return (IT[k] || [])[i < 0 ? ARALIK.length - 1 : i]; };
+  g.TOL = { render, sapma, itDeger };
 })(window);

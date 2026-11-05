@@ -412,3 +412,8 @@ button.seri-k:disabled { opacity: .45; cursor: default; }
 .tsev-btn button:hover { border-color: var(--accent); }
 .tsev-btn button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .tsev-btn button.on small { color: #fff; }
+/* Örnek teknik resim */
+.gdt-kap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.gdt-kap svg.gdt { width: 100%; min-width: 760px; height: auto; display: block; max-width: none; }
+table.karsi th.sec, table.karsi td.sec { background: var(--accent-soft); font-weight: 700; }
+table.karsi td.num, table.karsi th.num { text-align: center; }

@@ -11,7 +11,8 @@ Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve ü�
 Malzeme ve kaplama verileri `js/malzeme.js`, modül arayüzleri `js/moduller.js
 js/tolerans.js     – delik/mil toleransları, geçmeler, ISO 2768
 js/topluluk.js     – yorumlar ve kullanıcı tedarikçileri
-js/dinamik.js      – dinamik O-ring hesabı` dosyasındadır.
+js/dinamik.js      – dinamik O-ring hesabı
+js/resim.js        – örnek GD&T teknik resim üretici` dosyasındadır.
 
 Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
 
@@ -47,6 +48,10 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **Genel toleranslar** – ISO 2768-1 f/m/c/v (ince/orta/kaba/çok kaba) ve ISO 2768-2 H/K/L, antet notu
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
+
+## v1.0
+
+- **Örnek teknik resim (GD&T)** – Tolerans modülünde yeni sekme: prizmatik (L×W×H) veya silindirik (dış çap, iç çap, kalınlık) parça için çok hassas / hassas / standart / kaba işlemede datumlu (A-B-C) örnek resim; rastgele delik düzeni, konum (ASME Y14.5 bağlantı formülleri + ISO 273), düzlemsellik, diklik, paralellik, salgı, silindiriklik, antet notları ve dört seviyenin karşılaştırma tablosu
 
 ## v0.9
 
