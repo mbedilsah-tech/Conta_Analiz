@@ -1,0 +1,34 @@
+# Conta Analiz
+
+Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
+
+## Sayfalar
+
+1. **Proje girdileri**: Statik/dinamik (dinamik sonraki sürümde), O-ring / gasket (dolu kordon, D-profil, tüp, düz, sünger), EMI var/yok, tasarım yönü, sıcaklık, basınç ve yönü, ortam, gövde malzemesi.
+2. **Kanal & sıkıştırma**
+   - *Contayı biliyorum → kanal öner*: 3 sıkıştırma oranı (düşük / nominal / yüksek) için kanal derinliği, genişliği, kanal çapları, toleranslı en kötü durum sıkıştırması ve kanal doluluğu.
+   - *Kanalı biliyorum → conta öner*: uygun O-ring kesitleri ve en yakın AS568 ölçüsü; gasket için gerekli kalınlık ve en yakın stok kalınlık.
+   - Sıkıştırma limiti (compression limit): izin verilen en yüksek ve en düşük sıkıştırma, metal-metal temas veya stoper/burç önerisi.
+3. **Malzeme & Shore A**: Sıcaklık ve ortam uyumuna göre filtreleme. Sıralama ölçütü seçilebilir: piyasada bulunurluk, ortam uyumu veya maliyet. Basınç ve kapak rijitliğine göre Shore A önerisi verilir. EMI seçiliyse iletken elastomerler (Ag/Al, Ni/C, Ni/Al, Ag/Cu) listelenir.
+4. **Kanal çizim kuralları**: Cıvata deliği ile kanal arası et kalınlığı, kanal ekseni ile cıvata ekseni arası mesafe, kenar mesafesi, cıvata aralığı ve adedi, köşe yarıçapı, EMI için λ/20 kontrolü. Ayrıca çizim kontrol listesi.
+5. **Conta yapıştırma**: Conta malzemesi, yüzey, sıcaklık ve iletkenlik ihtiyacına göre yapıştırıcı önerisi. Önerilen yapıştırıcı teknik resim notuna eklenebilir.
+6. **Teknik resim notu**: ASTM D2000 kod oluşturucu ve TR/EN not metni (ISO 3601, ISO 3302-1, ISO 2230, MIL-DTL-83528, MIL-DTL-5541, yağlayıcı ve yapıştırma notları).
+7. **Ankara tedarikçileri**: OSTİM firma rehberi ve distribütör sayfalarından derlenen iletişim bilgileri.
+8. **Referanslar**: Parker ORD 5700, Parker Chomerics el kitapları, ASTM D2000, AS568, ISO 3601, SAE ARP1231 ve diğer kaynaklar.
+
+## Dosya yapısı
+
+```
+index.html      arayüz iskeleti
+css/style.css   stil
+js/as568.js     AS568 ölçü tablosu (001–475)
+js/data.js      malzeme, sıkıştırma bandı, yapıştırıcı, tedarikçi ve referans verisi
+js/calc.js      hesap motoru (DOM'dan bağımsız, Node ile test edilebilir)
+js/app.js       arayüz mantığı (durum tarayıcıda localStorage'da saklanır)
+```
+
+Değerleri revize etmek için genellikle yalnızca `js/data.js` dosyasını düzenlemek yeterlidir. Sıkıştırma bantları `SIKISTIRMA`, malzemeler `MALZEMELER`, yapıştırıcılar `YAPISTIRICILAR`, tedarikçiler ise `TEDARIKCILER` altındadır.
+
+## Önemli not
+
+Değerler el kitaplarından derlenmiş **başlangıç değerleridir**. Kesin tasarım için tedarikçinin malzeme veri sayfası, ilgili standart ve sızdırmazlık/EMI testi esas alınmalıdır. Tedarikçi iletişim bilgileri Kasım 2026 tarihlidir; aramadan önce güncel olup olmadığını kontrol edin.

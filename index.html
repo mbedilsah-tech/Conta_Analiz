@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conta Analiz – Statik Conta Tasarım Yardımcısı</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="none" stroke="currentColor" stroke-width="6"/><circle cx="20" cy="20" r="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/></svg>
+      <div>
+        <h1>Conta Analiz</h1>
+        <span class="sub">Statik conta tasarım yardımcısı · v0.1</span>
+      </div>
+    </div>
+    <div class="ozet" id="ozet"></div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" id="nav">
+      <button data-page="proje" class="active"><span>1</span>Proje girdileri</button>
+      <button data-page="kanal"><span>2</span>Kanal &amp; sıkıştırma</button>
+      <button data-page="malzeme"><span>3</span>Malzeme &amp; Shore A</button>
+      <button data-page="kurallar"><span>4</span>Kanal çizim kuralları</button>
+      <button data-page="yapistirma"><span>5</span>Conta yapıştırma</button>
+      <button data-page="not"><span>6</span>Teknik resim notu</button>
+      <button data-page="tedarik"><span>7</span>Ankara tedarikçileri</button>
+      <button data-page="ref"><span>8</span>Referanslar</button>
+      <div class="navnote">Değerler el kitaplarından derlenmiş başlangıç değerleridir. Kesin tasarımda tedarikçi veri sayfası ve test esas alınır.</div>
+    </nav>
+
+    <main id="main">
+      <!-- 1. PROJE -->
+      <section data-page="proje" class="page active">
+        <h2>Proje girdileri</h2>
+        <p class="lead">Conta uygulamanızı tanımlayın. Diğer sayfalar bu bilgilere göre otomatik güncellenir.</p>
+
+        <div class="card">
+          <h3>Uygulama türü</h3>
+          <div class="seg" data-bind="hareket">
+            <button data-v="statik">Statik</button>
+            <button data-v="dinamik" disabled title="Sonraki sürümde">Dinamik <small>(yakında)</small></button>
+          </div>
+          <p class="hint">Statik: contalı yüzeyler birbirine göre hareket etmez (kapak, flanş, muhafaza). Dinamik: mil, piston, döner/öteleme hareketi.</p>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h3>Conta tipi</h3>
+            <div class="seg" data-bind="tip">
+              <button data-v="oring">O-ring</button>
+              <button data-v="gasket">Gasket (profil / düz)</button>
+            </div>
+            <div id="gasketSekil" class="mt">
+              <label>Gasket şekli</label>
+              <div class="seg wrap" data-bind="sekil">
+                <button data-v="yuvarlak">Dolu yuvarlak kordon</button>
+                <button data-v="D">D-profil</button>
+                <button data-v="tup">Boşluklu tüp / P</button>
+                <button data-v="duz">Düz (levhadan kesim)</button>
+                <button data-v="sunger">Sünger / köpük</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>EMI ekranlama gerekli mi?</h3>
+            <div class="seg" data-bind="emi">
+              <button data-v="hayir">Hayır</button>
+              <button data-v="evet">Evet – iletken conta</button>
+            </div>
+            <div id="emiAlan" class="mt">
+              <label>En yüksek frekans (GHz)<input type="number" step="0.1" min="0" data-num="fGHz"></label>
+              <p class="hint">İletken elastomer conta hem çevresel sızdırmazlık hem EMI sürekliliği sağlar. Temas yüzeyleri iletken kaplamalı olmalıdır (eloksal yalıtkandır).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Tasarım yönü</h3>
+          <div class="seg" data-bind="mod">
+            <button data-v="conta">Contayı biliyorum → kanal öner</button>
+            <button data-v="kanal">Kanalı biliyorum → conta öner</button>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h3>Çalışma koşulları</h3>
+            <div class="row3">
+              <label>Min. sıcaklık (°C)<input type="number" data-num="Tmin"></label>
+              <label>Maks. sıcaklık (°C)<input type="number" data-num="Tmax"></label>
+              <label>Basınç farkı (bar)<input type="number" step="0.1" data-num="P"></label>
+            </div>
+            <label class="mt">Basınç yönü (O-ring/kanal konumu için)</label>
+            <div class="seg" data-bind="yon">
+              <button data-v="ic">İç basınç (içeriden dışarı)</button>
+              <button data-v="dis">Dış basınç / vakum</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Temas edilen ortam</h3>
+            <div class="checks" id="ortamlar"></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h3>Gövde / kapak</h3>
+            <label>Gövde malzemesi
+              <select data-sel="govde">
+                <option value="al">Alüminyum</option>
+                <option value="paslanmaz">Paslanmaz çelik</option>
+                <option value="celik">Karbon çelik</option>
+                <option value="plastik">Plastik / kompozit</option>
+              </select>
+            </label>
+            <label class="chk mt"><input type="checkbox" data-chk="kapakZayif"> Kapak ince / plastik – düşük sıkma kuvveti istiyorum</label>
+            <label class="chk"><input type="checkbox" data-chk="metalTemas"> Flanşlar metal-metal temas edecek (kanallı tasarım)</label>
+          </div>
+          <div class="card cta">
+            <h3>Hazır</h3>
+            <p>Girdiler kaydedildi. Sıradaki adım:</p>
+            <button class="primary" data-go="kanal">Kanal &amp; sıkıştırma hesabına geç →</button>
+            <button class="ghost" id="sifirla">Varsayılanlara dön</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. KANAL -->
+      <section data-page="kanal" class="page">
+        <h2>Kanal &amp; sıkıştırma</h2>
+        <p class="lead" id="kanalLead"></p>
+        <div class="card" id="kanalGirdi"></div>
+        <div id="kanalSonuc"></div>
+      </section>
+
+      <!-- 3. MALZEME -->
+      <section data-page="malzeme" class="page">
+        <h2>Malzeme &amp; Shore A önerisi</h2>
+        <p class="lead">Sıcaklık ve ortam uyumuna göre filtrelenir. Uygun olanlar seçtiğiniz kritere göre sıralanır.</p>
+        <div class="card row-inline">
+          <label>Sıralama
+            <select data-sel="siralama">
+              <option value="bul">Piyasada bulunurluk (önerilen)</option>
+              <option value="uyum">Ortam uyumu</option>
+              <option value="maliyet">Düşük maliyet</option>
+            </select>
+          </label>
+          <label class="chk"><input type="checkbox" id="uygunsuzGoster"> Uygun olmayanları da göster</label>
+        </div>
+        <div id="malzemeListe"></div>
+        <div id="shoreKart"></div>
+      </section>
+
+      <!-- 4. KURALLAR -->
+      <section data-page="kurallar" class="page">
+        <h2>Kanal çizerken dikkat edilecekler</h2>
+        <p class="lead">Cıvata yerleşimi hesabı ve genel çizim kontrol listesi.</p>
+        <div class="card">
+          <h3>Cıvata – kanal yerleşimi</h3>
+          <div class="row4">
+            <label>Cıvata
+              <select data-sel="M"><option>M3</option><option>M4</option><option>M5</option><option>M6</option><option>M8</option><option>M10</option><option>M12</option><option>M16</option></select>
+            </label>
+            <label>Conta çevre uzunluğu (mm)<input type="number" data-num="cevre"></label>
+            <label>Kapak kalınlığı (mm)<input type="number" step="0.5" data-num="kapakT"></label>
+          </div>
+          <div id="civataSonuc"></div>
+        </div>
+        <div id="kuralListe"></div>
+      </section>
+
+      <!-- 5. YAPIŞTIRMA -->
+      <section data-page="yapistirma" class="page">
+        <h2>Conta yapıştırma</h2>
+        <p class="lead">Conta malzemesi ve yapıştırılacak yüzeye göre yapıştırıcı önerisi (Türkiye’de bulunurluğa göre sıralı).</p>
+        <div class="card row4">
+          <label>Conta malzemesi<select id="yapMalz"></select></label>
+          <label>Yapıştırılacak yüzey<select data-sel="yuzey"></select></label>
+          <label>Maks. sıcaklık (°C)<input type="number" data-num="Tmax"></label>
+          <label class="chk"><input type="checkbox" data-chk="iletkenYap"> Elektriksel iletken bağ gerekli (EMI)</label>
+        </div>
+        <div id="yapListe"></div>
+        <div class="card info">
+          <h3>Uygulama ipuçları</h3>
+          <ul>
+            <li>Yüzeyleri izopropil alkol ile yağdan arındırın; silikon kalıntısı (kalıp ayırıcı) yapışmayı engeller.</li>
+            <li>Yapıştırıcı contanın <b>sızdırmazlık temas yüzeyine</b> taşmamalıdır; kanal tabanına ince ve sürekli değil, gerekiyorsa noktasal uygulayın.</li>
+            <li>EMI contalarda iletken olmayan yapıştırıcıyı yalnızca <b>noktasal</b> (spot) kullanın; iletken yolu kesmeyin.</li>
+            <li>O-ring kordonundan ek yapılıyorsa: prototipte siyanoakrilat (406) yeterli; seri üretimde <b>vulkanize ek</b> veya kalıplanmış (ekleme yapılmamış) O-ring isteyin.</li>
+            <li>Mümkünse yapıştırma yerine conta tutucu geometri tercih edin: kırlangıç kuyruğu (dovetail) kanal, yarım dovetail veya hafif sıkı geçme.</li>
+          </ul>
+          <div class="refs" data-refs="loctite,chomBond"></div>
+        </div>
+      </section>
+
+      <!-- 6. NOT -->
+      <section data-page="not" class="page">
+        <h2>Teknik resim notu oluşturucu</h2>
+        <p class="lead">Seçimlerinizden teknik resme yapıştırılabilir not metni üretir.</p>
+        <div class="grid2">
+          <div class="card" id="notGirdi"></div>
+          <div class="card" id="d2000Kart"></div>
+        </div>
+        <div class="card">
+          <div class="row-inline space">
+            <h3>Not metni</h3>
+            <div>
+              <div class="seg small" data-bind="notDil">
+                <button data-v="tr">Türkçe</button>
+                <button data-v="en">English</button>
+              </div>
+              <button class="primary" id="kopyala">Kopyala</button>
+            </div>
+          </div>
+          <pre id="notCikti" class="notbox"></pre>
+        </div>
+      </section>
+
+      <!-- 7. TEDARİK -->
+      <section data-page="tedarik" class="page">
+        <h2>Ankara’da conta tedarikçileri</h2>
+        <p class="lead">OSTİM firma rehberi ve distribütör sayfalarından derlenmiştir (Kasım 2026). Aramadan önce bilgilerin güncelliğini teyit edin.</p>
+        <div class="filters" id="tedarikFiltre"></div>
+        <div class="cards" id="tedarikListe"></div>
+        <div class="card info">
+          <h3>Global markaların yetkili satıcıları</h3>
+          <p>Parker (O-ring &amp; Chomerics), Freudenberg (Simrit), Trelleborg ve SKF için Türkiye’deki yetkili distribütörleri üreticilerin resmi “distribütör bulucu” sayfalarından kontrol edin. OSTİM’deki pek çok firma bu markaların ürünlerini stoktan sağlayabilir; orijinal ürün ve sertifika (CoC, kür tarihi) isteyin.</p>
+        </div>
+      </section>
+
+      <!-- 8. REF -->
+      <section data-page="ref" class="page">
+        <h2>Referanslar</h2>
+        <p class="lead">Uygulamadaki değerlerin dayandığı kaynaklar. Her hesap kartında ilgili referans etiketi gösterilir.</p>
+        <div id="refListe"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/as568.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/calc.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
