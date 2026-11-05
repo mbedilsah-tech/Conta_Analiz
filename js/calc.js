@@ -305,11 +305,17 @@
     let C = null;
     if (dH <= 0) uyarilar.push('Toleranslar sıkıştırma payının tamamını tüketiyor; kapak eğilmesine pay kalmıyor. Kanal/conta toleransını daraltın veya nominal sıkıştırmayı artırın.');
     else C = Math.pow(480 * p.Ek * p.a * Math.pow(p.tk, 3) * dH / (13 * qmin + 2 * qmax), 0.25);
-    const As = AS_GERILME[p.M] || 14.2;
-    const Fv = 0.6 * 640 * As;                             // 8.8 cıvata yaklaşık montaj ön yükü (N)
+    const tab = (D.CIVATA || {})[p.M];
+    const Fv = tab ? tab.FM * 1000 : 0.6 * 640 * (AS_GERILME[p.M] || 14.2);   // 8.8 montaj ön yükü (N), VDI 2230
     const Fciv = C ? ((qMax0 + 2 * qMin0) / 3 + qp) * C : null;   // cıvata başına conta + basınç yükü
     if (Fciv && Fciv > 0.5 * Fv) uyarilar.push(`Cıvata başına yük (${Math.round(Fciv)} N) 8.8 ${p.M} ön yükünün yarısını aşıyor; cıvatayı büyütün veya aralığı azaltın.`);
     return { E: r2(E), qmax: r2(qmax), qmin: r2(qmin), qp: r2(qp), dH: r2(dH), C: C && r2(C), Fciv: Fciv && Math.round(Fciv), Fv: Math.round(Fv), yontem: p.qOzel > 0 ? 'Kullanıcı değeri' : contaKuvveti(p.sekil, p.d, p.w, p.cNom, E).yontem, uyarilar };
+  }
+
+  // ASME VIII-1 App. 2 / TEMA en büyük cıvata aralığı; m: conta faktörü
+  function asmeMaksAralik(db, t, sekil, shore) {
+    const m = (sekil === 'oring' || sekil === 'yuvarlak' || sekil === 'tup') ? 0 : (shore >= 75 ? 1.0 : 0.5);
+    return { m, Bmax: r2(2 * db + 6 * t / (m + 0.5)), Bsc: r2(2 * db + t) };
   }
 
   // ---- ASTM D2000 kodu ----
@@ -323,7 +329,7 @@
     return `M = metrik birim, Grade ${o.grade}; Tip ${o.type} = ${D.D2000_TIP[o.type]} °C ısıl yaşlandırma; Sınıf ${o.cls} = IRM 903 yağında hacimsel şişme ${D.D2000_SINIF[o.cls]}; sertlik ${o.sert * 10} ± 5 Shore A; min. çekme dayanımı ${parseInt(o.ceki, 10)} MPa.`;
   }
 
-  const out = { shoreE, contaKuvveti, civataAraligi, yolUzunlugu, sekilliOring, daireselOring, kesitAlan, contadanKanal, kanaldanOring, kanaldanConta, oringdenKanalCap, kanalCapindanOring, as568Bul, shoreOneri, malzemeSirala, yapistiriciSirala, civataKurallari, d2000Kod, d2000Acikla, pct, r2 };
+  const out = { asmeMaksAralik, shoreE, contaKuvveti, civataAraligi, yolUzunlugu, sekilliOring, daireselOring, kesitAlan, contadanKanal, kanaldanOring, kanaldanConta, oringdenKanalCap, kanalCapindanOring, as568Bul, shoreOneri, malzemeSirala, yapistiriciSirala, civataKurallari, d2000Kod, d2000Acikla, pct, r2 };
   g.CALC = out;
   if (typeof module !== 'undefined') module.exports = out;
 })(typeof window !== 'undefined' ? window : globalThis);

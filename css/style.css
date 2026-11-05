@@ -220,3 +220,45 @@ details.rule > summary:hover b { color: var(--accent); }
 svg.cizim { width: 100%; height: auto; border-radius: 8px; }
 .formul { font-family: var(--mono); font-size: 13px; background: var(--bg); border-radius: 8px; padding: 10px 12px; margin: 10px 0; overflow-x: auto; }
 @media (max-width: 900px) { .rule-govde { grid-template-columns: 1fr; padding-left: 0; } }
+
+/* Tıklanabilir ölçü kutuları */
+button.kvb { all: unset; box-sizing: border-box; cursor: pointer; display: block; background: var(--bg); border-radius: 8px; padding: 10px 12px; border: 1px solid transparent; position: relative; }
+button.kvb b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+button.kvb span { font-size: 12.5px; color: var(--muted); }
+button.kvb .ipucu { position: absolute; top: 8px; right: 10px; font-size: 11px; color: var(--accent); }
+button.kvb:hover { border-color: var(--accent); }
+button.kvb.on { border-color: var(--accent); background: var(--accent-soft); }
+button.kvb.ana { background: var(--accent-soft); }
+.kvdetay { margin-top: 12px; border: 1px solid var(--accent); border-radius: 10px; padding: 14px; background: #fffdfb; animation: fade .15s ease; }
+.kvdetay h4 { margin: 0 0 8px; font-size: 14.5px; }
+.kvdetay table td { padding: 4px 6px; }
+
+/* Mod seçici */
+.seg.modsec button { font-weight: 600; }
+
+/* Kolay mod */
+.kolay-sayfa { display: none; }
+body.kolay .sidebar, body.kolay .page, body.kolay .ozet { display: none !important; }
+body.kolay .layout { grid-template-columns: 1fr; }
+body.kolay main { max-width: 980px; margin: 0 auto; }
+body.kolay .kolay-sayfa { display: block; }
+.kolay-sec { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.kolay-sec button { font: inherit; text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 16px; cursor: pointer; display: grid; grid-template-columns: 46px 1fr; grid-template-rows: auto auto; column-gap: 12px; }
+.kolay-sec button .ik { grid-row: span 2; font-size: 32px; color: var(--accent); line-height: 1; }
+.kolay-sec button b { font-size: 17px; }
+.kolay-sec button small { color: var(--muted); }
+.kolay-sec button.on { border-color: var(--accent); background: var(--accent-soft); }
+.buyuk input { font-size: 22px !important; padding: 10px 12px !important; max-width: 220px; }
+.hizli { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.secenek { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.secenek button { font: inherit; text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 12px 14px; cursor: pointer; }
+.secenek button.on { border-color: var(--accent); background: var(--accent-soft); }
+.secenek button b { display: block; font-size: 16px; }
+.secenek button .yuzde { font-size: 22px; font-weight: 700; color: var(--accent); }
+.secenek button small { color: var(--muted); display: block; margin-top: 4px; }
+.sonucbuyuk { font-size: 17px; line-height: 1.7; }
+.sonucbuyuk b { font-size: 20px; }
+.sozluk dt { font-weight: 700; margin-top: 8px; }
+.sozluk dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.sira { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--side); color: #fff; font-size: 12px; font-weight: 700; margin-right: 6px; }
+@media (max-width: 900px) { .kolay-sec, .secenek { grid-template-columns: 1fr; } }

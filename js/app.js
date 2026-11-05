@@ -30,7 +30,10 @@
     yuzey: 'al', iletkenYap: false, yapMalz: null,
     // Not
     notDil: 'tr', spec: 'd2000', tolSinif: 'B', yuzeyKalite: 'N', depolama: true, gres: true, yuzeyNot: true, yapNot: false, rohs: false, iso3302: 'M2',
-    d2: null
+    d2: null,
+    // Arayüz
+    arayuz: 'uzman', kolayMod: 'oring', kd: 2.62, kID: null, kh2: 2.0, kb2: 3.6, kolaySev: 1,
+    tedSekme: 'ankara', kvAcik: null
   };
   const KEY = 'contaAnaliz.v1';
   let S = load();
@@ -73,12 +76,13 @@
   document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
 
   // ---------------- Bağlama ----------------
-  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay'];
+  const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme'];
   document.addEventListener('click', e => {
-    const btn = e.target.closest('.seg[data-bind] button');
+    const btn = e.target.closest('[data-bind] > button');
     if (!btn || btn.disabled) return;
     const key = btn.parentElement.dataset.bind;
     S[key] = btn.dataset.v;
+    if (key === 'kolayMod') S.kolaySev = S.kolayMod === 'oring' ? 1 : 0;
     if (key === 'tip') S.sekil = S.tip === 'oring' ? 'oring' : (S.sekil === 'oring' ? 'yuvarlak' : S.sekil);
     if (key === 'tip' || key === 'sekil') {
       if (S.sekil === 'D' && !(S.gw <= 2 * S.gt)) S.gw = S.gt;
@@ -119,6 +123,7 @@
     const p = aktifSayfa();
     if (p === 'kanal') renderKanalGirdi();
     if (p === 'not') renderNotGirdi();
+    if (p === 'kolay') renderKolayGirdi();
   }
   // Detay bölümünün açık/kapalı durumunu hatırla
   document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('detay')) { S.detayAcik = e.target.open; save(); } }, true);
@@ -127,13 +132,14 @@
   }
 
   function syncControls() {
-    $$('.seg[data-bind]').forEach(seg => {
+    $$('[data-bind]').forEach(seg => {
       const v = S[seg.dataset.bind];
       $$('button', seg).forEach(b => b.classList.toggle('on', b.dataset.v === v));
     });
     $$('[data-num]').forEach(el => { if (el !== document.activeElement) el.value = S[el.dataset.num] ?? ''; });
     $$('[data-sel]').forEach(el => { if (S[el.dataset.sel] != null) el.value = S[el.dataset.sel]; });
     $$('[data-chk]').forEach(el => { el.checked = !!S[el.dataset.chk]; });
+    document.body.classList.toggle('kolay', S.arayuz === 'kolay');
     $('#gasketSekil').style.display = S.tip === 'gasket' ? '' : 'none';
     $('#emiAlan').style.display = emi() ? '' : 'none';
   }
@@ -505,70 +511,135 @@
     return null;
   }
 
+  // Tıklanabilir ölçü kutusu
+  const kvb = (key, deger, etiket, ana) => `<button type="button" class="kvb ${ana ? 'ana' : ''} ${S.kvAcik === key ? 'on' : ''}" data-kv="${key}"><span class="ipucu">${S.kvAcik === key ? 'Kapat ▾' : 'Detay ▸'}</span><b>${deger}</b><span>${etiket}</span></button>`;
+  function kvPanel(anahtarlar, detaylar) {
+    if (!anahtarlar.includes(S.kvAcik) || !detaylar[S.kvAcik]) return '';
+    const x = detaylar[S.kvAcik];
+    return `<div class="kvdetay"><h4>${esc(x.baslik)}</h4><div class="rule-govde" style="padding-left:0">${x.ciz}<div class="small">${x.metin}${refs(x.refs)}</div></div></div>`;
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button.kvb[data-kv]');
+    if (!b) return;
+    S.kvAcik = S.kvAcik === b.dataset.kv ? null : b.dataset.kv; save(); renderKurallar();
+  });
+
   function renderKurallar() {
     const sb = sikistirmaBilgi();
     const nk = nominalKanal();
     const kanalli = nk.kanalli !== false;
-    const plastik = (S.kapakMalz || S.govde) === 'plastik';
+    const govdeK = S.kapakMalz || S.govde;
+    const plastik = govdeK === 'plastik';
     const pr = C.civataKurallari({ M: S.M, d: sb.d, b: sb.b, kanalli, metalTemas: S.metalTemas, plastik: plastik || S.kapakZayif, emi: emi(), fGHz: S.fGHz, cevre: null });
     const oto = cevreOto(sb.b);
     const cevre = S.cevre > 0 ? S.cevre : (oto ? oto.L : 400);
     const alanCevre = oto && !(S.cevre > 0) ? oto.ac : cevre / 16;
-    const Ek = E_MALZ[S.kapakMalz || S.govde] || 70000;
+    const Ek = E_MALZ[govdeK] || 70000;
     const a = S.kirisA > 0 ? S.kirisA : Math.max(15, 2 * pr.eksen);
     const shore = S.shore || (mat() ? mat().shore[0] : 70);
-    const ca = C.civataAraligi({ sekil: sb.sekil, d: sb.d, w: sb.w, cNom: sb.cNom, cMinWorst: sb.cMinWorst, bantAlt: sb.bantAlt, shore, Ek, tk: S.kapakT || 5, a, Pbar: S.P, alanCevre, M: S.M, qOzel: S.qOzel });
+    const tk = S.kapakT || 5;
+    const ca = C.civataAraligi({ sekil: sb.sekil, d: sb.d, w: sb.w, cNom: sb.cNom, cMinWorst: sb.cMinWorst, bantAlt: sb.bantAlt, shore, Ek, tk, a, Pbar: S.P, alanCevre, M: S.M, qOzel: S.qOzel });
     const k = S.civK > 0 ? S.civK : 0.8;
     const pEg = ca.C ? ca.C * k : null;
-    const pOneri = pEg ? Math.min(pEg, pr.pMax) : pr.pMin;
-    const yoneten = !pEg ? 'Kapak eğilmesine pay kalmadığı için en sık pratik aralık alındı.' : pEg <= pr.pMax ? 'Belirleyici: kapak eğilmesi hesabı.' : 'Eğilme hesabı daha geniş aralığa izin veriyor; belirleyici pratik üst sınır (montaj düzgünlüğü, düzlemsellik).';
+    const asme = C.asmeMaksAralik(pr.db, tk, sb.sekil, shore);
+    const asmeEmi = emi() ? asme.Bmax * 0.75 : asme.Bmax;
+    const pMinT = Math.max(2.3 * pr.db, 2 * pr.db + 2);
+    let pOneri = Math.min(pEg ?? Infinity, asmeEmi);
+    if (!isFinite(pOneri)) pOneri = asmeEmi;
+    const minAltinda = pOneri < pMinT;
+    pOneri = Math.max(pOneri, pMinT);
+    const yoneten = minAltinda ? 'Hesap en küçük anahtar aralığının altında kaldı: daha kalın kapak veya daha rijit malzeme gerekir.' : (pEg && pEg <= asmeEmi) ? 'Belirleyici: kapak eğilmesi hesabı.' : 'Belirleyici: ASME VIII-1 Ek 2 / TEMA en büyük aralık sınırı' + (emi() ? ' (EMI için %25 sıklaştırıldı).' : '.');
     const adet = Math.max(4, Math.ceil(cevre / pOneri));
+    const adet4 = Math.ceil(adet / 4) * 4;
+    const cv = D.CIVATA[S.M] || { MA: 0, FM: 0 };
+    const disBoy = govdeK === 'al' ? 2 * pr.db : govdeK === 'plastik' ? 2.5 * pr.db : pr.db;
+    const govdeAd = { al: 'alüminyum', paslanmaz: 'paslanmaz', celik: 'çelik', plastik: 'plastik' }[govdeK];
+    const seri = D.DELIK_SERI[S.M] || [pr.delik, pr.delik, pr.delik];
     const ctxEg = `Cıvata aralığı C, kapak şeridi sürekli kiriş kabul edilerek hesaplandı: iki cıvata ortasındaki ek açılma ΔH, contanın en kötü tolerans durumundaki sıkışmasından alt sınıra (${P(sb.bantAlt)}) kadar kalan payı aşmamalı.`;
 
-    $('#civataSonuc').innerHTML = `<p class="small">2. sayfadaki nominal tasarımdan: kesit/kalınlık ${f(sb.d)} mm, kanal genişliği ${f(sb.b)} mm, nominal sıkıştırma ${P(sb.cNom)}, en kötü durumda ${P(sb.cMinWorst)}. Conta çevresi ${f(cevre, 0)} mm${S.cevre > 0 ? '' : oto ? ' (' + oto.kaynak + 'ndan otomatik)' : ' (varsayılan – girin)'}.</p>
+    const DET = {
+      delik: { baslik: `${S.M} geçiş deliği – ISO 273`, ciz: CIZIM.delikDetay({ D: pr.delik, d: pr.db, seri }),
+        metin: `<p>ISO 273’te üç seri vardır: <b>ince Ø${f(seri[0], 1)}</b>, <b>orta Ø${f(seri[1], 1)}</b>, <b>kaba Ø${f(seri[2], 1)}</b>. Kapak bağlantılarında genelde <b>orta seri</b> kullanılır. Kapak kılavuz pimle konumlanıyorsa ince seri yeterlidir. Delik toleransı H13 yazılabilir.</p>`, refs: [['iso273', 'Geçiş deliği çapları (ince/orta/kaba seri).']] },
+      et: { baslik: 'Kanal kenarı – delik kenarı arası et', ciz: CIZIM.etKalinlik({ delik: pr.delik, b: sb.b, e: pr.eMin, L: pr.eksen, M: S.M }),
+        metin: `<p>Et kalınlığı e = maks(2 mm, d) = <b>${f(pr.eMin, 1)} mm</b> (plastikte maks(3 mm, 1,5·d)). Daha ince et, işlemede çapak/kırılmaya ve sıkmada kanal duvarının esnemesine yol açar. Havşa başlı cıvatada havşa çapını, rondelada rondela dış çapını (≈ 2d = ${f(pr.rondela, 0)} mm) ölçün.</p>`, refs: [['kural', 'Et kalınlığı için temkinli başlangıç değeri; işleme ve dayanım kontrolüyle doğrulanmalı.']] },
+      eksen: { baslik: 'Kanal ekseni – cıvata ekseni mesafesi', ciz: CIZIM.etKalinlik({ delik: pr.delik, b: sb.b, e: pr.eMin, L: pr.eksen, M: S.M }),
+        metin: `<p>L = Ø<sub>delik</sub>/2 + e + b/2 = ${f(pr.delik / 2, 2)} + ${f(pr.eMin, 2)} + ${f(sb.b / 2, 2)} = <b>${f(pr.eksen, 1)} mm</b>. Bu en küçük değerdir; L büyüdükçe kapak eğilmesi contayı daha çok etkiler. Bu nedenle kanalı cıvata hattına olabildiğince yakın tutun.</p>`, refs: [['kural', 'Geometrik toplam.'], ['iso273', 'Delik çapı.']] },
+      kenar: { baslik: 'Delik merkezi – parça kenarı', ciz: CIZIM.kenarMesafe({ min: pr.kenarMin, ter: pr.kenarTercih, M: S.M }),
+        metin: `<p>Kenar mesafesi en az <b>1,5·d = ${f(pr.kenarMin, 1)} mm</b>, tercihen <b>2·d = ${f(pr.kenarTercih, 1)} mm</b>. Daha kısa kenarda sıkma kuvveti eti dışa iter, ince saclarda yırtılma olur.</p>`, refs: [['kural', 'Yaygın tasarım kuralı (1,5d–2d).']] },
+      tork: { baslik: `${S.M} sıkma torku ve diş boyu`, ciz: CIZIM.tork({ Lk: Math.min(90, disBoy * 6), MA: cv.MA, FM: cv.FM, dis: disBoy, M: S.M, govdeAd }),
+        metin: `<table><tr><td>Sıkma torku MA</td><td class="num"><b>${f(cv.MA, 1)} Nm</b></td><td>8.8, µ = 0,12, kuru-hafif yağlı</td></tr><tr><td>Montaj ön yükü FM</td><td class="num">${f(cv.FM, 2)} kN</td><td>cıvata başına</td></tr><tr><td>Conta + basınç yükü</td><td class="num">${ca.Fciv ? f(ca.Fciv / 1000, 2) + ' kN' : '–'}</td><td>${ca.Fciv ? 'ön yükün %' + f(ca.Fciv / (cv.FM * 1000) * 100, 0) + '’i' : ''}</td></tr><tr><td>En az diş boyu</td><td class="num"><b>${f(disBoy, 0)} mm</b></td><td>${govdeAd} gövdede ${govdeK === 'al' ? '2·d' : govdeK === 'plastik' ? '2,5·d + metal insert' : '1·d'}</td></tr></table>
+          <ul><li>Cıvatalar <b>çapraz sırayla, 3 adımda</b> (≈ %30 → %70 → %100) son torka getirilir.</li>
+          <li>O-ring + metal-metal temaslı tasarımda tam tork uygulanır; sıkışmayı kanal derinliği sınırlar.</li>
+          <li>Kanalsız düz/sünger contada sıkışma torka bağlıdır: stoper/burç kullanın, yoksa torku düşürün.</li>
+          ${govdeK === 'al' ? '<li>Alüminyumda sık sökülen bağlantılarda Helicoil (tel diş) kullanın.</li>' : ''}${govdeK === 'plastik' ? '<li>Plastikte doğrudan diş açmayın: pirinç insert ve metal compression limiter kullanın; tork plastik üreticisinin değerine göre düşürülür.</li>' : ''}
+          <li>Yağlı (µ ≈ 0,08) cıvatada aynı tork çok daha yüksek ön yük verir. Yağlıyorsanız torku yeniden hesaplayın.</li></ul>`,
+        refs: [['vdi2230', `${S.M} 8.8 µ=0,12: MA ≈ ${f(cv.MA, 1)} Nm, FM ≈ ${f(cv.FM, 2)} kN.`], ['amorim', 'Çapraz sıkma, 3 adım, yağlama uyarısı.'], ['kural', 'Diş boyu: çelik 1d, alüminyum 2d, plastik insert – yaygın tasarım kuralı.']] },
+      aralik: { baslik: 'Önerilen cıvata aralığı nasıl bulundu?', ciz: CIZIM.egilme({ t: tk, C: pOneri, dH: ca.dH }),
+        metin: `<p>Üç sınır birlikte kontrol edilir ve en dar olanı seçilir:</p>
+          <table><tr><td>1. Kapak eğilmesi (k = ${f(k, 2)})</td><td class="num">${pEg ? f(pEg, 0) + ' mm' : 'pay yok'}</td></tr>
+          <tr><td>2. ASME VIII-1 Ek 2 / TEMA en büyük aralık${emi() ? ' × 0,75 (EMI)' : ''}</td><td class="num">${f(asmeEmi, 0)} mm</td></tr>
+          <tr><td>3. En küçük aralık (anahtar boşluğu)</td><td class="num">≥ ${f(pMinT, 0)} mm</td></tr>
+          <tr><td><b>Sonuç</b></td><td class="num"><b>${f(pOneri, 0)} mm</b></td></tr></table>
+          <p>${yoneten}</p>`,
+        refs: [['ee', ctxEg], ['asme', `B_maks = 2·${pr.db} + 6·${f(tk, 1)} / (${asme.m} + 0,5) = ${f(asme.Bmax, 0)} mm.`], ['tema', 'En küçük aralık için oran ≈ 2,3·d.']] },
+      egilmeC: { baslik: 'Kapak eğilmesine göre en büyük aralık', ciz: CIZIM.egilme({ t: tk, C: ca.C || 0, dH: ca.dH }),
+        metin: `<div class="formul">C = [ 480 · E · a · t³ · ΔH / (13·q<sub>min</sub> + 2·q<sub>max</sub>) ]<sup>¼</sup> = <b>${ca.C ? f(ca.C, 0) : '–'} mm</b></div>
+          <table>
+            <tr><td>E (kapak)</td><td class="num">${f(Ek / 1000, 0)} GPa</td><td>${govdeAd}</td></tr>
+            <tr><td>a (kiriş genişliği)</td><td class="num">${f(a, 1)} mm</td><td>${S.kirisA > 0 ? 'girilen' : 'otomatik: 2 × kanal–cıvata eksen mesafesi'}</td></tr>
+            <tr><td>t (kapak kalınlığı)</td><td class="num">${f(tk, 1)} mm</td><td></td></tr>
+            <tr><td>ΔH (izin verilen açılma)</td><td class="num">${f(ca.dH, 3)} mm</td><td>d × (en kötü sıkıştırma − alt sınır)</td></tr>
+            <tr><td>q<sub>max</sub> (cıvata hizası)</td><td class="num">${f(ca.qmax, 2)} N/mm</td><td>conta ${P(sb.cNom)}${ca.qp ? ' + basınç ' + f(ca.qp, 2) : ''}</td></tr>
+            <tr><td>q<sub>min</sub> (cıvata ortası)</td><td class="num">${f(ca.qmin, 2)} N/mm</td><td>conta ${P(sb.bantAlt)}</td></tr>
+            <tr><td>Conta E (Shore ${shore}A)</td><td class="num">${f(ca.E, 2)} MPa</td><td>Gent bağıntısı</td></tr>
+            <tr><td>Conta kuvveti</td><td colspan="2">${esc(ca.yontem)}</td></tr>
+          </table>
+          <p>Basınç yükü, kapak alanı / conta çevresi oranıyla (${f(alanCevre, 1)} mm) çizgisel yüke çevrildi. Model kapak şeridini cıvatalar arasında sürekli kiriş kabul eder; köşe ve nervürler kapağı rijitleştirir, sonuç güvenli taraftadır.</p>`,
+        refs: [['ee', ctxEg], ['krishnan', 'Denklemin dayandığı çalışma.'], ['oren', 'Rijit flanş – sürekli kiriş yaklaşımı.'], ['lindley', 'Conta birim uzunluk kuvveti q.'], ['parkerKuvvet', 'q değerini Parker eğrisiyle karşılaştırın.'], ['gent', 'Shore A → E.']] },
+      asme: { baslik: 'ASME VIII-1 Ek 2 / TEMA en büyük cıvata aralığı', ciz: CIZIM.egilme({ t: tk, C: asme.Bmax, dH: ca.dH }),
+        metin: `<div class="formul">B<sub>maks</sub> = 2·a + 6·t / (m + 0,5) = 2·${pr.db} + 6·${f(tk, 1)} / (${asme.m} + 0,5) = <b>${f(asme.Bmax, 0)} mm</b></div>
+          <p>a: nominal cıvata çapı, t: flanş/kapak kalınlığı, m: conta faktörü. O-ring ve dolu/boşluklu kordon kendinden enerjili sayılır (m = 0). Elastomer düz contada 75 Shore A altında m = 0,5, üstünde m = 1,0.</p>
+          <p>Cıvata aralığı <b>2a + t = ${f(asme.Bsc, 0)} mm</b> değerini aşarsa ASME flanş momentini √(aralık / (2a + t)) katsayısıyla büyütür. Basınçlı kaplar için geliştirilmiştir; kapaklarda temkinli bir üst sınır olarak kullanılır.</p>`,
+        refs: [['asme', 'Bolt spacing (max) = 2a + 6t/(m + 0,5).'], ['tema', 'Aynı ifade TEMA standartlarında da yer alır.']] },
+      pmin: { baslik: 'En küçük cıvata aralığı', ciz: CIZIM.yerlesim(),
+        metin: `<p>Cıvata başı ve anahtarın sığması için aralık en az <b>${f(pMinT, 0)} mm</b> olmalı (≈ maks(2,3·d, rondela çapı + 2 mm)). TEMA Tablo D-5’te büyük cıvatalar için bu oran ≈ 2,3·d’dir.</p>`, refs: [['tema', 'Anahtar boşluğuna göre en küçük aralık.']] },
+      adet: { baslik: 'Cıvata sayısı', ciz: CIZIM.yerlesim(),
+        metin: `<p>n = çevre / aralık = ${f(cevre, 0)} / ${f(pOneri, 0)} → <b>${adet}</b> cıvata. Simetri ve köşe yerleşimi için 4’ün katına yuvarlamak pratiktir: <b>${adet4}</b>. Dikdörtgen kapakta her köşeye bir cıvata koyun; köşe cıvatası kanal köşe radyüsünün dışında kalsın.</p>`,
+        refs: [['kural', '4’ün katına yuvarlama ve köşe cıvatası – yaygın uygulama.']] },
+      kose: { baslik: 'Kanal köşe yarıçapı', ciz: CIZIM.kose({ Rmin: 3 * sb.d, Rtercih: 6 * sb.d }),
+        metin: `<p>Kanal ekseninde köşe yarıçapı en az <b>3·d = R${f(3 * sb.d, 1)}</b>, tercihen <b>6·d = R${f(6 * sb.d, 1)}</b>. Dar köşede O-ring katlanır, kanaldan taşar veya köşede sıkışma azalır.</p>`, refs: [['parker', 'Dairesel olmayan yüz contası kanallarında köşe yarıçapı ≥ 3 × kesit.']] }
+    };
+    const yer = ['delik', 'et', 'eksen', 'kenar', 'tork', 'kose'];
+    const ara = ['aralik', 'egilmeC', 'asme', 'pmin', 'adet'];
+
+    $('#civataSonuc').innerHTML = `<p class="small">2. sayfadaki nominal tasarımdan: kesit/kalınlık ${f(sb.d)} mm, kanal genişliği ${f(sb.b)} mm, nominal sıkıştırma ${P(sb.cNom)}, en kötü durumda ${P(sb.cMinWorst)}. Conta çevresi ${f(cevre, 0)} mm${S.cevre > 0 ? '' : oto ? ' (' + oto.kaynak + 'ndan otomatik)' : ' (varsayılan – girin)'}. <b>Kutulara tıklayın</b>: çizim, açıklama ve kaynak açılır.</p>
       <h3 class="mt">Yerleşim ölçüleri</h3>
       <div class="kv">
-        <div><b>Ø${f(pr.delik, 1)}</b><span>${S.M} geçiş deliği (ISO 273 orta seri)</span></div>
-        <div><b>≥ ${f(pr.eMin, 1)} mm</b><span>kanal kenarı – delik kenarı arası et</span></div>
-        <div><b>≥ ${f(pr.eksen, 1)} mm</b><span>kanal ekseni – cıvata ekseni</span></div>
-        <div><b>${f(pr.kenarMin, 1)} – ${f(pr.kenarTercih, 1)} mm</b><span>delik merkezi – parça dış kenarı (1,5d – 2d)</span></div>
+        ${kvb('delik', 'Ø' + f(pr.delik, 1), `${S.M} geçiş deliği (ISO 273 orta)`)}
+        ${kvb('et', '≥ ' + f(pr.eMin, 1) + ' mm', 'kanal kenarı – delik kenarı arası et')}
+        ${kvb('eksen', '≥ ' + f(pr.eksen, 1) + ' mm', 'kanal ekseni – cıvata ekseni')}
+        ${kvb('kenar', f(pr.kenarMin, 1) + ' – ' + f(pr.kenarTercih, 1) + ' mm', 'delik merkezi – parça kenarı')}
+        ${kvb('tork', f(cv.MA, 1) + ' Nm', `${S.M} 8.8 sıkma torku · diş ≥ ${f(disBoy, 0)} mm`)}
+        ${kvb('kose', 'R ≥ ' + f(3 * sb.d, 1), 'kanal köşe yarıçapı (öneri R' + f(6 * sb.d, 0) + ')')}
       </div>
+      ${kvPanel(yer, DET)}
       <h3 class="mt">Cıvata aralığı</h3>
-      <div class="rule-govde" style="padding-left:0">
-        ${CIZIM.egilme({ t: S.kapakT || 5, C: pOneri, dH: ca.dH })}
-        <div>
-          <div class="kv" style="margin-top:0">
-            <div style="background:var(--accent-soft)"><b>${f(pOneri, 0)} mm</b><span>önerilen cıvata aralığı → en az <b>${adet}</b> cıvata</span></div>
-            <div><b>${pEg ? f(ca.C, 0) + ' mm' : '–'}</b><span>eğilmeye göre maks. C (k = ${f(k, 2)} ile ${pEg ? f(pEg, 0) : '–'} mm)</span></div>
-            <div><b>${f(pr.pMin, 0)} – ${f(pr.pMax, 0)} mm</b><span>pratik aralık (${kanalli ? (S.metalTemas ? 'kanallı, metal temas' : 'kanallı') : 'kanalsız'})</span></div>
-          </div>
-          <p class="small mt"><b>${yoneten}</b></p>
-          <details class="detay"><summary>Hesabın ayrıntısı</summary><div class="detay-ic small">
-            <div class="formul">C = [ 480 · E · a · t³ · ΔH / (13·q<sub>min</sub> + 2·q<sub>max</sub>) ]<sup>¼</sup></div>
-            <table>
-              <tr><td>E (kapak)</td><td class="num">${f(Ek / 1000, 0)} GPa</td><td>${esc(S.kapakMalz || S.govde)}</td></tr>
-              <tr><td>a (kiriş genişliği)</td><td class="num">${f(a, 1)} mm</td><td>${S.kirisA > 0 ? 'girilen' : 'otomatik: 2 × kanal–cıvata eksen mesafesi'}</td></tr>
-              <tr><td>t (kapak kalınlığı)</td><td class="num">${f(S.kapakT || 5, 1)} mm</td><td></td></tr>
-              <tr><td>ΔH (izin verilen açılma)</td><td class="num">${f(ca.dH, 3)} mm</td><td>d × (en kötü sıkıştırma − alt sınır)</td></tr>
-              <tr><td>q<sub>max</sub> (cıvata hizası)</td><td class="num">${f(ca.qmax, 2)} N/mm</td><td>conta ${P(sb.cNom)}${ca.qp ? ' + basınç ' + f(ca.qp, 2) : ''}</td></tr>
-              <tr><td>q<sub>min</sub> (cıvata ortası)</td><td class="num">${f(ca.qmin, 2)} N/mm</td><td>conta ${P(sb.bantAlt)}${ca.qp ? ' + basınç' : ''}</td></tr>
-              <tr><td>Conta E (Shore ${shore}A)</td><td class="num">${f(ca.E, 2)} MPa</td><td>Gent bağıntısı</td></tr>
-              <tr><td>Conta kuvveti yöntemi</td><td colspan="2">${esc(ca.yontem)}</td></tr>
-              <tr><td>Cıvata başına yük</td><td class="num">${ca.Fciv ? f(ca.Fciv, 0) + ' N' : '–'}</td><td>8.8 ${S.M} ön yükü ≈ ${f(ca.Fv, 0)} N</td></tr>
-            </table>
-            ${ca.qp ? '' : ''}
-            <p>Basınç yükü, kapak alanı / conta çevresi oranıyla (${f(alanCevre, 1)} mm) çizgisel yüke çevrildi. Eğilme modeli kapak şeridini cıvatalar arasında sürekli kiriş kabul eder; köşeler ve nervürler kapağı rijitleştirir, yani sonuç güvenli taraftadır. Kritik tasarımda FEA ile doğrulayın.</p>
-          </div></details>
-          ${ca.uyarilar.map(u => `<div class="warnbox">${esc(u)}</div>`).join('')}
-          ${pr.pEmi ? `<div class="okbox">EMI: ${f(S.fGHz, 1)} GHz için λ/20 = ${f(pr.pEmi, 1)} mm. Bu, conta temasının koptuğu durumda oluşacak açıklığın üst sınırıdır. İletken conta sürekli temas ettiği sürece cıvata aralığını değil, kapak eğilmesini sınırlar. Pratik aralık EMI için %25 sıklaştırıldı.</div>` : ''}
-          ${refs([['ee', ctxEg], ['krishnan', 'Denklemin dayandığı çalışma.'], ['oren', 'Rijit flanş – sürekli kiriş yaklaşımı.'], ['lindley', 'O-ring/kordon birim uzunluk sıkıştırma kuvveti q.'], ['parkerKuvvet', 'Kuvveti üretici eğrisiyle karşılaştırmak için.'], ['gent', 'Shore A → E dönüşümü.'], ['iso273', 'Geçiş deliği çapı.'], ['kural', 'Pratik aralık: ' + pr.aciklama]])}
-        </div>
-      </div>`;
+      <div class="kv">
+        ${kvb('aralik', f(pOneri, 0) + ' mm', `önerilen aralık → en az ${adet} cıvata`, true)}
+        ${kvb('egilmeC', ca.C ? f(ca.C, 0) + ' mm' : '–', 'kapak eğilmesine göre en büyük')}
+        ${kvb('asme', f(asmeEmi, 0) + ' mm', 'ASME VIII-1 Ek 2 / TEMA en büyük' + (emi() ? ' (EMI ×0,75)' : ''))}
+        ${kvb('pmin', '≥ ' + f(pMinT, 0) + ' mm', 'en küçük (anahtar boşluğu)')}
+        ${kvb('adet', adet4 + ' adet', `simetrik yerleşim (hesap: ${adet})`)}
+      </div>
+      ${kvPanel(ara, DET)}
+      <p class="small mt"><b>${yoneten}</b></p>
+      ${ca.uyarilar.map(u => `<div class="warnbox">${esc(u)}</div>`).join('')}
+      ${pr.pEmi ? `<div class="okbox">EMI: ${f(S.fGHz, 1)} GHz için λ/20 = ${f(pr.pEmi, 1)} mm. Bu değer, conta temasının koptuğu yerde oluşacak açıklık içindir. İletken conta sürekli temas ettiği sürece cıvata aralığını değil, kapak eğilmesini sınırlar.</div>` : ''}`;
 
     const d = sb.d;
     const R = [
       { t: 'Contayı basınç tarafına, cıvataları dışına yerleştirin', d: 'Cıvata delikleri sızdırmaz bölgenin dışında kalmalı. Cıvata sızdırmaz bölgeden geçmek zorundaysa her cıvataya ayrı O-ring veya contalı rondela verin.', r: [['parker', 'Statik yüz contası düzenlemesi: conta, basınçlı hacmi cıvata deliklerinden ayırır.']], c: () => CIZIM.yerlesim() },
-      { t: `Cıvata aralığı ≈ ${f(pOneri, 0)} mm (en az ${adet} cıvata)`, d: 'İki cıvata ortasında kapak eğilir, conta en az orada sıkışır. Aralık, bu noktadaki sıkışma alt sınırın altına düşmeyecek şekilde seçilir. Hesabın ayrıntısı yukarıdaki kartta.', r: [['ee', ctxEg], ['oren', 'Sürekli kiriş yaklaşımı.'], ['lindley', 'Conta kuvveti.']], c: () => CIZIM.egilme({ t: S.kapakT || 5, C: pOneri, dH: ca.dH }) },
+      { t: `Cıvata aralığı ≈ ${f(pOneri, 0)} mm (${adet4} cıvata), sıkma torku ${f(cv.MA, 1)} Nm`, d: `İki cıvata ortasında kapak eğilir, conta en az orada sıkışır. Aralık, kapak eğilmesi hesabı ile ASME VIII-1 Ek 2 / TEMA üst sınırının küçüğüdür. ${S.M} 8.8 cıvatalar çapraz sırayla, 3 adımda ${f(cv.MA, 1)} Nm’ye sıkılır.`, r: [['ee', ctxEg], ['asme', `B_maks = ${f(asme.Bmax, 0)} mm.`], ['vdi2230', 'Sıkma torku.'], ['amorim', 'Sıkma sırası.']], c: () => CIZIM.egilme({ t: tk, C: pOneri, dH: ca.dH }) },
       { t: 'Kanalı cıvata hattına yakın tutun, et kalınlığını koruyun', d: `Conta ne kadar cıvataya yakınsa kapak eğilmesinin etkisi o kadar az olur. Ancak delikle kanal arasında en az ≈ ${f(pr.eMin, 1)} mm et kalmalı (plastikte ≥ ${f(Math.max(3, 1.5 * d), 1)} mm). Havşa ve rondela izini de hesaba katın.`, r: [['kural', 'Et kalınlığı = maks(2 mm, d) metal; maks(3 mm, 1,5d) plastik – işleme ve dayanım için temkinli başlangıç.'], ['iso273', 'Delik çapı.']], c: () => CIZIM.etKalinlik({ delik: pr.delik, b: sb.b, e: pr.eMin, L: pr.eksen, M: S.M }) },
       { t: 'Köşelerde yeterli yarıçap', d: `Dikdörtgen kanal yolunda köşe yarıçapı kanal ekseninde en az 3 × kesit (≈ R${f(3 * d, 1)}), tercihen 6 × kesit olmalı. Keskin köşede O-ring kanaldan taşar veya katlanır.`, r: [['parker', 'Dairesel olmayan yüz contası kanallarında köşe yarıçapı ≥ 3 × kesit.']], c: () => CIZIM.kose({ Rmin: 3 * d, Rtercih: 6 * d }) },
       { t: 'Kanal kenarları ve taban radyüsü', d: 'Kanal tabanında R0,2–0,4 mm köşe radyüsü, kanal ağzında 0,1–0,2 mm kenar kırma/radyüs. Çapak kesinlikle olmamalı (montajda contayı keser).', r: [['parker', 'Kanal taban ve kenar radyüsleri (gland detail).'], ['iso3601', 'ISO 3601-2 kanal detayları.']], c: () => CIZIM.kenar() },
@@ -577,6 +648,7 @@
       { t: 'Düzlemsellik ve rijitlik', d: 'Conta temas yüzeyinin düzlemselliği sıkıştırma payının küçük bir kısmı olmalı (tipik ≤ 0,05 mm / 100 mm). Uzun ince kapaklarda nervür veya kalınlık artışı düşünün.', r: [['kural', `Düzlemsellik, ΔH payını (${f(ca.dH, 2)} mm) tüketmemeli.`]], c: () => CIZIM.duzlem() },
       { t: 'Basınç yönüne göre O-ring konumu', d: 'İç basınçta O-ring kanalın dış duvarına, dış basınç/vakumda iç duvarına yaslanacak şekilde boyutlandırın (2. sayfa bunu otomatik yapar). Böylece basınç O-ring’i hareket ettirmez.', r: [['parker', 'Yüz contasında iç/dış basınca göre O-ring konumlandırma.']], c: () => CIZIM.basincYonu() },
       { t: 'Tolerans zinciri', d: 'Kanal derinliği toleransı genelde ±0,05 mm yeterli; EMI conta gibi dar bantlarda ±0,03 mm hedefleyin. Kapak/gövde çarpılması ve kaplama kalınlığı (eloksal, boya) derinliğe eklenir.', r: [['iso3601', 'Kanal derinlik toleransları.']], c: () => CIZIM.tolerans({ h: nk.h || 2, tol: S.hTol || 0.05 }) },
+      { t: `Sıkma torku ve diş boyu: ${S.M} → ${f(cv.MA, 1)} Nm, diş ≥ ${f(disBoy, 0)} mm`, d: `8.8, µ = 0,12 için ${f(cv.MA, 1)} Nm (ön yük ≈ ${f(cv.FM, 1)} kN). ${govdeAd} gövdede en az ${f(disBoy, 0)} mm diş boyu bırakın. Kanalsız contada sıkışma torka bağlıdır; stoper kullanın.`, r: [['vdi2230', 'Tork ve ön yük tablo değerleri.'], ['amorim', 'Çapraz sıkma, 3 adım.'], ['kural', 'Diş boyu kuralı.']], c: () => CIZIM.tork({ Lk: Math.min(90, disBoy * 6), MA: cv.MA, FM: cv.FM, dis: disBoy, M: S.M, govdeAd }) },
       { t: 'Montaj ve servis', d: 'Kanalın kolay temizlenebilir olmasını sağlayın; contayı söküp takmak için bir noktada sökme cebi bırakmak faydalıdır. Conta ezilmesini önlemek için kapak kılavuz pimle konumlansın.', r: [['kural', 'Montaj kolaylığı önerisi.']], c: () => CIZIM.servis() }
     ];
     if (emi()) R.push(
@@ -745,20 +817,118 @@
   // ---------------- 7. Tedarikçiler ----------------
   let tedFiltre = 'Tümü';
   function renderTedarik() {
-    const tags = ['Tümü', ...new Set(D.TEDARIKCILER.flatMap(t => t.tags))];
+    const G = D.TEDARIKCI_GRUP[S.tedSekme] || D.TEDARIKCI_GRUP.ankara;
+    $('#tedarikNot').textContent = {
+      ankara: 'Ankara’da doğrudan ulaşabileceğiniz üretici, stokçu ve distribütörler.',
+      turkiye: 'Türkiye genelindeki büyük üreticiler ve global firmaların Türkiye şirketleri. Ankara firmaları da bu listede.',
+      dunya: 'Türkiye’ye ürün satan dünyanın en büyük sızdırmazlık firmaları. Türkiye’deki satış kanalı kartlarda yazılı.'
+    }[S.tedSekme];
+    const tags = ['Tümü', ...new Set(G.liste.flatMap(t => t.tags))];
+    if (!tags.includes(tedFiltre)) tedFiltre = 'Tümü';
     $('#tedarikFiltre').innerHTML = tags.map(t => `<button class="mini ${t === tedFiltre ? 'on' : ''}" data-tf="${esc(t)}">${esc(t)}</button>`).join('');
     $$('[data-tf]').forEach(b => b.addEventListener('click', () => { tedFiltre = b.dataset.tf; renderTedarik(); }));
-    const liste = D.TEDARIKCILER.filter(t => tedFiltre === 'Tümü' || t.tags.includes(tedFiltre))
-      .sort((a, b) => (emi() ? (b.tags.includes('EMI') - a.tags.includes('EMI')) : 0));
-    $('#tedarikListe').innerHTML = liste.map(t => `<div class="card sup">
-      <h3>${esc(t.ad)}</h3><div class="where">${esc(t.bolge)}</div>
+    const liste = G.liste.filter(t => tedFiltre === 'Tümü' || t.tags.includes(tedFiltre))
+      .sort((a, b) => (b.olcek - a.olcek) || ((a.kurulus || 9999) - (b.kurulus || 9999)));
+    $('#tedarikListe').innerHTML = liste.map((t, i) => `<div class="card sup">
+      <h3><span class="sira">${i + 1}</span>${esc(t.ad)}</h3><div class="where">${esc(t.bolge)}</div>
+      <div class="pill-row small">${t.kurulus ? `<span class="chip">Kuruluş <b>${t.kurulus}</b></span>` : ''}${t.calisan && t.calisan !== '–' ? `<span class="chip">Çalışan <b>${esc(t.calisan)}</b></span>` : ''}</div>
       <p>${esc(t.odak)}</p>
       <p>📍 ${esc(t.adres)}</p>
-      <p>📞 ${t.tel.map(n => `<a href="tel:${n.replace(/\s/g, '')}">${esc(n)}</a>`).join(' · ')}</p>
+      ${t.tel.length ? `<p>📞 ${t.tel.map(n => `<a href="tel:${n.replace(/\s/g, '')}">${esc(n)}</a>`).join(' · ')}</p>` : ''}
       ${t.eposta ? `<p>✉️ <a href="mailto:${esc(t.eposta)}">${esc(t.eposta)}</a></p>` : ''}
       ${t.web ? `<p>🌐 <a href="${esc(t.web)}" target="_blank" rel="noopener">${esc(t.web.replace(/^https?:\/\//, ''))}</a></p>` : ''}
-      <div class="pill-row">${t.tags.map(x => `<span class="chip">${esc(x)}</span>`).join('')}<a class="ref" href="${esc(t.kaynak)}" target="_blank" rel="noopener">Kaynak</a></div>
+      <div class="pill-row">${t.tags.map(x => `<span class="chip">${esc(x)}</span>`).join('')}<a class="ref" href="${esc(t.kaynak)}" target="_blank" rel="noopener">Bilgi kaynağı ↗</a></div>
     </div>`).join('');
+  }
+
+  // ---------------- Kolay mod ----------------
+  const HIZLI = [1.78, 2.0, 2.62, 3.0, 3.53, 4.0, 5.33, 6.99];
+  function renderKolayGirdi() {
+    const el = $('#kolayGirdi');
+    if (S.kolayMod === 'oring') {
+      el.innerHTML = `<h3>2 · O-ring’inizin ölçüsü</h3>
+        <div class="row-inline">
+          <label class="buyuk">O-ring kalınlığı (mm)<input type="number" step="0.01" data-num="kd"></label>
+          <label class="buyuk">İç çap (mm) – bilmiyorsanız boş bırakın<input type="number" step="0.1" data-num="kID" placeholder="opsiyonel"></label>
+        </div>
+        <p class="hint">Kalınlık: halkanın et kalınlığıdır, kumpasla yandan ölçülür (iç çap değil). Sık kullanılan ölçüler:</p>
+        <div class="hizli">${HIZLI.map(d => `<button class="mini ${Math.abs(S.kd - d) < 0.005 ? 'on' : ''}" data-kd="${d}">${f(d)} mm</button>`).join('')}</div>`;
+      $$('[data-kd]').forEach(b => b.addEventListener('click', () => { S.kd = +b.dataset.kd; S.kolaySev = 1; changed(true); }));
+    } else {
+      el.innerHTML = `<h3>2 · Kanalınızın ölçüsü</h3>
+        <div class="row-inline">
+          <label class="buyuk">Kanal derinliği (mm)<input type="number" step="0.01" data-num="kh2"></label>
+          <label class="buyuk">Kanal genişliği (mm)<input type="number" step="0.01" data-num="kb2"></label>
+        </div>
+        <p class="hint">Derinlik: kanal tabanından yüzeye kadar. Genişlik: kanalın iki duvarı arası.</p>`;
+    }
+    syncControls();
+  }
+  function malzemeKolay() {
+    return `<div class="card"><h3>4 · Malzeme ve sertlik</h3>
+      <p class="sonucbuyuk">Önerilen: <b>NBR (nitril) – 70 Shore A</b></p>
+      <p class="small">En yaygın ve en ucuz O-ring malzemesi; her conta satıcısında stokta bulunur. Yağa, yakıta, suya ve havaya dayanır. Sertlik 70 Shore A, çoğu kapak ve flanş için doğru değerdir.</p>
+      <table class="mt"><thead><tr><th>Durumunuz buysa</th><th>Bunu seçin</th></tr></thead><tbody>
+        <tr><td>Genel kullanım, yağ, yakıt (−30 … +100 °C)</td><td><b>NBR 70 Shore A</b></td></tr>
+        <tr><td>Su, buhar, dış ortam / güneş (yağ YOK)</td><td><b>EPDM 70 Shore A</b></td></tr>
+        <tr><td>Yüksek sıcaklık (200 °C’ye kadar), yakıt, kimyasal</td><td><b>FKM (Viton) 75 Shore A</b></td></tr>
+        <tr><td>Çok soğuk veya çok sıcak (−60 … +200 °C), gıda, ince/plastik kapak</td><td><b>Silikon (VMQ) 60–70 Shore A</b></td></tr>
+        <tr><td>Yüksek basınç (> 100 bar)</td><td><b>NBR veya FKM 90 Shore A</b></td></tr>
+      </tbody></table>
+      <dl class="sozluk mt">
+        <dt>Shore A nedir?</dt><dd>Kauçuğun sertliği. 50 yumuşak (silgi gibi), 70 orta (araba lastiği gibi), 90 serttir. Yumuşak conta az kuvvetle sızdırmazlık sağlar, sert conta yüksek basınca dayanır.</dd>
+        <dt>Sıkıştırma oranı nedir?</dt><dd>Kapak kapandığında O-ring’in kalınlığının yüzde kaçı ezildiği. Çok az ezilirse sızdırır, çok ezilirse zamanla kalıcı deforme olup çatlar. Statik contada %18–28 arası iyidir.</dd>
+      </dl>
+      ${refs([['parker', 'Malzeme seçimi ve statik conta sıkıştırma aralığı.']])}</div>`;
+  }
+  function renderKolaySonuc() {
+    const el = $('#kolaySonuc');
+    const sevAd = [['Az sıkı', 'Kapak inceyse / plastikse; az kuvvet ister'], ['Önerilen', 'Çoğu uygulama için en iyisi'], ['Sıkı', 'Gaz, vakum veya çok soğuk ortam']];
+    if (S.kolayMod === 'oring') {
+      if (!(S.kd > 0)) { el.innerHTML = ''; return; }
+      const cs = D.CS_LISTE.find(c => Math.abs(c.d - S.kd) < 0.005);
+      const r = C.contadanKanal({ sekil: 'oring', t: S.kd, tTol: cs ? cs.tol : 0.08, hTol: 0.05, bTol: 0.1, g: 0 });
+      const i = S.kolaySev ?? 1, s = r.satirlar[i];
+      const cap = S.kID > 0 ? C.oringdenKanalCap(S.kID, S.kd, s.b, 'ic') : null;
+      el.innerHTML = `<div class="card"><h3>3 · Kanalı şu ölçülerde açın</h3>
+        <div class="secenek">${r.satirlar.map((x, j) => `<button class="${j === i ? 'on' : ''}" data-ksev="${j}"><b>${sevAd[j][0]}</b><span class="yuzde">%${f(x.c * 100, 0)}</span> sıkıştırma<small>${sevAd[j][1]}</small></button>`).join('')}</div>
+        <div class="rule-govde mt" style="padding-left:0; grid-template-columns: minmax(320px, 560px) 1fr">
+          ${CIZIM.kolayKesit({ b: s.b, h: s.h, d: S.kd })}
+          <div class="sonucbuyuk">
+            Kanal derinliği: <b>${f(s.h)} mm</b> <span class="small">(±0,05)</span><br>
+            Kanal genişliği: <b>${f(s.b)} mm</b> <span class="small">(+0,1 / 0)</span><br>
+            ${cap ? `Kanal dış çapı: <b>Ø${f(cap.kanalDis)} mm</b><br>Kanal iç çapı: <b>Ø${f(cap.kanalIc)} mm</b><br>` : ''}
+            <p class="small">Kapak gövdeye tam oturmalı (metal metale). O-ring’in ezilmesini kanal derinliği ayarlar. Kanal köşeleri çapaksız olmalı, köşe yarıçapı en az R${f(3 * S.kd, 1)}.</p>
+            ${cap ? '<p class="small">Çaplar, basınç içeriden dışarı doğru kabul edilerek verildi (O-ring dış duvara yaslanır).</p>' : '<p class="small">İç çapı da girerseniz kanalın çaplarını da veririz.</p>'}
+          </div>
+        </div></div>${malzemeKolay()}
+        <div class="card info"><p>Daha fazlası için (tolerans, cıvata aralığı, teknik resim notu) <button class="primary" id="uzmanaAktar">Uzman moduna aktar →</button></p></div>`;
+    } else {
+      if (!(S.kh2 > 0 && S.kb2 > 0)) { el.innerHTML = ''; return; }
+      const k = C.kanaldanOring({ h: S.kh2, b: S.kb2, g: 0, hTol: 0.05 });
+      const uy = k.list.filter(x => x.uygun).slice(0, 3);
+      if (!uy.length) {
+        el.innerHTML = `<div class="card"><h3>3 · Uygun O-ring</h3><div class="warnbox">Bu kanal ölçüsüne standart O-ring uymuyor. Kanal derinliği yaklaşık O-ring kalınlığının ¾’ü, genişliği ise kalınlığın 1,4 katı olmalı. Örneğin 2,62 mm O-ring için derinlik 2,0 mm, genişlik 3,6 mm.</div></div>${malzemeKolay()}`;
+      } else {
+        const i = Math.min(S.kolaySev ?? 0, uy.length - 1), x = uy[i];
+        el.innerHTML = `<div class="card"><h3>3 · Bu kanala uyan O-ring</h3>
+          <div class="secenek">${uy.map((y, j) => `<button class="${j === i ? 'on' : ''}" data-ksev="${j}"><b>${f(y.d)} mm kalınlık</b><span class="yuzde">%${f(y.c * 100, 0)}</span> sıkıştırma<small>${j === 0 ? 'En uygun' : y.c > uy[0].c ? 'Daha sıkı' : 'Daha gevşek'}${y.std.startsWith('AS568') ? ' · inç standart (AS568)' : ' · metrik'}</small></button>`).join('')}</div>
+          <div class="rule-govde mt" style="padding-left:0; grid-template-columns: minmax(320px, 560px) 1fr">
+            ${CIZIM.kolayKesit({ b: S.kb2, h: S.kh2, d: x.d })}
+            <div class="sonucbuyuk">Alınacak O-ring kalınlığı: <b>${f(x.d)} mm</b><br>Sıkıştırma: <b>%${f(x.c * 100, 0)}</b> <span class="small">(iyi aralık %18–28)</span><br>Kanal doluluğu: <b>%${f(x.dol * 100, 0)}</b> <span class="small">(en fazla %85)</span>
+            <p class="small">Satıcıya kalınlığı ve kanalın çapını söyleyin; iç çapı kanal çapına göre seçerler. O-ring kanala oturunca kanalın dış duvarına hafifçe yaslanmalı.</p></div>
+          </div></div>${malzemeKolay()}
+          <div class="card info"><p>Daha fazlası için <button class="primary" id="uzmanaAktar">Uzman moduna aktar →</button></p></div>`;
+      }
+    }
+    $$('[data-ksev]').forEach(b => b.addEventListener('click', () => { S.kolaySev = +b.dataset.ksev; changed(false); }));
+    const ua = $('#uzmanaAktar');
+    if (ua) ua.addEventListener('click', () => {
+      S.arayuz = 'uzman'; S.tip = 'oring'; S.sekil = 'oring';
+      if (S.kolayMod === 'oring') { S.mod = 'conta'; S.cs = S.kd; S.ozelOring = S.kID > 0; S.ID = S.kID; }
+      else { S.mod = 'kanal'; S.kh = S.kh2; S.kb = S.kb2; }
+      save(); go('kanal'); toast('Ölçüler uzman moduna aktarıldı');
+    });
   }
 
   // ---------------- 8. Referanslar ----------------
@@ -768,7 +938,7 @@
   }
 
   // ---------------- Ana render ----------------
-  function aktifSayfa() { return ($('.page.active') || {}).dataset?.page; }
+  function aktifSayfa() { return S.arayuz === 'kolay' ? 'kolay' : ($('.page.active') || {}).dataset?.page; }
   function renderAll(yapisal) {
     syncControls();
     renderOzet();
@@ -780,6 +950,7 @@
     if (p === 'not') { if (yapisal || !$('#notGirdi').innerHTML) renderNotGirdi(); renderNotCikti(); }
     if (p === 'tedarik') renderTedarik();
     if (p === 'ref') renderRef();
+    if (p === 'kolay') { if (yapisal || !$('#kolayGirdi').innerHTML) renderKolayGirdi(); renderKolaySonuc(); }
     syncControls();
   }
   $('#uygunsuzGoster').addEventListener('change', renderMalzeme);

@@ -184,6 +184,74 @@
         <path d="M290 30 h-60 a10 10 0 0 0 -10 10 v90 a10 10 0 0 0 10 10 h120 a10 10 0 0 0 10 -10 v-90 a10 10 0 0 0 -10 -10 h-40" fill="none" stroke="#7d8b8f" stroke-width="6"/>
         ${isaret(290, 85, false)}${txt(290, 160, 'Boşluklu bindirme – sızıntı/EMI açıklığı', { s: 10.5 })}`, 'EMI süreklilik');
     },
+    // Cıvata kesiti: tork, ön yük, diş boyu
+    tork(p) {
+      const x = 200;
+      return svg(400, 230, `
+        <rect x="40" y="70" width="320" height="26" fill="url(#tr-hat)" stroke="${INK}"/>${txt(48, 86, 'Kapak', { s: 10, a: 'start', c: THIN })}
+        <rect x="40" y="96" width="320" height="110" fill="url(#tr-hat)" stroke="${INK}"/>${txt(48, 200, 'Gövde', { s: 10, a: 'start', c: THIN })}
+        <rect x="${x - 22}" y="40" width="44" height="30" rx="3" fill="#cfd5d3" stroke="${INK}"/>
+        <rect x="${x - 10}" y="70" width="20" height="${26 + p.Lk}" fill="#e7ebe9" stroke="${INK}"/>
+        ${Array.from({ length: Math.floor(p.Lk / 6) }, (_, i) => `<line x1="${x - 10}" y1="${100 + i * 6}" x2="${x + 10}" y2="${103 + i * 6}" stroke="${INK}" stroke-width="0.7"/>`).join('')}
+        <rect x="${x - 13}" y="96" width="26" height="${p.Lk}" fill="none" stroke="${INK}" stroke-dasharray="3 2"/>
+        <path d="M${x - 34} 48 A36 14 0 1 1 ${x + 34} 48" fill="none" stroke="${DIM}" stroke-width="1.6" marker-end="url(#ok-a)"/>
+        ${txt(x, 26, 'MA = ' + f(p.MA, 1) + ' Nm', { c: DIM, b: 1, s: 12 })}
+        ${uzatma(x + 13, 96, x + 60, 96)}${uzatma(x + 13, 96 + p.Lk, x + 60, 96 + p.Lk)}
+        ${olcuV(x + 54, 96, 96 + p.Lk, 'Diş boyu ≥ ' + f(p.dis, 0) + ' mm')}
+        ${etiket(x - 10, 84, 110, 56, '', 'end')}${txt(108, 52, 'Ön yük FM ≈ ' + f(p.FM, 1) + ' kN', { a: 'end', s: 10.5 })}
+        ${txt(200, 222, p.M + ' 8.8 · µ = 0,12 · ' + p.govdeAd + ' gövde', { s: 10.5, c: THIN })}`, 'Sıkma torku');
+    },
+    // Delik merkezi – parça kenarı
+    kenarMesafe(p) {
+      return svg(400, 190, `
+        <path d="M40 40 H300 V150 H40 Z" fill="#f7f8f6" stroke="${INK}" stroke-width="1.4"/>
+        ${delik(120, 95, 16)}
+        ${uzatma(120, 95, 120, 172)}${uzatma(40, 150, 40, 172)}
+        ${olcuH(40, 120, 168, f(p.min, 1) + ' – ' + f(p.ter, 1), false)}
+        ${txt(210, 80, 'Kenar mesafesi = 1,5d … 2d', { s: 11, a: 'start' })}
+        ${txt(210, 98, 'Kısa kalırsa kenar yırtılır,', { s: 10.5, a: 'start', c: THIN })}
+        ${txt(210, 114, 'sıkmada et şişer', { s: 10.5, a: 'start', c: THIN })}
+        ${txt(120, 128, p.M, { s: 10.5 })}`, 'Kenar mesafesi');
+    },
+    // Geçiş deliği
+    delikDetay(p) {
+      return svg(400, 190, `
+        <rect x="40" y="60" width="320" height="30" fill="url(#tr-hat)" stroke="${INK}"/>
+        <rect x="40" y="90" width="320" height="60" fill="url(#tr-hat)" stroke="${INK}"/>
+        <rect x="${200 - p.D * 3}" y="60" width="${p.D * 6}" height="30" fill="#fff" stroke="${INK}"/>
+        <rect x="${200 - p.d * 3}" y="40" width="${p.d * 6}" height="80" fill="#e7ebe9" stroke="${INK}"/>
+        ${uzatma(200 - p.D * 3, 60, 200 - p.D * 3, 30)}${uzatma(200 + p.D * 3, 60, 200 + p.D * 3, 30)}
+        ${olcuH(200 - p.D * 3, 200 + p.D * 3, 34, 'Ø' + f(p.D, 1) + ' (orta seri)')}
+        ${txt(200, 176, 'İnce Ø' + f(p.seri[0], 1) + ' · Orta Ø' + f(p.seri[1], 1) + ' · Kaba Ø' + f(p.seri[2], 1), { s: 10.5, c: THIN })}`, 'Geçiş deliği');
+    },
+    // Kolay mod: açıklamalı kanal kesiti
+    kolayKesit(p) {
+      const W = 560, H = 300;
+      const k = Math.min(55, 250 / Math.max(p.b * 1.6, p.d * 2));
+      const x0 = W / 2 - p.b * k / 2, yTop = 110, yBot = yTop + p.h * k;
+      const cw = Math.min(p.b, p.d * p.d / p.h), cx = x0 + p.b * k - cw * k / 2, cy = yBot - p.h * k / 2;
+      const bgTxt = (x, y, t, a, c) => { const w = t.length * 6.4 + 8; const rx = a === 'end' ? x - w + 4 : a === 'middle' ? x - w / 2 : x - 4; return `<rect x="${rx}" y="${y - 12}" width="${w}" height="16" rx="3" fill="#fff" opacity=".95"/>${txt(x, y, t, { a, c: c || DIM, s: 12 })}`; };
+      return `<svg class="cizim" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kanal kesiti">${defs}
+        <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" fill="#fff" stroke="#c9cec7"/>
+        <rect x="20" y="${yTop - 50}" width="${W - 40}" height="50" fill="url(#tr-hat)" stroke="${INK}"/>
+        ${bgTxt(30, yTop - 28, 'KAPAK', 'start', THIN)}
+        <path d="M20 ${yTop} H${x0} V${yBot} H${x0 + p.b * k} V${yTop} H${W - 20} V${H - 50} H20 Z" fill="url(#tr-hat)" stroke="${INK}" stroke-width="1.4"/>
+        ${bgTxt(30, H - 62, 'GÖVDE', 'start', THIN)}
+        <circle cx="${cx}" cy="${yBot - p.d * k / 2}" r="${p.d * k / 2}" fill="none" stroke="${SEAL}" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="${cw * k / 2}" ry="${p.h * k / 2}" fill="${SEAL}" opacity=".9"/>
+        ${uzatma(x0, yBot, x0, yBot + 30)}${uzatma(x0 + p.b * k, yBot, x0 + p.b * k, yBot + 30)}
+        <line x1="${x0}" y1="${yBot + 24}" x2="${x0 + p.b * k}" y2="${yBot + 24}" stroke="${DIM}" stroke-width="1" marker-start="url(#ok-a)" marker-end="url(#ok-a)"/>
+        ${bgTxt(x0 + p.b * k / 2, yBot + 44, 'Kanal genişliği ' + f(p.b, 2) + ' mm', 'middle')}
+        ${uzatma(x0 + p.b * k, yTop, x0 + p.b * k + 40, yTop)}${uzatma(x0 + p.b * k, yBot, x0 + p.b * k + 40, yBot)}
+        <line x1="${x0 + p.b * k + 34}" y1="${yTop}" x2="${x0 + p.b * k + 34}" y2="${yBot}" stroke="${DIM}" stroke-width="1" marker-start="url(#ok-a)" marker-end="url(#ok-a)"/>
+        ${bgTxt(x0 + p.b * k + 42, (yTop + yBot) / 2 + 4, 'Derinlik ' + f(p.h, 2) + ' mm', 'start')}
+        ${uzatma(x0, yBot - p.d * k, x0 - 40, yBot - p.d * k)}
+        <line x1="${x0 - 34}" y1="${yBot - p.d * k}" x2="${x0 - 34}" y2="${yBot}" stroke="${SEAL}" stroke-width="1" marker-start="url(#ok-a)" marker-end="url(#ok-a)"/>
+        ${bgTxt(x0 - 42, yBot - p.d * k / 2 + 4, 'O-ring ' + f(p.d, 2) + ' mm', 'end', SEAL)}
+        <ellipse cx="40" cy="${H - 24}" rx="9" ry="6" fill="${SEAL}"/>${txt(54, H - 20, 'Takılı O-ring', { a: 'start', s: 11 })}
+        <circle cx="170" cy="${H - 24}" r="7" fill="none" stroke="${SEAL}" stroke-dasharray="4 3"/>${txt(184, H - 20, 'Takmadan önceki hali', { a: 'start', s: 11 })}
+      </svg>`;
+    },
     // Cıvata aralığı – kapak eğilmesi (yandan görünüş, abartılı)
     egilme(p) {
       const x1 = 60, x2 = 340, y = 80;

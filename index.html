@@ -15,7 +15,7 @@
         <span class="sub">Statik conta tasarım yardımcısı · v0.1</span>
       </div>
     </div>
-    <div class="topright"><div class="ozet" id="ozet"></div><button class="gear" id="ayarAc" title="Ayarlar">⚙ Ayarlar</button></div>
+    <div class="topright"><div class="seg modsec" data-bind="arayuz"><button data-v="kolay">Kolay mod</button><button data-v="uzman">Uzman mod</button></div><div class="ozet" id="ozet"></div><button class="gear" id="ayarAc" title="Ayarlar">⚙ Ayarlar</button></div>
   </header>
 
   <div class="layout">
@@ -26,12 +26,26 @@
       <button data-page="kurallar"><span>4</span>Kanal çizim kuralları</button>
       <button data-page="yapistirma"><span>5</span>Conta yapıştırma</button>
       <button data-page="not"><span>6</span>Teknik resim notu</button>
-      <button data-page="tedarik"><span>7</span>Ankara tedarikçileri</button>
+      <button data-page="tedarik"><span>7</span>Tedarikçiler</button>
       <button data-page="ref"><span>8</span>Referanslar</button>
       <div class="navnote">Değerler el kitaplarından derlenmiş başlangıç değerleridir. Kesin tasarımda tedarikçi veri sayfası ve test esas alınır.</div>
     </nav>
 
     <main id="main">
+      <!-- KOLAY MOD -->
+      <section id="kolay" class="kolay-sayfa">
+        <h2>Kolay mod</h2>
+        <p class="lead">Sadece elinizdeki ölçüyü girin. Kanal ölçüsünü, malzemeyi ve sertliği biz önerelim. Ayrıntı isterseniz sağ üstten <b>Uzman mod</b>’a geçebilirsiniz.</p>
+        <div class="card">
+          <h3>1 · Elinizde ne var?</h3>
+          <div class="kolay-sec" data-bind="kolayMod">
+            <button data-v="oring"><span class="ik">◯</span><b>O-ring’im var</b><small>Kanal ölçüsünü öğrenmek istiyorum</small></button>
+            <button data-v="kanal"><span class="ik">⊔</span><b>Kanalım var</b><small>Hangi O-ring’i alacağımı öğrenmek istiyorum</small></button>
+          </div>
+        </div>
+        <div class="card" id="kolayGirdi"></div>
+        <div id="kolaySonuc" class="sonuc"></div>
+      </section>
       <!-- 1. PROJE -->
       <section data-page="proje" class="page active">
         <h2>Proje girdileri</h2>
@@ -238,14 +252,16 @@
 
       <!-- 7. TEDARİK -->
       <section data-page="tedarik" class="page">
-        <h2>Ankara’da conta tedarikçileri</h2>
-        <p class="lead">OSTİM firma rehberi ve distribütör sayfalarından derlenmiştir (Kasım 2026). Aramadan önce bilgilerin güncelliğini teyit edin.</p>
-        <div class="filters" id="tedarikFiltre"></div>
-        <div class="cards sonuc" id="tedarikListe"></div>
-        <div class="card info">
-          <h3>Global markaların yetkili satıcıları</h3>
-          <p>Parker (O-ring &amp; Chomerics), Freudenberg (Simrit), Trelleborg ve SKF için Türkiye’deki yetkili distribütörleri üreticilerin resmi “distribütör bulucu” sayfalarından kontrol edin. OSTİM’deki pek çok firma bu markaların ürünlerini stoktan sağlayabilir; orijinal ürün ve sertifika (CoC, kür tarihi) isteyin.</p>
+        <h2>Conta tedarikçileri</h2>
+        <p class="lead">Firmalar büyüklüğe göre sıralanmıştır. Önce çalışan sayısına (bilinenler), sonra kuruluş yılına bakılır; en üstte en büyük ve en tecrübeli firmalar yer alır. Bilgiler firma rehberleri ve firma sayfalarından derlenmiştir (Kasım 2026). Aramadan önce güncel olup olmadığını teyit edin.</p>
+        <div class="seg" data-bind="tedSekme">
+          <button data-v="ankara">Ankara</button>
+          <button data-v="turkiye">Türkiye</button>
+          <button data-v="dunya">Dünya</button>
         </div>
+        <p class="hint" id="tedarikNot"></p>
+        <div class="filters mt" id="tedarikFiltre"></div>
+        <div class="cards sonuc" id="tedarikListe"></div>
       </section>
 
       <!-- 8. REF -->
