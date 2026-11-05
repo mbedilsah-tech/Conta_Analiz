@@ -159,14 +159,31 @@
         <h2>Kanal çizerken dikkat edilecekler</h2>
         <p class="lead">Cıvata yerleşimi hesabı ve genel çizim kontrol listesi.</p>
         <div class="card">
-          <h3>Cıvata – kanal yerleşimi</h3>
+          <h3>Cıvata – kanal yerleşimi ve cıvata aralığı</h3>
           <div class="row4">
             <label>Cıvata
               <select data-sel="M"><option>M3</option><option>M4</option><option>M5</option><option>M6</option><option>M8</option><option>M10</option><option>M12</option><option>M16</option></select>
             </label>
-            <label>Conta çevre uzunluğu (mm)<input type="number" data-num="cevre"></label>
-            <label>Kapak kalınlığı (mm)<input type="number" step="0.5" data-num="kapakT"></label>
+            <label>Kapak kalınlığı t (mm)<input type="number" step="0.5" data-num="kapakT"></label>
+            <label>Kapak malzemesi
+              <select data-sel="kapakMalz">
+                <option value="">Gövdeyle aynı</option>
+                <option value="al">Alüminyum (E ≈ 70 GPa)</option>
+                <option value="paslanmaz">Paslanmaz çelik (E ≈ 193 GPa)</option>
+                <option value="celik">Karbon çelik (E ≈ 200 GPa)</option>
+                <option value="plastik">Plastik (E ≈ 3 GPa)</option>
+              </select>
+            </label>
+            <label>Conta çevre uzunluğu (mm)<input type="number" data-num="cevre" placeholder="otomatik"></label>
           </div>
+          <details class="detay"><summary>Detaylar (opsiyonel) – kiriş genişliği, conta kuvveti</summary><div class="detay-ic">
+            <div class="row4">
+              <label>Kiriş genişliği a (mm)<input type="number" data-num="kirisA" placeholder="otomatik"></label>
+              <label>Conta kuvveti q (N/mm)<input type="number" step="0.1" data-num="qOzel" placeholder="hesaplanır"></label>
+              <label>Güvenlik katsayısı (C × k)<input type="number" step="0.05" data-num="civK"></label>
+              <div class="small">a: cıvata hattı boyunca eğilen kapak şeridinin genişliği (kenardan kanalın iç tarafına). q: üretici kuvvet–sıkıştırma eğrisi varsa girin.</div>
+            </div>
+          </div></details>
           <div id="civataSonuc" class="sonuc"></div>
         </div>
         <div id="kuralListe" class="sonuc"></div>
@@ -263,10 +280,18 @@
       </div>
     </aside>
   </div>
+  <div id="refModal" class="drawer modal">
+    <div class="drawer-bg" data-rkapat></div>
+    <div class="modal-ic" role="dialog" aria-label="Kaynak">
+      <div class="row-inline space"><h3 id="refBaslik">Kaynak</h3><button class="ghost" data-rkapat>Kapat ✕</button></div>
+      <div id="refIcerik"></div>
+    </div>
+  </div>
   <div id="toast" class="toast"></div>
   <script src="js/as568.js"></script>
   <script src="js/data.js"></script>
   <script src="js/calc.js"></script>
+  <script src="js/cizim.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

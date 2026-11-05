@@ -19,6 +19,13 @@
     mil5541: { kisa: 'MIL-DTL-5541', ad: 'MIL-DTL-5541 – Alüminyum kromat dönüşüm kaplaması (Class 3: düşük elektrik direnci, EMI temas yüzeyleri)', url: 'https://quicksearch.dla.mil/' },
     loctite: { kisa: 'Henkel Loctite', ad: 'Henkel Loctite – Design Guide for Bonding Rubbers and Thermoplastic Elastomers', url: 'https://www.henkel-adhesives.com/' },
     iso273: { kisa: 'ISO 273', ad: 'ISO 273 – Cıvata geçiş delikleri (ince/orta/kaba seri)', url: 'https://www.iso.org/standard/4166.html' },
+    ee: { kisa: 'Engineers Edge – cıvata aralığı', ad: 'Engineers Edge – Gasket Compression and Fastener Spacing Design Equation. Kapak/flanş kiriş modeli: ΔH = (13·Pmin + 2·Pmax)·C⁴·b / (480·E·a·t³). Cıvata ortasında conta basıncının minimuma indiği parabolik dağılım varsayılır.', url: 'https://engineersedge.com/general_engineering/gasket_cover_compression.htm' },
+    krishnan: { kisa: 'Krishnan & Nair', ad: 'R. Krishnan, K.R.M. Nair – Fastener Spacing and Tightening Torque of Gasket Joints of Oil Filled Transformers (cıvata aralığı denkleminin dayandığı çalışma; Engineers Edge kaynakçasında)', url: 'https://engineersedge.com/general_engineering/gasket_cover_compression.htm' },
+    marks: { kisa: 'Marks’ Handbook', ad: 'Marks’ Standard Handbook for Mechanical Engineers – sürekli kiriş eğilme bağıntıları', url: '' },
+    oren: { kisa: 'SAE 810362', ad: 'J. Oren – Creating Gasket Seals with Rigid Flanges, SAE Technical Paper 810362 (1981): basit ve sürekli kiriş formülleriyle yeterince rijit flanş tasarımı; çoklu cıvata sürekli kiriş etkisi', url: 'https://saemobilus.sae.org/papers/creating-gasket-seals-rigid-flanges-810362' },
+    lindley: { kisa: 'Lindley denklemi', ad: 'P.B. Lindley – O-ring sıkıştırma kuvveti: F = π·D·d·E·(1,25·ε^1,5 + 50·ε^6). Burada birim uzunluk için q = d·E·(1,25·ε^1,5 + 50·ε^6) kullanıldı.', url: 'https://www.xmbestseal.com/info/how-to-calculate-rubber-seal-compression-force-103529791.html' },
+    parkerKuvvet: { kisa: 'Parker ORD 5700 §2.4.6', ad: 'Parker O-Ring Handbook ORD 5700 §2.4.6 – O-ring sıkıştırma yükü eğrileri (kesit, sertlik ve sıkıştırma oranına göre birim uzunluk kuvveti). Lindley sonucunu bu eğrilerle karşılaştırın.', url: 'https://parker.com/promotionsite/oring-ehandbook/us/ehome/ci.O–Ring-Compression-Force,EN.EN' },
+    gent: { kisa: 'Gent (1958)', ad: 'A.N. Gent – Shore A sertliğinden Young modülü: E = 0,0981·(56 + 7,62336·S) / (0,137505·(254 − 2,54·S)) MPa', url: '' },
     kural: { kisa: 'Genel pratik', ad: 'Genel mühendislik pratiği / temkinli başlangıç değeri – prototip testi veya FEA ile doğrulanmalıdır', url: '' },
     ostim: { kisa: 'OSTİM Firma Rehberi', ad: 'OSTİM OSB firma rehberi (ostim.org.tr/companies) – Kasım 2026 itibarıyla', url: 'https://ostim.org.tr/companies' }
   };

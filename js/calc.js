@@ -276,6 +276,42 @@
     };
   }
 
+  // ---- Cıvata aralığı: kapak eğilmesine göre ----
+  // Shore A → Young modülü (MPa), Gent (1958) ilişkisi
+  function shoreE(sh) { return 0.0981 * (56 + 7.62336 * sh) / (0.137505 * (254 - 2.54 * sh)); }
+  // Contanın birim uzunluk kuvveti q (N/mm) – c: sıkıştırma oranı
+  function contaKuvveti(sekil, d, w, c, E) {
+    const lind = x => 1.25 * Math.pow(x, 1.5) + 50 * Math.pow(x, 6);     // Lindley (1967)
+    switch (sekil) {
+      case 'oring': case 'yuvarlak': return { q: d * E * lind(c), yontem: 'Lindley O-ring denklemi' };
+      case 'D': return { q: (w || d) * E * lind(c) * 1.15, yontem: 'Lindley (D-profil ≈ yuvarlak ×1,15, kaba)' };
+      case 'tup': return { q: 0.15 * d * E * lind(c), yontem: 'Dolu kordonun ~%15’i (boşluklu profil, kaba)' };
+      case 'sunger': return { q: (w || d) * 0.35 * c, yontem: 'Kapalı hücre sünger ≈ 0,35·c MPa (kaba)' };
+      default: { const Sf = (w || d) / (2 * d); return { q: (w || d) * E * (1 + 2 * 0.57 * Sf * Sf) * c, yontem: 'Düz conta, şekil faktörlü basma modülü (kaba)' }; }
+    }
+  }
+  // Kiriş modeli: ΔH = (13·qmin + 2·qmax)·C⁴ / (480·E·a·t³)  →  C = [480·E·a·t³·ΔH / (13·qmin + 2·qmax)]^¼
+  // (Engineers Edge "Gasket Compression and Fastener Spacing"; Krishnan & Nair; Marks' Handbook)
+  // p: {sekil, d, w, cNom, cMinWorst, bantAlt, shore, Ek (kapak E, MPa), tk (kapak kalınlığı), a (kiriş genişliği), Pbar, alanCevre (mm), M, qOzel}
+  const AS_GERILME = { M3: 5.03, M4: 8.78, M5: 14.2, M6: 20.1, M8: 36.6, M10: 58.0, M12: 84.3, M16: 157 };
+  function civataAraligi(p) {
+    const E = shoreE(p.shore || 70);
+    const qMax0 = p.qOzel > 0 ? p.qOzel : contaKuvveti(p.sekil, p.d, p.w, p.cNom, E).q;
+    const qMin0 = p.qOzel > 0 ? p.qOzel * (p.bantAlt / p.cNom) : contaKuvveti(p.sekil, p.d, p.w, p.bantAlt, E).q;
+    const qp = (p.Pbar || 0) / 10 * (p.alanCevre || 0);   // basınç kuvveti / çevre (N/mm)
+    const qmax = qMax0 + qp, qmin = qMin0 + qp;
+    const dH = p.d * (p.cMinWorst - p.bantAlt);           // en kötü durumdan alt sınıra kalan pay (mm)
+    const uyarilar = [];
+    let C = null;
+    if (dH <= 0) uyarilar.push('Toleranslar sıkıştırma payının tamamını tüketiyor; kapak eğilmesine pay kalmıyor. Kanal/conta toleransını daraltın veya nominal sıkıştırmayı artırın.');
+    else C = Math.pow(480 * p.Ek * p.a * Math.pow(p.tk, 3) * dH / (13 * qmin + 2 * qmax), 0.25);
+    const As = AS_GERILME[p.M] || 14.2;
+    const Fv = 0.6 * 640 * As;                             // 8.8 cıvata yaklaşık montaj ön yükü (N)
+    const Fciv = C ? ((qMax0 + 2 * qMin0) / 3 + qp) * C : null;   // cıvata başına conta + basınç yükü
+    if (Fciv && Fciv > 0.5 * Fv) uyarilar.push(`Cıvata başına yük (${Math.round(Fciv)} N) 8.8 ${p.M} ön yükünün yarısını aşıyor; cıvatayı büyütün veya aralığı azaltın.`);
+    return { E: r2(E), qmax: r2(qmax), qmin: r2(qmin), qp: r2(qp), dH: r2(dH), C: C && r2(C), Fciv: Fciv && Math.round(Fciv), Fv: Math.round(Fv), yontem: p.qOzel > 0 ? 'Kullanıcı değeri' : contaKuvveti(p.sekil, p.d, p.w, p.cNom, E).yontem, uyarilar };
+  }
+
   // ---- ASTM D2000 kodu ----
   function d2000Kod(o) {
     if (!o) return '';
@@ -287,7 +323,7 @@
     return `M = metrik birim, Grade ${o.grade}; Tip ${o.type} = ${D.D2000_TIP[o.type]} °C ısıl yaşlandırma; Sınıf ${o.cls} = IRM 903 yağında hacimsel şişme ${D.D2000_SINIF[o.cls]}; sertlik ${o.sert * 10} ± 5 Shore A; min. çekme dayanımı ${parseInt(o.ceki, 10)} MPa.`;
   }
 
-  const out = { yolUzunlugu, sekilliOring, daireselOring, kesitAlan, contadanKanal, kanaldanOring, kanaldanConta, oringdenKanalCap, kanalCapindanOring, as568Bul, shoreOneri, malzemeSirala, yapistiriciSirala, civataKurallari, d2000Kod, d2000Acikla, pct, r2 };
+  const out = { shoreE, contaKuvveti, civataAraligi, yolUzunlugu, sekilliOring, daireselOring, kesitAlan, contadanKanal, kanaldanOring, kanaldanConta, oringdenKanalCap, kanalCapindanOring, as568Bul, shoreOneri, malzemeSirala, yapistiriciSirala, civataKurallari, d2000Kod, d2000Acikla, pct, r2 };
   g.CALC = out;
   if (typeof module !== 'undefined') module.exports = out;
 })(typeof window !== 'undefined' ? window : globalThis);
