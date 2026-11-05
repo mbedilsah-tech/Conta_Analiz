@@ -44,7 +44,7 @@
     notMalz: '6082', notUrun: 'cubuk', notKap: 'eloksal', notMaske: true, notSonra: true, notTol: true, notKenar: true, notRohs: false, notDil2: 'tr',
     grSekil: 'prizma', grSeviye: '2', grDelik: 'gecis', grL: 120, grW: 80, grH: 20, grOD: 100, grID: 40, grT: 20, grSeed: 1,
     tSekme: 'delikmil', tTip: 'delik', tHarf: 'H', tKalite: '7', tCap: 5, gCap: 20, gDelik: 'H7', gMil: 'g6', gelSinif: 'm', gelOlcu: 50, gelGeo: 'K',
-    civM: 'M5', civSinif: '8.8', civMu: '0.12', civKarsi: 'al', civTip: 'ISO 4762', civL: 16, civKap: 'cinko', civKilit: 'LOCTITE 243', civDil: 'tr'
+    civSekme: 'hesap', civM: 'M5', civSinif: '8.8', civMu: '0.12', civKarsi: 'al', civTip: 'ISO 4762', civL: 16, civKap: 'cinko', civKilit: 'LOCTITE 243', civDil: 'tr'
   };
   const KEY = 'contaAnaliz.v1';
   let S = load();
@@ -89,7 +89,7 @@
   // ---------------- Bağlama ----------------
   const YAPISAL = ['dHareket', 'dKonum', 'tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip',
     'modul', 'mSekme', 'alSeri', 'celikGrup', 'alSec', 'celikSec', 'alOzellik', 'celikOzellik', 'agSekil', 'kTaban', 'ist_iletken', 'ist_asinma', 'ist_disOrtam', 'ist_renk', 'ist_boyut', 'ist_ucuz',
-    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil', 'tSekme', 'grSekil', 'grSeviye', 'tTip', 'tHarf', 'tKalite', 'gelSinif', 'gelGeo'];
+    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civSekme', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil', 'tSekme', 'grSekil', 'grSeviye', 'tTip', 'tHarf', 'tKalite', 'gelSinif', 'gelGeo'];
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-bind] > button');
     if (!btn || btn.disabled) return;
@@ -1073,6 +1073,7 @@
     if (p === 'not') { if (yapisal || !$('#notGirdi').innerHTML) renderNotGirdi(); renderNotCikti(); }
     if (p === 'tedarik') renderTedarik();
     if (p === 'ref') renderRef();
+    if (p === 'egitim' && !$('#egitimConta').innerHTML) $('#egitimConta').innerHTML = window.EGITIM.html('conta');
     if (p === 'kolay') { if (yapisal || !$('#kolayGirdi').innerHTML) renderKolayGirdi(); renderKolaySonuc(); }
     syncControls();
   }

@@ -417,3 +417,16 @@ button.seri-k:disabled { opacity: .45; cursor: default; }
 .gdt-kap svg.gdt { width: 100%; min-width: 760px; height: auto; display: block; max-width: none; }
 table.karsi th.sec, table.karsi td.sec { background: var(--accent-soft); font-weight: 700; }
 table.karsi td.num, table.karsi th.num { text-align: center; }
+/* Eğitim */
+.egit-icerik { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-top: 8px; }
+.egit-icerik a { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); text-decoration: none; background: #fff; font-size: 14px; }
+.egit-icerik a:hover { border-color: var(--accent); }
+.egit-icerik a span, .egit-no { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-grid; place-items: center; font-weight: 700; font-size: 13px; }
+.egit-ders h3 { display: flex; gap: 10px; align-items: center; }
+.egit-ders { scroll-margin-top: 80px; }
+.egit-govde { display: grid; grid-template-columns: minmax(300px, 1.1fr) 1fr; gap: 22px; align-items: start; }
+@media (max-width: 900px) { .egit-govde { grid-template-columns: 1fr; } }
+.egit-gorsel svg { width: 100%; height: auto; display: block; background: #fff; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
+.egit-metin p { line-height: 1.6; margin: 0 0 10px; }
+.egit-metin ul { padding-left: 20px; line-height: 1.55; margin: 0 0 10px; }
+#nav .egit-nav { margin-top: 6px; }

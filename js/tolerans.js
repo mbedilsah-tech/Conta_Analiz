@@ -359,8 +359,8 @@
     if (!yap && $('#modulAlan .tmodul') && $('#tolSonuc')) { $('#tolSonuc').innerHTML = sonuc(); return; }
     $('#modulAlan').innerHTML = `<div class="tmodul">
       <div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Geometrik toleranslandırma <span class="gelis">(geliştirme aşamasında)</span></h2></div>
-      <div class="seg wrap" data-bind="tSekme"><button data-v="delikmil">Delik / mil toleransı</button><button data-v="gecme">Geçme hesabı</button><button data-v="resim">Örnek teknik resim (GD&amp;T)</button><button data-v="genel">Genel toleranslar (ince / orta / kaba)</button><button data-v="islem">İşleme yöntemi ve IT</button><button data-v="sembol">GD&amp;T sembolleri</button></div>
-      <div class="mt">${sek === 'resim' ? g.TRESIM.girdi(s) : sek === 'delikmil' ? delikMilGirdi(s) : sek === 'gecme' ? gecmeGirdi(s) : sek === 'genel' ? genelGirdi(s) : sek === 'islem' ? islemSekme() : sembolSekme()}</div>
+      <div class="seg wrap" data-bind="tSekme"><button data-v="delikmil">Delik / mil toleransı</button><button data-v="gecme">Geçme hesabı</button><button data-v="resim">Örnek teknik resim (GD&amp;T)</button><button data-v="genel">Genel toleranslar (ince / orta / kaba)</button><button data-v="islem">İşleme yöntemi ve IT</button><button data-v="sembol">GD&amp;T sembolleri</button><button data-v="egitim">📘 Eğitim</button></div>
+      <div class="mt">${sek === 'egitim' ? g.EGITIM.html('tolerans') : sek === 'resim' ? g.TRESIM.girdi(s) : sek === 'delikmil' ? delikMilGirdi(s) : sek === 'gecme' ? gecmeGirdi(s) : sek === 'genel' ? genelGirdi(s) : sek === 'islem' ? islemSekme() : sembolSekme()}</div>
     </div>`;
     syncControls();
     const el = $('#tolSonuc'); if (el) el.innerHTML = sonuc();

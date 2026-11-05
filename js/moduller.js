@@ -267,8 +267,8 @@
     const sekme = s.mSekme || 'al';
     $('#modulAlan').innerHTML = `<div class="mmodul">
       <div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Malzeme seçimi ve kaplama/boya <span class="gelis">(geliştirme aşamasında)</span></h2></div>
-      <div class="seg" data-bind="mSekme"><button data-v="al">Alüminyum</button><button data-v="celik">Çelik</button><button data-v="kaplama">Kaplama ve boya</button><button data-v="not">Teknik resim notu</button></div>
-      <div class="mt">${sekme === 'al' ? malzemeSekme(true) : sekme === 'celik' ? malzemeSekme(false) : sekme === 'kaplama' ? kaplamaSekme() : notSekme()}</div>
+      <div class="seg" data-bind="mSekme"><button data-v="al">Alüminyum</button><button data-v="celik">Çelik</button><button data-v="kaplama">Kaplama ve boya</button><button data-v="not">Teknik resim notu</button><button data-v="egitim">📘 Eğitim</button></div>
+      <div class="mt">${sekme === 'egitim' ? g.EGITIM.html('malzeme') : sekme === 'al' ? malzemeSekme(true) : sekme === 'celik' ? malzemeSekme(false) : sekme === 'kaplama' ? kaplamaSekme() : notSekme()}</div>
     </div>`;
     syncControls();
     agSonuc();
@@ -311,8 +311,11 @@
     if (h.tahmini) uyar.push('Paslanmaz cıvata torku, 8.8 tablosunun akma oranıyla (Rp ' + sinifSec.Rp + ' / 640) ölçeklenmiş tahmindir. Paslanmazda sürtünme dağınık ve sıvama riski var; üretici tablosu ve anti-seize kullanın.');
     if (s.civKarsi === 'plastik') uyar.push('Plastik parçaya doğrudan cıvata sıkmayın: insert ve metal burç kullanın; tork insert üreticisine göre belirlenir.');
     const MAlist = Object.keys(V.TORK).map(k => ({ ad: k, v: V.TORK[k][s.civMu][sinifSec.paslanmaz ? 3 : sinifSec.i + 3] * (sinifSec.paslanmaz ? sinifSec.Rp / 640 : 1), sel: k === s.civM }));
+    const civBas = `<div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Cıvatalar ve tork değerleri <span class="gelis">(geliştirme aşamasında)</span></h2></div>
+      <div class="seg" data-bind="civSekme"><button data-v="hesap">Tork hesabı</button><button data-v="egitim">📘 Eğitim</button></div>`;
+    if (s.civSekme === 'egitim') { $('#modulAlan').innerHTML = `<div class="cmodul">${civBas}<div class="mt">${g.EGITIM.html('civata')}</div></div>`; syncControls(); return; }
     $('#modulAlan').innerHTML = `<div class="cmodul">
-      <div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Cıvatalar ve tork değerleri <span class="gelis">(geliştirme aşamasında)</span></h2></div>
+      ${civBas}<div class="mt"></div>
       <div class="card"><h3>Cıvatanızı seçin</h3>
         <div class="row4">
           <label>Boyut<select data-sel="civM">${Object.keys(V.TORK).map(k => `<option ${k === s.civM ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
