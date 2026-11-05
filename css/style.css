@@ -310,3 +310,10 @@ td.hl { background: var(--accent) !important; color: #fff; font-weight: 700; }
 
 svg.cubukg { max-width: 760px; display: block; }
 .notbox.kisa { min-height: 0; }
+
+/* Sade ana ekran */
+.ana { min-height: calc(100vh - 160px); display: flex; align-items: center; }
+.ana .ana-kart { width: 100%; }
+.ana-kart button { align-items: center; justify-content: center; text-align: center; padding: 48px 24px; min-height: 300px; gap: 18px; }
+.ana-kart b { font-size: 30px; line-height: 1.2; }
+.ana-kart em { margin-top: 0; font-size: 14px; }
