@@ -49,6 +49,10 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
 
+## v1.1
+
+- Örnek teknik resim değerleri GB/T 1184-1996 Ek B kalite tablolarına (ISO 2768-2 eşdeğeri) bağlandı: çok hassas 5, hassas 7, standart 9, kaba 11. Datum formu < yönelim, paralellik ≤ kalınlık toleransı ve genel tolerans kontrolleri; delik işlevi (geçiş / dişli + Ⓟ) seçilebilir; doğrulanamayan salgı ve silindiriklik çıkarıldı.
+
 ## v1.0
 
 - **Örnek teknik resim (GD&T)** – Tolerans modülünde yeni sekme: prizmatik (L×W×H) veya silindirik (dış çap, iç çap, kalınlık) parça için çok hassas / hassas / standart / kaba işlemede datumlu (A-B-C) örnek resim; rastgele delik düzeni, konum (ASME Y14.5 bağlantı formülleri + ISO 273), düzlemsellik, diklik, paralellik, salgı, silindiriklik, antet notları ve dört seviyenin karşılaştırma tablosu
