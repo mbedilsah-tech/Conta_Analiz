@@ -41,6 +41,7 @@
     agSekil: 'levha', agA: 200, agB: 100, agT: 10, agD: 40, agL: 100, agEt: 3,
     kTaban: 'al', ist_iletken: false, ist_asinma: false, ist_disOrtam: false, ist_renk: false, ist_boyut: false, ist_ucuz: false,
     notMalz: '6082', notUrun: 'cubuk', notKap: 'eloksal', notMaske: true, notSonra: true, notTol: true, notKenar: true, notRohs: false, notDil2: 'tr',
+    tSekme: 'delikmil', tTip: 'delik', tHarf: 'H', tKalite: '7', tCap: 5, gCap: 20, gDelik: 'H7', gMil: 'g6', gelSinif: 'm', gelOlcu: 50, gelGeo: 'K',
     civM: 'M5', civSinif: '8.8', civMu: '0.12', civKarsi: 'al', civTip: 'ISO 4762', civL: 16, civKap: 'cinko', civKilit: 'LOCTITE 243', civDil: 'tr'
   };
   const KEY = 'contaAnaliz.v1';
@@ -86,12 +87,13 @@
   // ---------------- Bağlama ----------------
   const YAPISAL = ['tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip',
     'modul', 'mSekme', 'alSec', 'celikSec', 'alOzellik', 'celikOzellik', 'agSekil', 'kTaban', 'ist_iletken', 'ist_asinma', 'ist_disOrtam', 'ist_renk', 'ist_boyut', 'ist_ucuz',
-    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil'];
+    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil', 'tSekme', 'tTip', 'tHarf', 'tKalite', 'gelSinif', 'gelGeo'];
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-bind] > button');
     if (!btn || btn.disabled) return;
     const key = btn.parentElement.dataset.bind;
     S[key] = btn.dataset.v;
+    if (key === 'tTip') S.tHarf = S.tTip === 'delik' ? 'H' : 'h';
     if (key === 'kolayMod') S.kolaySev = S.kolayMod === 'oring' ? 1 : 0;
     if (key === 'tip') S.sekil = S.tip === 'oring' ? 'oring' : (S.sekil === 'oring' ? 'yuvarlak' : S.sekil);
     if (key === 'tip' || key === 'sekil') {

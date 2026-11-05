@@ -324,3 +324,14 @@ button, input, select, textarea { color: var(--ink); }
 .ana-kart button, .ana-kart button b { color: var(--ink); background: #fff; }
 .ana-kart button em { color: var(--warn); }
 .seg button.on, button.primary, button.mini.on { color: #fff; }
+
+.ana-kart { grid-template-columns: repeat(4, 1fr); }
+.ana-kart b { font-size: 26px; }
+@media (max-width: 1100px) { .ana-kart { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .ana-kart { grid-template-columns: 1fr; } }
+.gecmeler { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.gecmeler button { font: inherit; text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 10px; padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; color: var(--ink); }
+.gecmeler button.on { border-color: var(--accent); background: var(--accent-soft); }
+.gecmeler b { font-size: 15px; }
+.gecmeler small { color: var(--muted); }
+td.sembol { font-size: 24px; text-align: center; width: 60px; }

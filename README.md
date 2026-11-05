@@ -8,7 +8,8 @@ Mühendislik tasarım yardımcısı. Açılışta bir **ana menü** gelir ve ü�
 | **Malzeme seçimi ve kaplama/boya** | Geliştirme aşamasında | Alüminyum serileri (1xxx–7xxx) ve alaşımlar (1050A, 2024, 5083, 6060, 6061, 6082, 7075); çelikler (S235JR, S355J2, C45, 42CrMo4, 1.4301, 1.4404, 1.4305, 1.4542). Yoğunluk, akma/çekme, E, ısıl iletkenlik, sıcaklık; işlenebilirlik, kaynak, korozyon ve eloksal puanları; karşılaştırma grafiği; temper kodları; ağırlık hesabı. Kaplamalar: alodin (MIL-DTL-5541 Class 1A/3), eloksal ve sert eloksal (MIL-PRF-8625 Tip II/III), akımsız nikel, yaş ve toz boya, çinko, Zn-Ni, galvaniz, fosfat, brünür, pasivasyon. "Ne istiyorum?" ile sıralı öneri ve teknik resim notu oluşturucu |
 | **Cıvatalar ve tork değerleri** | Geliştirme aşamasında | M4–M16; 8.8, 10.9, 12.9 ve paslanmaz (tahmini) sınıflar; sürtünme µ 0,08–0,14. Sıkma torku ve ön yük (VDI 2230 tablosu), tork anahtarı aralığı, diş boyu, uyarılar (hidrojen gevrekliği, sıvama), teknik resim notu |
 
-Malzeme ve kaplama verileri `js/malzeme.js`, modül arayüzleri `js/moduller.js` dosyasındadır.
+Malzeme ve kaplama verileri `js/malzeme.js`, modül arayüzleri `js/moduller.js
+js/tolerans.js     – delik/mil toleransları, geçmeler, ISO 2768` dosyasındadır.
 
 Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
 
@@ -36,6 +37,14 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 6. **Teknik resim notu**: ASTM D2000 kod oluşturucu ve TR/EN not metni (ISO 3601, ISO 3302-1, ISO 2230, MIL-DTL-83528, MIL-DTL-5541, yağlayıcı ve yapıştırma notları).
 7. **Tedarikçiler**: Ankara, Türkiye (Ankara dahil) ve Dünya sekmeleri. Firmalar büyüklüğe göre sıralanır: önce çalışan sayısı, sonra kuruluş yılı. Her kartta bilgi kaynağı bağlantısı vardır.
 8. **Referanslar**: Parker ORD 5700, Parker Chomerics el kitapları, ASTM D2000, AS568, ISO 3601, SAE ARP1231 ve diğer kaynaklar.
+
+## Geometrik toleranslandırma (geliştirme aşamasında)
+
+- **Delik / mil toleransı** – çap + harf + kalite (ör. Ø5 H7 → 5,000 … 5,012 mm), ISO 286-1 hesaplı, tolerans bölgesi çizimi ve resim yazımı
+- **Geçme hesabı** – H7/g6, H7/k6, H7/p6… hazır geçmeler; boşluk / ara / sıkı geçme ve min–maks boşluk/sıkılık
+- **Genel toleranslar** – ISO 2768-1 f/m/c/v (ince/orta/kaba/çok kaba) ve ISO 2768-2 H/K/L, antet notu
+- **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
+- **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
 
 ## Ayarlar
 

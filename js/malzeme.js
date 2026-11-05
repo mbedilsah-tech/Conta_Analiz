@@ -28,6 +28,11 @@
     iso12944: { kisa: 'ISO 12944', ad: 'ISO 12944 – Çelik yapıların boya sistemleriyle korozyondan korunması (korozif ortam sınıfları C1–C5, CX)', url: '' },
     vdiTablo: { kisa: 'VDI 2230 tablo (Marek)', ad: 'VDI 2230 yöntemiyle, µG = µK kabulüyle, akma sınırının %90’ı kullanılarak hesaplanmış sıkma kuvveti FM (kN) ve sıkma torku MA (Nm) – M4…M16, 8.8 / 10.9 / 12.9, µ = 0,08…0,14', url: 'https://www.marek.eu/katalog-obrazku/produkt-24858/58479-technical-information-screws-nuts-en.pdf' },
     zimmer: { kisa: 'Zimmer tork tablosu', ad: 'Zimmer Group – ISO 4762 / 4017 bağlama vidaları sıkma torkları, µ = 0,12 (M3: 1,3 Nm)', url: 'https://www.zimmer-group.com/en/td' },
+    iso286: { kisa: 'ISO 286-1 / -2', ad: 'ISO 286-1/-2 – Uzunluk ölçüleri için ISO kod sistemi: standart tolerans kaliteleri (IT), temel sapmalar, delik/mil sınır sapmaları ve tercih edilen geçmeler', url: 'https://en.wikipedia.org/wiki/IT_Grade' },
+    roymech286: { kisa: 'Roymech ISO toleranslar', ad: 'Roymech – ISO 286 kullanım örnekleri (Ø40 H7 = +25/0, Ø40 g6 = −9/−25, 300 K7 = +16/−36), tipik geçmeler ve işleme yöntemi ↔ IT tablosu', url: 'https://www.roymech.co.uk/Useful_Tables/ISO_Tolerances/how-to-use-iso-tolerances/' },
+    iso2768: { kisa: 'ISO 2768-1', ad: 'ISO 2768-1 – Ayrıca tolerans verilmemiş doğrusal ve açısal ölçüler için genel toleranslar: f (ince), m (orta), c (kaba), v (çok kaba)', url: 'https://amesweb.info/fits-tolerances/iso-2768-linear-dimensions-tolerances.aspx' },
+    iso27682: { kisa: 'ISO 2768-2', ad: 'ISO 2768-2 – Geometrik genel toleranslar H, K, L (doğrusallık/düzlemsellik, diklik, simetri, salgı); geri çekilmiş, yerini ISO 22081 almıştır', url: 'https://www.modulusmetal.com/iso-2768-1-and-iso-2768-2-tolerances' },
+    iso1101: { kisa: 'ISO 1101', ad: 'ISO 1101 – Geometrik ürün spesifikasyonu (GPS): form, yönelim, konum ve salgı toleransları', url: '' },
     loctiteTL: { kisa: 'Loctite vida sabitleyiciler', ad: 'Henkel Loctite vida sabitleyiciler: 222 (düşük mukavemet, küçük vidalar), 243 (orta mukavemet, elle sökülebilir), 270 (yüksek mukavemet, kalıcı)', url: 'https://www.henkel-adhesives.com/' }
   };
 
