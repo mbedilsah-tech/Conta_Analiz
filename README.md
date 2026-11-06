@@ -15,7 +15,8 @@ js/tolerans.js     – delik/mil toleransları, geçmeler, ISO 2768
 js/topluluk.js     – yorumlar ve kullanıcı tedarikçileri
 js/dinamik.js      – dinamik O-ring hesabı
 js/resim.js        – örnek GD&T teknik resim üretici
-js/egitim.js       – eğitim sekmeleri` dosyasındadır.
+js/egitim.js       – eğitim sekmeleri
+js/sizdirmazlik.js – genel sızdırmazlık modülü` dosyasındadır.
 
 Statik conta (O-ring ve gasket) tasarımı için Türkçe, tarayıcıda çalışan yardımcı uygulama. Kurulum gerektirmez: `index.html` dosyasını tarayıcıda açmanız yeterli. GitHub Pages ile de yayınlanabilir (Settings → Pages → `main` / root).
 
@@ -51,6 +52,11 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **Genel toleranslar** – ISO 2768-1 f/m/c/v (ince/orta/kaba/çok kaba) ve ISO 2768-2 H/K/L, antet notu
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
+
+## v1.4
+
+- **Sızdırmazlık modülü (yeni katalog)** – genel kurallar (sızıntı yolları, basınç dengeleme, yoğuşma, yüzey hazırlığı…), ürün seçimi (RTV silikon, sıvı conta, diş sızdırmazlık, konformal kaplama, dolgu, vent membranı, MIL astar/boya – kullanım ve sıcaklığa göre), IP kodu seçici (IEC 60529), desikant hesabı için DESIC hesaplayıcısına yönlendirme (https://utkubayram.com/desic/), tedarikçiler (+ ekleme) ve eğitim
+- Her sayfanın üstünde yapay zekâ / doğrulama uyarısı (v1.3)
 
 ## v1.2
 

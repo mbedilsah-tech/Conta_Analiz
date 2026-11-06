@@ -40,6 +40,7 @@
   const IKON = {
     conta: `<svg viewBox="0 0 64 64" width="110" height="110"><circle cx="32" cy="32" r="22" fill="none" stroke="#d9622b" stroke-width="9"/><circle cx="32" cy="32" r="9" fill="none" stroke="#1d2326" stroke-width="2" stroke-dasharray="3 3"/></svg>`,
     malzeme: `<svg viewBox="0 0 64 64" width="110" height="110"><rect x="8" y="34" width="48" height="16" rx="2" fill="#b9c4c1"/><rect x="14" y="20" width="36" height="14" rx="2" fill="#7d8b8f"/><rect x="20" y="8" width="24" height="12" rx="2" fill="#d9622b"/></svg>`,
+    sizdirmazlik: `<svg viewBox="0 0 64 64" width="88" height="88" aria-hidden="true"><path d="M32 6 L52 14 V30 C52 44 43 54 32 58 C21 54 12 44 12 30 V14 Z" fill="#eef1ee" stroke="#1d2326" stroke-width="2.5"/><path d="M32 20 C38 28 41 32 41 37 A9 9 0 0 1 23 37 C23 32 26 28 32 20 Z" fill="#1f5f99"/></svg>`,
     tolerans: `<svg viewBox="0 0 64 64" width="110" height="110"><rect x="6" y="20" width="52" height="24" rx="2" fill="none" stroke="#1d2326" stroke-width="2.5"/><line x1="24" y1="20" x2="24" y2="44" stroke="#1d2326" stroke-width="2.5"/><text x="15" y="37" font-size="13" text-anchor="middle" fill="#d9622b" font-family="sans-serif" font-weight="700">⌖</text><text x="41" y="37" font-size="11" text-anchor="middle" fill="#1d2326" font-family="sans-serif" font-weight="700">H7</text></svg>`,
     civata: `<svg viewBox="0 0 64 64" width="110" height="110"><path d="M20 8 h24 l6 10 -6 10 h-24 l-6 -10z" fill="#7d8b8f"/><rect x="26" y="28" width="12" height="30" fill="#b9c4c1"/>${[0, 1, 2, 3, 4].map(i => `<line x1="26" y1="${32 + i * 5}" x2="38" y2="${35 + i * 5}" stroke="#1d2326" stroke-width="1.5"/>`).join('')}<path d="M50 14 a16 16 0 0 1 4 18" fill="none" stroke="#d9622b" stroke-width="3"/><path d="M52 34 l2 -4 3 3z" fill="#d9622b"/></svg>`
   };
@@ -51,6 +52,7 @@
         <button data-modul-git="malzeme">${IKON.malzeme}<b>Malzeme seçimi ve kaplama</b><em>(geliştirme aşamasında)</em></button>
         <button data-modul-git="civata">${IKON.civata}<b>Cıvatalar ve tork</b><em>(geliştirme aşamasında)</em></button>
         <button data-modul-git="tolerans">${IKON.tolerans}<b>Geometrik toleranslandırma</b><em>(geliştirme aşamasında)</em></button>
+        <button data-modul-git="sizdirmazlik">${IKON.sizdirmazlik}<b>Sızdırmazlık</b><em>(geliştirme aşamasında)</em></button>
       </div>
     </div>`;
   }
@@ -367,6 +369,7 @@
     else if (md === 'malzeme') malzeme(yap);
     else if (md === 'civata') civata(yap);
     else if (md === 'tolerans') g.TOL.render(yap);
+    else if (md === 'sizdirmazlik') g.SZ.render(yap);
   }
   g.MODUL = { render };
 })(window);

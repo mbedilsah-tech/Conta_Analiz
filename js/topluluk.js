@@ -16,7 +16,7 @@
     }
   };
 
-  const MODUL_AD = { conta: 'Conta', malzeme: 'Malzeme seçimi ve kaplama', civata: 'Cıvatalar ve tork', tolerans: 'Geometrik toleranslandırma' };
+  const MODUL_AD = { conta: 'Conta', malzeme: 'Malzeme seçimi ve kaplama', civata: 'Cıvatalar ve tork', tolerans: 'Geometrik toleranslandırma', sizdirmazlik: 'Sızdırmazlık' };
   const id = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const toast = m => (g.UI && g.UI.toast ? g.UI.toast(m) : null);

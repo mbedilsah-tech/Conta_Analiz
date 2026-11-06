@@ -381,8 +381,61 @@
     ];
   }
 
-  const KAYNAK = { conta, malzeme, civata, tolerans };
-  const BASLIK = { conta: 'Conta eğitimi', malzeme: 'Malzeme ve kaplama eğitimi', civata: 'Cıvata ve tork eğitimi', tolerans: 'Tolerans ve GD&T eğitimi' };
+
+  // ---------------- SIZDIRMAZLIK ----------------
+  function sizdirmazlik() {
+    const kart = (x, y) => `<rect x="${x}" y="${y}" width="150" height="14" fill="#2f7d4f"/>` + [20, 60, 100].map(d => `<rect x="${x + d}" y="${y - 16}" width="26" height="16" fill="#555f63"/>`).join('');
+    return [
+      { id: 's1', t: 'Konformal kaplama mı, dolgu (potting) mu?',
+        g: svg(520, 190, `
+          ${T(120, 24, 'Konformal kaplama', { b: 1 })}${T(390, 24, 'Dolgu (potting)', { b: 1 })}
+          ${kart(45, 120)}<path d="M43 136 V118 H65 V102 H91 V118 H105 V102 H131 V118 H145 V102 H171 V118 H197 V136 Z" fill="none" stroke="${MAVI}" stroke-width="3" opacity=".8"/>
+          ${T(120, 160, '25–75 µm ince film', { s: 12, c: MAVI, b: 1 })}${T(120, 178, 'hafif · onarılabilir · ucuz', { s: 11, c: GRI })}
+          <rect x="300" y="60" width="180" height="84" fill="#e6edf5" stroke="${INK}" stroke-width="1.8"/><rect x="300" y="60" width="180" height="84" fill="${MAVI}" opacity=".25"/>
+          ${kart(315, 120)}
+          ${T(390, 160, 'kutu tamamen dolar', { s: 12, c: MAVI, b: 1 })}${T(390, 178, 'en güçlü koruma · ağır · onarımı zor', { s: 11, c: GRI })}`),
+        x: `<p><b>Konformal kaplama</b>, elektronik kartın yüzeyini birkaç on mikronluk şeffaf bir filmle kaplar. Nem, toz ve yoğuşmaya karşı korur; hafiftir, UV ışıkta kontrol edilir ve gerektiğinde sökülüp onarılabilir.</p>
+          <p><b>Dolgu (potting)</b>, modülü veya kutuyu tamamen kauçuk / reçineyle doldurur. Suya batma, titreşim ve darbeye karşı en güçlü korumayı verir; ama ağırdır, ısıyı hapsedebilir ve onarım neredeyse imkânsızdır.</p>`,
+        r: [['hs1b31', 'Akrilik konformal kaplama.'], ['syl184', 'Silikon dolgu.']] },
+      { id: 's2', t: 'Sıvı conta: silikon mu, anaerobik mi?',
+        g: svg(520, 170, `
+          ${T(130, 24, 'Silikon (RTV)', { b: 1 })}${T(390, 24, 'Anaerobik', { b: 1 })}
+          <rect x="40" y="96" width="180" height="30" fill="url(#eg-h)" stroke="${INK}" stroke-width="1.5"/>
+          <path d="M40 72 Q130 88 220 72 V84 Q130 100 40 84 Z" fill="#dfe4e1" stroke="${INK}"/><rect x="40" y="84" width="180" height="12" fill="${TUR}" opacity=".8"/>
+          ${T(130, 148, 'esnek / sac kapak, plastik', { s: 11, c: GRI })}${T(130, 164, 'kalın boşluk doldurur', { s: 11, c: GRI })}
+          <rect x="300" y="96" width="180" height="30" fill="url(#eg-h)" stroke="${INK}" stroke-width="1.5"/><rect x="300" y="64" width="180" height="30" fill="url(#eg-h)" stroke="${INK}" stroke-width="1.5"/>
+          <rect x="300" y="94" width="180" height="2" fill="${KIR}"/>
+          ${T(390, 148, 'rijit işlenmiş metal flanş', { s: 11, c: GRI })}${T(390, 164, 'ince boşluk (≈ 0,25 mm’ye kadar)', { s: 11, c: GRI })}`),
+        x: `<p><b>Silikon sıvı conta</b> havadaki nemle kürlenir ve esnek kalır. Sac kapaklar, plastik parçalar ve titreşimli flanşlar için uygundur; daha kalın boşlukları doldurabilir.</p>
+          <p><b>Anaerobik sızdırmazlık</b> ise yalnızca havasız ortamda ve metal temasında sertleşir. İşlenmiş, rijit metal flanşlar arasında çok ince bir tabaka oluşturur; parçalar arası metal-metal teması korunduğu için cıvata ön yükü kaybolmaz. Plastikte çalışmaz.</p>`,
+        r: [['loc5699', 'Silikon sıvı conta.'], ['loc518', 'Anaerobik flanş sızdırmazlığı.']] },
+      { id: 's3', t: 'IP67, IP66’yı kapsar mı?',
+        g: svg(520, 170, `
+          <rect x="60" y="70" width="110" height="70" rx="6" fill="#eef1ee" stroke="${INK}" stroke-width="1.8"/>
+          ${[0, 1, 2].map(i => `<path d="M${10 + i * 6} ${40 + i * 14} L58 ${90 + i * 8}" stroke="${MAVI}" stroke-width="3"/>`).join('')}
+          ${T(115, 30, 'IPX6: güçlü su jeti', { b: 1, c: MAVI })}${T(115, 160, 'dinamik basınç', { s: 11, c: GRI })}
+          <rect x="300" y="40" width="190" height="110" fill="#cfe0f0" stroke="${MAVI}"/><rect x="340" y="80" width="110" height="50" rx="6" fill="#eef1ee" stroke="${INK}" stroke-width="1.8"/>
+          ${T(395, 30, 'IPX7: 1 m daldırma', { b: 1, c: MAVI })}${T(395, 160, 'statik basınç', { s: 11, c: GRI })}
+          ${T(240, 100, '≠', { s: 32, b: 1, c: KIR })}`),
+        x: `<p>IP kodunun ikinci hanesi 6’ya kadar birikimlidir: IPX6 sağlayan kutu IPX5’i de sağlar. Ama <b>7 ve 8 daldırma testleridir</b>; su jeti testlerini (5 ve 6) kapsamaz. Daldırmada su yavaşça ve sabit basınçla zorlar, jette ise hızlı ve darbeli gelir; bir conta birinde geçip diğerinde kalabilir.</p>
+          <p>Hem yağmur / yıkama hem suya batma ihtimali varsa <b>IP66/IP67</b> gibi çift sınıf isteyin.</p>`,
+        r: [['iec60529', 'IP kodu.'], ['ipRehber', 'Çift sınıflandırma.']] },
+      { id: 's4', t: 'Kutunun içinde yoğuşma nasıl oluşur?',
+        g: svg(520, 170, `
+          <rect x="60" y="40" width="240" height="110" rx="8" fill="#eef1ee" stroke="${INK}" stroke-width="2"/>
+          <rect x="60" y="40" width="14" height="110" fill="#9fc4e6"/>${T(40, 30, 'soğuk duvar', { s: 11, c: MAVI, a: 'start' })}
+          ${[0, 1, 2, 3, 4].map(i => `<ellipse cx="${80}" cy="${60 + i * 20}" rx="4" ry="6" fill="${MAVI}"/>`).join('')}
+          ${[0, 1, 2].map(i => `<path d="M${260 - i * 40} 120 q-10 -14 0 -28 q10 -14 0 -28" fill="none" stroke="${TUR}" stroke-width="2"/>`).join('')}
+          ${T(200, 165, 'sıcak nemli hava', { s: 11, c: TUR })}
+          ${T(410, 70, 'Çözümler', { b: 1 })}${['kuru ortamda kapatma', 'desikant', 'membranlı vent', 'konformal kaplama'].map((m, i) => T(410, 94 + i * 20, '• ' + m, { s: 12 })).join('')}`),
+        x: `<p>Kutunun içindeki havada bir miktar su buharı vardır. Dış ortam soğuyunca kutu duvarı da soğur; duvarın sıcaklığı havanın <b>çiğ noktasının</b> altına inerse buhar duvarda su damlacıklarına dönüşür. Damlacıklar karta damlarsa kısa devre ve korozyon yapar.</p>
+          <p>Tamamen sızdırmaz bir kutu bile, kapatılırken içeride kalan nem kadar su yoğuşturabilir. Bu yüzden kuru ortamda montaj, desikant, membranlı vent ve konformal kaplama birlikte düşünülür. Desikant miktarı için Desikant sekmesindeki hesaplayıcıyı kullanın.</p>`,
+        r: [['goreVent', 'Yoğuşma yönetimi ve basınç dengeleme.'], ['desic', 'Desikant hesabı.']] }
+    ];
+  }
+
+  const KAYNAK = { conta, malzeme, civata, tolerans, sizdirmazlik };
+  const BASLIK = { conta: 'Conta eğitimi', malzeme: 'Malzeme ve kaplama eğitimi', civata: 'Cıvata ve tork eğitimi', tolerans: 'Tolerans ve GD&T eğitimi', sizdirmazlik: 'Sızdırmazlık eğitimi' };
 
   function html(modul) {
     const { esc, refs } = U();
