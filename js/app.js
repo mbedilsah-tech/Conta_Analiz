@@ -658,6 +658,7 @@
       </div>
       ${kvPanel(ara, DET)}
       <p class="small mt"><b>${yoneten}</b></p>
+      <p class="katki">🤝 Cıvata aralığı hesabı <b>Miraç Tepekıran</b>’ın katkılarıyla hazırlanmıştır.</p>
       ${ca.uyarilar.map(u => `<div class="warnbox">${esc(u)}</div>`).join('')}
       ${pr.pEmi ? `<div class="okbox">EMI: ${f(S.fGHz, 1)} GHz için λ/20 = ${f(pr.pEmi, 1)} mm. Bu değer, conta temasının koptuğu yerde oluşacak açıklık içindir. İletken conta sürekli temas ettiği sürece cıvata aralığını değil, kapak eğilmesini sınırlar.</div>` : ''}`;
 
