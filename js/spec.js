@@ -250,10 +250,10 @@
   const KALITE = [
     { ad: '304', uns: 'S30400', wnr: '1.4301', en: 'X5CrNi18-10', tur: 'Ostenitik paslanmaz çelik (18Cr-8Ni) – en yaygın paslanmaz', astm: ['A240', 'A276', 'A479', 'A312', 'A182 F304', 'A193 B8'], kart: '1.4301', a: ['SUS304', 'V2A', '18/8'] },
     { ad: '304L', uns: 'S30403', wnr: '1.4307', en: 'X2CrNi18-9', tur: 'Ostenitik paslanmaz, düşük karbonlu (kaynak sonrası taneler arası korozyona dayanıklı)', astm: ['A240', 'A276', 'A479', 'A312', 'A182 F304L'], kart: '1.4307', a: ['1.4306', 'SUS304L'] },
-    { ad: '316', uns: 'S31600', wnr: '1.4401', en: 'X5CrNiMo17-12-2', tur: 'Ostenitik paslanmaz, molibdenli (klorür / deniz ortamı)', astm: ['A240', 'A276', 'A479', 'A312', 'A182 F316', 'A193 B8M'], kart: '1.4404', a: ['SUS316', 'V4A'] },
+    { ad: '316', uns: 'S31600', wnr: '1.4401', en: 'X5CrNiMo17-12-2', tur: 'Ostenitik paslanmaz, molibdenli (klorür / deniz ortamı)', astm: ['A240', 'A276', 'A479', 'A312', 'A182 F316', 'A193 B8M'], kart: '1.4401', a: ['SUS316', 'V4A'] },
     { ad: '316L', uns: 'S31603', wnr: '1.4404', en: 'X2CrNiMo17-12-2', tur: 'Ostenitik paslanmaz, molibdenli, düşük karbonlu', astm: ['A240', 'A276', 'A479', 'A312', 'A269', 'A182 F316L'], kart: '1.4404', a: ['SUS316L'] },
     { ad: '316Ti', uns: 'S31635', wnr: '1.4571', en: 'X6CrNiMoTi17-12-2', tur: 'Titanyum ile stabilize 316', astm: ['A240'], kart: '1.4404', a: [] },
-    { ad: '321', uns: 'S32100', wnr: '1.4541', en: 'X6CrNiTi18-10', tur: 'Titanyum ile stabilize ostenitik paslanmaz (yüksek sıcaklık)', astm: ['A240', 'A276', 'A312'], kart: '1.4301', a: [] },
+    { ad: '321', uns: 'S32100', wnr: '1.4541', en: 'X6CrNiTi18-10', tur: 'Titanyum ile stabilize ostenitik paslanmaz (yüksek sıcaklık)', astm: ['A240', 'A276', 'A312'], kart: '1.4541', a: [] },
     { ad: '303', uns: 'S30300', wnr: '1.4305', en: 'X8CrNiS18-9', tur: 'Kolay işlenen (kükürtlü) ostenitik paslanmaz – kaynaklanmaz', astm: ['A582', 'A581 (tel)'], kart: '1.4305', a: ['SUS303'] },
     { ad: '301', uns: 'S30100', wnr: '1.4310', en: 'X10CrNi18-8', tur: 'Soğuk işlemle sertleşen ostenitik paslanmaz (yay, sac)', astm: ['A666', 'A240'], kart: '1.4301', a: [] },
     { ad: '310S', uns: 'S31008', wnr: '1.4845', en: 'X8CrNi25-21', tur: 'Isıya dayanıklı ostenitik paslanmaz (≈ 1100 °C’ye kadar oksidasyon)', astm: ['A240', 'A276'], kart: '1.4301', a: [] },
@@ -261,7 +261,7 @@
     { ad: '410', uns: 'S41000', wnr: '1.4006', en: 'X12Cr13', tur: 'Martenzitik paslanmaz (sertleştirilebilir, manyetik)', astm: ['A276', 'A240'], kart: '1.4021', a: [] },
     { ad: '416', uns: 'S41600', wnr: '1.4005', en: 'X12CrS13', tur: 'Kolay işlenen martenzitik paslanmaz', astm: ['A582'], kart: '1.4021', a: [] },
     { ad: '420', uns: 'S42000', wnr: '1.4021', en: 'X20Cr13', tur: 'Martenzitik paslanmaz (bıçak, pompa mili, valf) – 420 aralığı 1.4021/1.4028’i kapsar', astm: ['A276', 'A240'], kart: '1.4021', a: ['1.4028', 'X30Cr13'] },
-    { ad: '430', uns: 'S43000', wnr: '1.4016', en: 'X6Cr17', tur: 'Ferritik paslanmaz (manyetik, ucuz, sac)', astm: ['A240', 'A276'], kart: '1.4301', a: ['SUS430'] },
+    { ad: '430', uns: 'S43000', wnr: '1.4016', en: 'X6Cr17', tur: 'Ferritik paslanmaz (manyetik, ucuz, sac)', astm: ['A240', 'A276'], kart: '1.4016', a: ['SUS430'] },
     { ad: '440C', uns: 'S44004', wnr: '1.4125', en: 'X105CrMo17', tur: 'Yüksek karbonlu martenzitik paslanmaz (rulman, ≈ 58–60 HRC)', astm: ['A276'], kart: '1.4021', a: [] },
     { ad: '17-4PH', uns: 'S17400', wnr: '1.4542', en: 'X5CrNiCuNb16-4', tur: 'Çökelme sertleşmeli paslanmaz (ASTM Type 630)', astm: ['A564 Type 630', 'A693', 'A705'], kart: '1.4542', a: ['630', '174PH', 'SUS630'] },
     { ad: '15-5PH', uns: 'S15500', wnr: '1.4545', en: 'X5CrNiCu15-5', tur: 'Çökelme sertleşmeli paslanmaz (ASTM XM-12)', astm: ['A564 XM-12'], kart: '1.4542', a: ['XM-12', '155PH'] },
@@ -272,14 +272,17 @@
     { ad: '1045', uns: 'G10450', wnr: '1.0503', en: '≈ C45', tur: 'Orta karbonlu ıslah çeliği (mil, pim)', astm: ['A29', 'A108'], kart: 'C45', a: ['AISI1045', 'SAE1045'] },
     { ad: '4140', uns: 'G41400', wnr: '1.7225', en: '≈ 42CrMo4', tur: 'Cr-Mo ıslah çeliği (mil, dişli, A193 B7 saplama)', astm: ['A29', 'A322', 'A193 B7'], kart: '42CrMo4', a: ['AISI4140', 'SCM440', '4142'] },
     { ad: '4340', uns: 'G43400', wnr: '1.6582 (≈)', en: '≈ 34CrNiMo6', tur: 'Ni-Cr-Mo yüksek dayanımlı ıslah çeliği', astm: ['A29', 'A322'], kart: '34CrNiMo6', a: ['AISI4340'] },
-    { ad: '4130', uns: 'G41300', wnr: '1.7218 (≈)', en: '≈ 25CrMo4', tur: 'Cr-Mo çeliği (kaynaklı boru konstrüksiyon, havacılık)', astm: ['A29', 'A519'], kart: '42CrMo4', a: [] },
+    { ad: '4130', uns: 'G41300', wnr: '1.7218 (≈)', en: '≈ 25CrMo4', tur: 'Cr-Mo çeliği (kaynaklı boru konstrüksiyon, havacılık)', astm: ['A29', 'A519'], kart: '25CrMo4', a: [] },
     { ad: '8620', uns: 'G86200', wnr: '1.6523', en: '≈ 20NiCrMo2-2', tur: 'Sementasyon çeliği (dişli)', astm: ['A29', 'A322'], kart: '16MnCr5', a: [] },
     { ad: '12L14', uns: 'G12144', wnr: '1.0718 (≈)', en: '≈ 11SMnPb30', tur: 'Kurşunlu otomat çeliği – kaynaklanmaz', astm: ['A108'], kart: '11SMnPb30', a: [] },
     { ad: 'D2', uns: 'T30402', wnr: '1.2379', en: 'X153CrMoV12', tur: 'Soğuk iş takım çeliği (yüksek C-Cr, aşınmaya çok dayanıklı) · JIS SKD11 yaklaşık', astm: ['A681'], kart: '1.2379', a: ['SKD11'] },
-    { ad: 'H13', uns: 'T20813', wnr: '1.2344', en: 'X40CrMoV5-1', tur: 'Sıcak iş takım çeliği (basınçlı döküm, dövme kalıbı) · JIS SKD61', astm: ['A681'], kart: '1.2379', a: ['SKD61'] },
+    { ad: 'H13', uns: 'T20813', wnr: '1.2344', en: 'X40CrMoV5-1', tur: 'Sıcak iş takım çeliği (basınçlı döküm, dövme kalıbı) · JIS SKD61', astm: ['A681'], kart: '1.2344', a: ['SKD61'] },
     { ad: 'A2', uns: 'T30102', wnr: '1.2363', en: 'X100CrMoV5', tur: 'Havada sertleşen soğuk iş takım çeliği', astm: ['A681'], kart: '1.2379', a: [] },
     { ad: 'O1', uns: 'T31501', wnr: '1.2510', en: '100MnCrW4', tur: 'Yağda sertleşen soğuk iş takım çeliği', astm: ['A681'], kart: '1.2379', a: [] },
     { ad: 'P20', uns: 'T51620', wnr: '1.2311', en: '40CrMnMo7', tur: 'Plastik kalıp çeliği (≈ 30 HRC ön sertleştirilmiş); kükürtlü türevi 1.2312', astm: ['A681'], kart: '1.2312', a: [] },
+    { ad: '52100', uns: 'G52986', wnr: '1.3505', en: '100Cr6', tur: 'Rulman çeliği (yüksek karbonlu krom çeliği, 60–64 HRC)', astm: ['A295'], kart: '100Cr6', a: ['SUJ2', 'AISI52100'] },
+    { ad: '6150', uns: 'G61500', wnr: '1.8159', en: '≈ 51CrV4', tur: 'Cr-V yay çeliği', astm: ['A29', 'A322'], kart: '51CrV4', a: ['SAE6150', '50CrV4'] },
+    { ad: '1008', uns: 'G10080', wnr: '1.0330 (≈)', en: '≈ DC01', tur: 'Düşük karbonlu soğuk haddelenmiş sac çeliği (ASTM A1008 CS)', astm: ['A1008'], kart: 'DC01', a: ['A1008', 'ST12', 'SPCC'] },
     { ad: 'A36', uns: 'K02600', wnr: '—', en: '≈ S235JR / S275JR', tur: 'Karbonlu yapı çeliği', astm: ['A36'], kart: 'S235JR', a: [] },
     { ad: 'B7', uns: '—', wnr: '≈ 1.7225', en: '≈ 42CrMo4', tur: 'ASTM A193 Grade B7: ıslah edilmiş Cr-Mo saplama / cıvata malzemesi (4140/4142)', astm: ['A193'], kart: '42CrMo4', a: [] }
   ];
@@ -375,6 +378,9 @@
         <div class="kv"><div><b>${esc(a.en)}</b><span>EN 573-3</span></div><div><b>${esc(a.wnr)}</b><span>W.Nr</span></div><div><b>B209 / B211 / B221</b><span>ASTM (levha / çubuk / ekstrüzyon)</span></div></div>
         <div class="mt"><button class="mini" data-al-git="${esc(a.kod)}">Alüminyum kartını aç ›</button></div></div>`;
     }
+    const YAKIN = { '4041': '4140', '4014': '4140', '4410': '4140', '4104': '4140', '1054': '1045', '3016': '316', '3014': '304' };
+    const yk = YAKIN[norm(r.ham)];
+    if (!h && yk) h = `<div class="warnbox">“${esc(r.ham)}” diye bir AISI/SAE kalitesi yok. <b>${yk}</b> mı demek istediniz? <button class="linkbtn" data-kod-ornek="${yk}">${yk}’i göster ›</button></div>`;
     if (!h) h = `<div class="warnbox">“${esc(r.ham)}” için eşleşme bulunamadı. Şunları deneyin: ASTM numarası (A240, A645/A645M-10), kalite (316L, 17-4PH, 4140, D2), UNS (S31603) veya W.Nr (1.4404).</div>`;
     return h;
   }
@@ -409,7 +415,7 @@
   // Çelik kartında kısa ASTM/UNS satırı
   function celikSatir(c) {
     const t = x => norm(x).replace(/\(≈\)|≈/g, '');
-    const L = KALITE.filter(q => [c.kod, c.wnr].some(k => t(q.wnr) === t(k)));
+    const L = KALITE.filter(q => q.uns !== '—' && [c.kod, c.wnr].some(k => t(q.wnr) === t(k)));
     if (!L.length) return '';
     const { esc } = U();
     return `<p><b>ASTM / UNS karşılığı:</b> ${L.map(q => `${esc(q.ad)} (UNS ${esc(q.uns)}) – ${esc(q.astm.slice(0, 4).join(', '))}`).join('; ')} <button class="linkbtn small" data-kod-git="${esc(L[0].ad)}">kod çözücüde aç ›</button></p>`;

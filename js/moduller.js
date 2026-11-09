@@ -58,8 +58,8 @@
   }
 
   // ---------- Malzeme modülü ----------
-  const AL_OZ = { Rp: ['Akma dayanımı Rp0,2', ' MPa', 0], Rm: ['Çekme dayanımı Rm', ' MPa', 0], rho: ['Yoğunluk', ' g/cm³', 2], ozgul: ['Özgül dayanım (Rp/ρ)', ' kN·m/kg', 0], k: ['Isıl iletkenlik', ' W/m·K', 0], tMax: ['Yaklaşık en yüksek kullanım sıcaklığı', ' °C', 0], isl: ['İşlenebilirlik (puan)', '/5', 0], kay: ['Kaynak kabiliyeti (puan)', '/5', 0], kor: ['Korozyon dayanımı (puan)', '/5', 0], elk: ['Eloksal uygunluğu (puan)', '/5', 0] };
-  const CE_OZ = { Rp: AL_OZ.Rp, Rm: AL_OZ.Rm, rho: AL_OZ.rho, ozgul: AL_OZ.ozgul, k: AL_OZ.k, tMax: ['Yaklaşık en yüksek kullanım sıcaklığı', ' °C', 0], isl: AL_OZ.isl, kay: AL_OZ.kay, kor: AL_OZ.kor, ist: ['Isıl işlemle sertleşme (puan)', '/5', 0] };
+  const AL_OZ = { Rp: ['Akma dayanımı Rp0,2', ' MPa', 0], Rm: ['Çekme dayanımı Rm', ' MPa', 0], rho: ['Yoğunluk', ' g/cm³', 2], ozgul: ['Özgül dayanım (Rp/ρ)', ' kN·m/kg', 0], k: ['Isıl iletkenlik', ' W/m·K', 0], tMax: ['Yaklaşık en yüksek kullanım sıcaklığı', ' °C', 0], isl: ['İşlenebilirlik (puan)', '/5', 0], kay: ['Kaynak kabiliyeti (puan)', '/5', 0], kor: ['Korozyon dayanımı (puan)', '/5', 0], elk: ['Eloksal uygunluğu (puan)', '/5', 0], buk: ['Bükülebilirlik (puan)', '/5', 0] };
+  const CE_OZ = { Rp: AL_OZ.Rp, Rm: AL_OZ.Rm, rho: AL_OZ.rho, ozgul: AL_OZ.ozgul, k: AL_OZ.k, tMax: ['Yaklaşık en yüksek kullanım sıcaklığı', ' °C', 0], isl: AL_OZ.isl, kay: AL_OZ.kay, kor: AL_OZ.kor, ist: ['Isıl işlemle sertleşme (puan)', '/5', 0], buk: AL_OZ.buk };
   const deger = (m, k) => k === 'ozgul' ? m.Rp / m.rho : (m.p && m.p[k] != null ? m.p[k] : m[k]);
 
   function malzemeNot(m, al, urun, dil) {
@@ -79,7 +79,7 @@
   function malzemeSecimKart(m, al) {
     const { f, esc, refs } = U();
     const P = al ? [['isl', 'İşlenebilirlik'], ['kay', 'Kaynak'], ['kor', 'Korozyon'], ['elk', 'Eloksal'], ['sek', 'Şekillendirme']] : [['isl', 'İşlenebilirlik'], ['kay', 'Kaynak'], ['kor', 'Korozyon'], ['ist', 'Isıl işlem/sertleşme'], ['sek', 'Şekillendirme']];
-    const baslik = al ? `${m.kod}-${m.temper} · ${m.en} [${m.sembol}] · W.Nr ${m.wnr}` : (m.grup.startsWith('Paslanmaz') ? `${m.kod} · ${m.wnr}` : `${m.kod} · ${m.wnr}`) + ` · ${m.grup}`;
+    const baslik = al ? `${m.kod}-${m.temper} · ${m.en} [${m.sembol}] · W.Nr ${m.wnr}` : `${m.kod} · ${m.wnr}${m.aisi ? ' · AISI/ASTM ' + m.aisi : ''} · ${m.grup}`;
     const notId = 'mNot1';
     return `<div class="card mkart">
       <h3>${esc(baslik)}</h3>
@@ -97,12 +97,14 @@
           </div>
           <p class="mt"><b>Nerede kullanılır?</b> ${esc(m.kullanim)}</p>
           <p><b>Bilinmesi gereken:</b> ${esc(m.not)}</p>
+          ${m.buk ? `<p class="bukum"><b>Büküm (soğuk bükme):</b> ${esc(m.buk.r)}. ${esc(m.buk.n)}</p>` : ''}
           ${m.sicak ? `<p><b>Sıcaklık:</b> ${esc(m.sicak)}</p>` : ''}
           ${!al && g.KSPEC ? g.KSPEC.celikSatir(m) : ''}
           ${al ? '' : `<p><b>Manyetik:</b> ${m.manyetik ? 'Evet' : 'Hayır (ostenitik)'}</p>`}
         </div>
         <div>
           <table class="puanlar">${P.map(([k, ad]) => `<tr><td>${ad}</td><td>${puan(m.p[k])}</td></tr>`).join('')}
+            ${m.buk ? `<tr><td>Bükülebilirlik</td><td>${puan(m.buk.p)}</td></tr>` : ''}
             <tr><td>Türkiye’de bulunurluk</td><td>${puan(m.bul)}</td></tr>
             <tr><td>Maliyet</td><td><b>${'₺'.repeat(m.mal)}</b><span class="small"> / 5</span></td></tr>
             ${al ? `<tr><td>Ürün şekli</td><td class="small">${esc(m.urun)}</td></tr>` : ''}</table>
@@ -111,7 +113,7 @@
           <div class="mt">${kopyaBtn(notId)}</div>
         </div>
       </div>
-      ${refs(al ? [['alProp', 'Tipik mekanik değerler.'], ['alSec', 'İşlenebilirlik, kaynak, korozyon ve eloksal karşılaştırması.'], ['en573', 'EN AW gösterimi ve kimyasal sembol.'], ['astmB209', 'ABD eşdeğer standartları.']] : [[m.ref, 'Malzeme standardı ve mekanik değerler.']])}
+      ${refs(al ? [['alProp', 'Tipik mekanik değerler.'], ['alSec', 'İşlenebilirlik, kaynak, korozyon ve eloksal karşılaştırması.'], ['en573', 'EN AW gösterimi ve kimyasal sembol.'], ['astmB209', 'ABD eşdeğer standartları.']].concat(m.buk ? [[m.buk.ref, 'Bükme yarıçapı / bükülebilirlik.']] : []) : [[m.ref, 'Malzeme standardı ve mekanik değerler.']].concat(m.buk ? [[m.buk.ref, 'Bükme yarıçapı / bükülebilirlik.']] : []))}
     </div>`;
   }
 
@@ -135,7 +137,7 @@
     return `<div class="card"><h3>${al ? 'Alüminyum serileri – ilk rakam ana alaşım elementini gösterir' : 'Çelik grupları'} <span class="small">(birine tıklayın)</span></h3>${rehber}
         <div class="seri-alt">
           <div class="seri-alt-bas"><b>${al ? esc(grup.s) + ' serisi · ' + esc(grup.el) : esc(grup.g)}</b> <span class="small">– ${uyeler.length} ${al ? 'alaşım' : 'çelik'}, birini seçin</span></div>
-          <div class="seg wrap" data-bind="${secKey}">${uyeler.map(x => `<button data-v="${x.kod}">${esc(x.kod)}${al ? `<small> ${esc(x.temper.split(' ')[0])}</small>` : ''}</button>`).join('')}</div>
+          <div class="seg wrap" data-bind="${secKey}">${uyeler.map(x => `<button data-v="${x.kod}">${esc(x.kod)}${al ? `<small> ${esc(x.temper.split(' ')[0])}</small>` : x.aisi ? `<small> ${esc(x.aisi)}</small>` : ''}</button>`).join('')}</div>
         </div>
       </div>
       ${malzemeSecimKart(m, al)}
@@ -144,12 +146,28 @@
         <div class="mt">${cubuk(L.map(x => ({ ad: x.kod + (al ? '-' + x.temper.split(' ')[0] : ''), v: deger(x, oz), sel: x === m })), OZ[oz][1], OZ[oz][2])}</div>
         ${oz === 'tMax' ? '<p class="small">Sıcaklık değerleri yaklaşık ve temkinlidir; uzun süreli yükte dayanım kaybı başlar.</p>' : ''}
       </div>
+      <div class="card"><h3>Bükme yarıçapı tahmini (Datsko–Yang)</h3>
+        <p class="small">Tabloda değeri olmayan malzemede minimum iç bükme yarıçapı, çekme deneyindeki <b>kesit daralmasından (Z, %)</b> tahmin edilir. Z değerini malzeme sertifikasından veya üretici veri sayfasından alın.</p>
+        <div class="row4"><label>Sac kalınlığı t (mm)<input type="number" step="0.1" data-num="bkT" value="${s.bkT ?? ''}"></label><label>Kesit daralması Z (%)<input type="number" step="1" data-num="bkZ" value="${s.bkZ ?? ''}"></label></div>
+        <div id="bukSonuc" class="sonuc mt"></div>
+        ${U().refs([['datsko', 'Formül.'], ['fab63', 'Pratik değerler ve kalıp etkisi.']])}
+      </div>
       ${al ? `<div class="card"><h3>Temper (ısıl işlem durumu) kodları</h3><table>${V.TEMPER.map(([k, a]) => `<tr><td><b>${k}</b></td><td>${esc(a)}</td></tr>`).join('')}</table></div>` : ''}
       <div class="card"><h3>Ağırlık hesabı – ${esc(m.kod)} (ρ = ${m.rho} g/cm³)</h3>
         <div class="seg" data-bind="agSekil"><button data-v="levha">Levha / blok</button><button data-v="cubuk">Yuvarlak çubuk</button><button data-v="boru">Boru</button><button data-v="altigen">Altıköşe</button></div>
         <div class="row4 mt">${agGirdi(s.agSekil)}</div>
         <div id="agSonuc" class="sonuc mt"></div>
       </div>`;
+  }
+  function bukSonuc() {
+    const { $, f, S } = U(); const s = S();
+    const el = $('#bukSonuc'); if (!el) return;
+    const t = s.bkT, Z = s.bkZ;
+    if (!(t > 0) || !(Z > 0 && Z < 100)) { el.innerHTML = '<p class="small">Kalınlık ve Z girin (ör. t = 3 mm, Z = %50).</p>'; return; }
+    const rt = Z < 20 ? 50 / Z - 1 : (100 - Z) ** 2 / (200 * Z - Z * Z);
+    const R = Math.max(0, rt * t);
+    el.innerHTML = `<div class="kv"><div style="background:var(--accent-soft)"><b>${f(R, 2)} mm</b><span>tahmini minimum iç yarıçap</span></div><div><b>${f(rt, 2)} t</b><span>R/t oranı</span></div><div><b>${f(Math.max(R, t), 1)} mm</b><span>önerilen (en az 1 t)</span></div></div>
+      <p class="small">Bu, çatlamanın başladığı teorik sınırdır. Kenar kalitesi, haddeleme yönü ve dayanım dağılımı için tasarımda payla seçin; Z &lt; %20 bölgesinde formül değişir.</p>`;
   }
   function agGirdi(sk) {
     const { S } = U(); const s = S();
@@ -267,7 +285,7 @@
 
   function malzeme(yap) {
     const { $, S, syncControls } = U(); const s = S();
-    if (!yap && $('#modulAlan .mmodul')) { agSonuc(); return; }
+    if (!yap && $('#modulAlan .mmodul')) { agSonuc(); bukSonuc(); return; }
     const sekme = s.mSekme || 'al';
     $('#modulAlan').innerHTML = `<div class="mmodul">
       <div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Malzeme seçimi ve kaplama/boya <span class="gelis">(geliştirme aşamasında)</span></h2></div>
@@ -275,7 +293,7 @@
       <div class="mt">${sekme === 'kod' ? g.KSPEC.kodSekme() : sekme === 'egitim' ? g.EGITIM.html('malzeme') : sekme === 'al' ? malzemeSekme(true) : sekme === 'celik' ? malzemeSekme(false) : sekme === 'kaplama' ? kaplamaSekme() : notSekme()}</div>
     </div>`;
     syncControls();
-    agSonuc();
+    agSonuc(); bukSonuc();
   }
 
   // ---------- Cıvata modülü ----------

@@ -279,6 +279,113 @@
     { k: 'LOCTITE 270', ad: 'Loctite 270 – yüksek (kalıcı, ısıtarak sökülür)' }
   ];
 
+
+  // ---------- v1.6: ek çelikler, AISI adları ve bükülebilirlik ----------
+  Object.assign(REF2, {
+    ua: { kisa: 'United Aluminum bükme tablosu', ad: 'United Aluminum – sac için 90° soğuk bükmede minimum iç yarıçap (t cinsinden), 1/64–1/8 in kalınlık: 3003-H14 0–1t, 5052-H32 0–1,5t, 6061-T6 1–2,5t, 2024-T3 2,5–5t, 7075-T6 3–6t', url: 'https://unitedaluminum.com/?p=859' },
+    oceanBend: { kisa: 'Bükme yarıçapı rehberi', ad: 'Malzemeye göre minimum bükme yarıçapı tablosu (ör. 304 tavlı 0,5t; 6061-T6 pratikte 3–4t; 7075-T6 5–6t) – üretici deneyimine dayalı', url: 'https://oceanplayer.com/?p=13703' },
+    tkS235: { kisa: 'thyssenkrupp S235JR', ad: 'thyssenkrupp S235JR (1.0038) veri sayfası – soğuk bükme için önerilen minimum iç yarıçap (≤ 90°): S235JRC/J2C için t ≤ 6 mm: 1t, 6–8 mm: 1,5t', url: 'https://ucpcdn.thyssenkrupp.com/_legacy/UCPthyssenkruppBAMXFrance/assets.files/product_pdf/carbon_flat_steel_/plates_and_slabs_carbon_steel/s235jr_1_0038_11_2016_engl.pdf' },
+    gn504: { kisa: 'SCI GN 5.04', ad: 'SteelConstruction.info GN 5.04 – soğuk bükülecek yapı çeliği “C” sembolüyle (ör. S355J2C) sipariş edilmeli; EN 10025-2 tablosu minimum iç yarıçapları verir', url: 'https://www.SteelConstruction.info/images/f/f9/GN_5-04.pdf' },
+    ssab355: { kisa: 'SSAB S355J2+N', ad: 'SSAB S355J2+N – tüm yönlerde garanti minimum bükme yarıçapı 1,5 × t (30 mm’ye kadar)', url: 'https://websitecdn.ssab.com/en/brands-and-products/ssab-zero/s355j2-plus-n-zero' },
+    dc01: { kisa: 'EN 10130 DC01', ad: 'EN 10130 DC01 (1.0330) soğuk haddelenmiş yumuşak çelik: Re ≤ 280 MPa, Rm 270–410 MPa, A80 ≥ %28 (thyssenkrupp tablosu)', url: 'https://d2zo35mdb530wx.cloudfront.net/_binary/UCPtkMXMaterialsProcessingEuropeCopy/en/c-steel/cold-rolled-sheet/tkmpe_cold_rolled_sheet_en.pdf' },
+    fab63: { kisa: 'The Fabricator – bükme', ad: 'The Fabricator (S. Benson): soğuk haddelenmiş yumuşak çelikte doğal minimum iç yarıçap ≈ kalınlığın %63’ü; 304 paslanmaz havada bükmede kalıp açıklığının %20–22’si kadar yarıçap oluşturur', url: 'https://www.thefabricator.com/thefabricator/article/bending/why-should-you-care-about-inside-bend-radiir' },
+    datsko: { kisa: 'Datsko–Yang bükme formülü', ad: 'Datsko & Yang (1959) / Machinery’s Handbook: minimum iç yarıçap kesit daralmasından (Z, %) tahmin edilir: Z < %20 için R/t = 50/Z − 1; Z > %20 için R/t = (100−Z)² / (200Z − Z²)', url: 'https://vulcanhammer.info/2022/05/02/minimum-bend-radius-for-plate-bending/' },
+    tk51: { kisa: 'thyssenkrupp 51CrV4', ad: 'thyssenkrupp precidur 51CrV4 (1.8159): küreselleştirme tavlı (GKZ) Rm ≤ 670 MPa, A80 ≥ %20; haddelenmiş Rm ≈ 930 MPa, A80 ≥ %9', url: 'https://www.thyssenkrupp-steel.com/media/content_1/publikationen/precision_steel/produktinformationen_1/verguetungsstahl/thyssenkrupp_51crv4_product_information_precision_steel_en.pdf' },
+    saar51: { kisa: 'Saarstahl 51CrV4', ad: 'Saarstahl 51CrV4 (1.8159, SAE 6150) – ıslah hâlinde ≤ 16 mm: Rp0,2 ≥ 900, Rm 1100–1300 MPa, A ≥ %9', url: 'https://www.saarstahl.com/app/uploads/2024/03/20160318100831-51CrV4-50CrV4-.pdf' },
+    saar100: { kisa: '100Cr6 veri sayfası', ad: '100Cr6 (1.3505, AISI 52100) – ISO 683-17; yumuşak tavlı (+AC) en fazla 207 HB; sertleştirilmiş 58–66 HRC; kaynaklanmaz', url: 'https://ucpcdn.thyssenkrupp.com/_binary/UCPthyssenkruppBAMXSchweiz/de/downloads/werkstoffdatenblaetter-baustahl/datenblatt-baustahl-thyroforce-3505/edelbau_3505.pdf' },
+    meus2344: { kisa: 'Meusburger 1.2344', ad: 'Meusburger 1.2344 / AISI H13 – tavlı en fazla 230 HB (≈ 780 N/mm²), ulaşılabilir sertlik 54 HRC, ısıl iletkenlik 26 W/m·K', url: 'https://meusburger.com/DA/DK/material-grades/12344-12344-esr-hot-work-steel' },
+    dew4016: { kisa: 'DEW 1.4016', ad: 'Deutsche Edelstahlwerke 1.4016 (AISI 430) – tavlı: Rp0,2 ≥ 240, Rm 400–630 MPa, A5 ≥ %20; kaynak kabiliyeti zayıf', url: 'https://swisssteel-group.com/content-media/documents/Data-Sheets/Stainless-Steel/Datenblatt_4016_UK.pdf' },
+    salzQT: { kisa: 'Salzgitter ıslah çelikleri', ad: 'Salzgitter – EN ISO 683 ıslah çelikleri tablosu (42CrMo4, 34CrMo4, 51CrV4 …) ve AISI/SAE karşılıkları', url: 'https://salzgitter-flachstahl.de/en/products/hot-rolled-products/steel-grades/quenched-and-tempered-steels.html' }
+  });
+
+  // AISI / SAE / ASTM karşılıkları (≈ yaklaşık)
+  const AISI = { 'S235JR': '≈ A36', 'S275JR': '≈ A36 / A283 C', 'S355J2': '≈ A572 Gr 50', 'C45': '1045', '42CrMo4': '4140', '34CrNiMo6': '≈ 4340', '16MnCr5': '≈ 5115', '11SMnPb30': '≈ 12L14',
+    '1.2312': 'P20+S', '1.2379': 'D2', '1.4301': '304', '1.4307': '304L', '1.4404': '316L', '1.4305': '303', '1.4021': '420', '1.4462': '2205', '1.4542': '17-4PH (630)', 'EN-GJS-400-15': '≈ A536 60-42-10' };
+  CELIK.forEach(c => { if (AISI[c.kod]) c.aisi = AISI[c.kod]; });
+
+  CELIK.push(
+    { kod: 'DC01', wnr: '1.0330', aisi: '≈ 1008 / A1008 CS', gid: 'yapi', grup: 'Soğuk haddelenmiş sac', std: 'EN 10130', ref: 'dc01', rho: 7.85, E: 210, Rm: 340, Rp: 210, A: 28, k: 55, cte: 12, tMax: 300,
+      p: { isl: 2, kay: 5, kor: 1, ist: 1, sek: 5 }, bul: 5, mal: 1, manyetik: true, kullanim: 'Büküm sac parçalar, kutu ve kapaklar, elektrik panosu, braket, boyalı/kaplamalı sac gövdeler.', not: 'Soğuk haddelenmiş yumuşak çelik sac (genelde 0,4–3 mm). Değerler EN 10130 aralığının ortasıdır (Re ≤ 280, Rm 270–410, A80 ≥ %28). Paslanır: boya, toz boya veya galvanizli (DX51D+Z) muadili kullanılır.' },
+    { kod: '25CrMo4', wnr: '1.7218', aisi: '≈ 4130', gid: 'islah', grup: 'Islah çeliği', std: 'EN ISO 683-2', ref: 'en683', rho: 7.85, E: 210, Rm: 900, Rp: 700, A: 12, k: 42, cte: 12, tMax: 400,
+      p: { isl: 3, kay: 3, kor: 1, ist: 4, sek: 3 }, bul: 3, mal: 2, manyetik: true, kullanim: 'Kaynaklı ince cidarlı boru konstrüksiyon (şasi, kafes), basınçlı tüp, mil ve bağlantı parçası.', not: 'Değerler ıslah (+QT, ≤ 16 mm) standart minimumlarıdır. Karbonu düşük olduğundan 42CrMo4’e göre kaynağa daha uygundur (ön ısıtma önerilir). AISI 4130 eşdeğeri.' },
+    { kod: '51CrV4', wnr: '1.8159', aisi: '6150', gid: 'yay', grup: 'Yay çeliği (ıslah)', std: 'EN ISO 683-2 / EN 10089', ref: 'saar51', rho: 7.85, E: 210, Rm: 1100, Rp: 900, A: 9, k: 40, cte: 12, tMax: 300,
+      p: { isl: 2, kay: 1, kor: 1, ist: 5, sek: 2 }, bul: 4, mal: 2, manyetik: true, kullanim: 'Yaprak ve helezon yay, yay rondelası, burulma çubuğu, yüksek yüklü mil ve dişli.', not: 'Değerler ıslah (+QT, ≤ 16 mm) standart minimumlarıdır. Yay olarak 1400–1700 MPa’ya kadar sertleştirilir. Kaynaklanmaz.' },
+    { kod: '100Cr6', wnr: '1.3505', aisi: '52100', gid: 'yay', grup: 'Rulman çeliği', std: 'ISO 683-17', ref: 'saar100', rho: 7.81, E: 210, Rm: 700, Rp: 420, A: 20, k: 43, cte: 12, tMax: 150,
+      p: { isl: 3, kay: 1, kor: 1, ist: 5, sek: 1 }, bul: 4, mal: 2, manyetik: true, kullanim: 'Rulman bilyası ve bileziği, kılavuz mili, pim, mastar, aşınmaya maruz küçük parçalar.', not: 'Tavlı (+AC, ≤ 207 HB) teslim edilir; değerler tavlı hâl için yaklaşıktır (207 HB ≈ 700 MPa). Sertleştirilince 60–64 HRC. Kaynaklanmaz.' },
+    { kod: '1.2344', wnr: 'X40CrMoV5-1', aisi: 'H13', gid: 'takim', grup: 'Takım/kalıp çeliği (sıcak iş)', std: 'ISO 4957', ref: 'meus2344', rho: 7.8, E: 215, Rm: 780, Rp: 500, A: 15, k: 26, cte: 11.5, tMax: 550,
+      p: { isl: 3, kay: 2, kor: 1, ist: 5, sek: 1 }, bul: 4, mal: 4, manyetik: true, kullanim: 'Basınçlı döküm ve dövme kalıbı, ekstrüzyon kalıbı, yüksek parlatma isteyen plastik kalıp.', not: 'Tavlı (≤ 229 HB ≈ 780 MPa) teslim edilir; Rp ve A tavlı hâl için yaklaşıktır. Sertleştirilip 44–52 HRC’de kullanılır; 500 °C üstünde sertliğini korur. Nitrürlenebilir.' },
+    { kod: '1.4401', wnr: 'X5CrNiMo17-12-2', aisi: '316', gid: 'ostenitik', grup: 'Paslanmaz (ostenitik)', std: 'EN 10088-3', ref: 'en10088', rho: 8.0, E: 200, Rm: 600, Rp: 220, A: 40, k: 15, cte: 16.0, tMax: 800,
+      p: { isl: 2, kay: 5, kor: 5, ist: 1, sek: 5 }, bul: 4, mal: 4, manyetik: false, kullanim: 'Deniz ortamı, kimya ve gıda ekipmanı; kaynak gerekmeyen 316 parçalar.', not: '316L’nin normal karbonlu sürümü; kaynaklı parçalarda 1.4404 (316L) tercih edilir.' },
+    { kod: '1.4541', wnr: 'X6CrNiTi18-10', aisi: '321', gid: 'ostenitik', grup: 'Paslanmaz (ostenitik, Ti stabilize)', std: 'EN 10088-3', ref: 'en10088', rho: 7.9, E: 200, Rm: 580, Rp: 200, A: 40, k: 15, cte: 16.5, tMax: 850,
+      p: { isl: 2, kay: 5, kor: 4, ist: 1, sek: 4 }, bul: 4, mal: 3, manyetik: false, kullanim: 'Egzoz, ısı değiştirici, 400–800 °C’de çalışan kaynaklı parçalar.', not: 'Titanyum karbonu bağlar: kaynak ve yüksek sıcaklıkta taneler arası korozyona dayanıklı. Parlatılmış yüzey istenen yerde 304 tercih edilir (Ti karbürleri).' },
+    { kod: '1.4016', wnr: 'X6Cr17', aisi: '430', gid: 'ferritik', grup: 'Paslanmaz (ferritik)', std: 'EN 10088-2/-3', ref: 'dew4016', rho: 7.7, E: 220, Rm: 480, Rp: 300, A: 25, k: 25, cte: 10, tMax: 800,
+      p: { isl: 3, kay: 2, kor: 3, ist: 1, sek: 3 }, bul: 4, mal: 2, manyetik: true, kullanim: 'Ev aletleri, iç mekân dekoratif sac, mutfak ekipmanı, manyetik olması gereken paslanmaz parçalar.', not: 'Nikelsiz, ucuz paslanmaz; manyetiktir. Korozyon dayanımı 304’ten düşük (iç ortam). Kaynakta tane büyümesi ve gevrekleşme olur.' },
+    { kod: 'EN-GJL-250', wnr: '5.1301', aisi: '≈ A48 Class 35', gid: 'dokme', grup: 'Lamel grafitli (gri) dökme demir', std: 'EN 1561', ref: 'dokmeEsd', rho: 7.2, E: 110, Rm: 250, Rp: 165, A: 0.5, k: 48, cte: 11, tMax: 350,
+      p: { isl: 5, kay: 1, kor: 2, ist: 1, sek: 1 }, bul: 5, mal: 1, manyetik: true, kullanim: 'Tezgâh gövdesi ve kızakları, motor bloğu, pompa gövdesi, fren diski, titreşim sönümü istenen gövdeler.', not: 'Eski GG25. Çekmede gevrek (%A < 1), basmada güçlü; titreşim sönümü ve işlenebilirliği çok iyi. Rp yerine Rp0,1 yaklaşık değeri verilmiştir.' },
+    { kod: 'EN-GJS-500-7', wnr: '5.3200', aisi: '≈ A536 80-55-06', gid: 'dokme', grup: 'Küresel grafitli dökme demir', std: 'EN 1563', ref: 'en1563', rho: 7.1, E: 169, Rm: 500, Rp: 320, A: 7, k: 35, cte: 12.5, tMax: 350,
+      p: { isl: 4, kay: 1, kor: 2, ist: 2, sek: 1 }, bul: 4, mal: 1, manyetik: true, kullanim: 'Daha yüksek dayanım isteyen dişli kutusu, hidrolik gövde, krank, makine parçaları.', not: 'Eski GGG50. Ferritik-perlitik; GJS-400’e göre daha dayanıklı, daha az sünek.' }
+  );
+  CELIK_GRUP.splice(CELIK_GRUP.findIndex(x => x.id === 'takim') + 1, 0, { id: 'yay', g: 'Yay ve rulman çelikleri', ozet: 'Yüksek karbonlu; sertleştirilerek yay, bilya, aşınma parçası.', ornek: '51CrV4 (6150), 100Cr6 (52100)' });
+  CELIK_GRUP.splice(CELIK_GRUP.findIndex(x => x.id === 'martenzit'), 0, { id: 'ferritik', g: 'Ferritik paslanmaz', ozet: 'Nikelsiz, ucuz, manyetik paslanmaz; iç ortam ve sac.', ornek: '1.4016 (430)' });
+  const GRUP_SIRA = CELIK_GRUP.map(x => x.id);
+  CELIK.sort((a, b) => GRUP_SIRA.indexOf(a.gid) - GRUP_SIRA.indexOf(b.gid));
+
+  // Bükülebilirlik: p (1–5), r (min. iç yarıçap / durum), n (not), ref
+  const AL_BUK = {
+    '1050A': [4, '0 (≤ 1,6 mm) · 1 t (3,2 mm) – 90°', '1100-H14 verisi (saf Al, benzer). Yumuşak (O) hâlde düz katlanabilir.', 'ua'],
+    '3003': [4, '0 (≤ 1,6 mm) · 1 t (3,2 mm) – 90°', 'H14 için tablo değeri. O hâlinde 0.', 'ua'],
+    '5005': [4, '0 (≤ 1,6 mm) · 1 t (3,2 mm) – 90°', 'H14 için tablo değeri.', 'ua'],
+    '5052': [3, '1 t (1,6 mm) · 1,5 t (3,2 mm) – 90°', 'H32: sac bükümü için en çok tercih edilen alaşım. O hâlinde 0–½ t.', 'ua'],
+    '5083': [4, '≈ ½ t (3,2 mm) – yaklaşık', 'Tabloda yok; H111 tavlıya yakın olduğundan 5052-O değeri esas alındı (yaklaşık).', 'ua'],
+    '5754': [4, '≈ ½ t (3,2 mm) – yaklaşık', 'Tabloda yok; H111 tavlıya yakın olduğundan 5052-O değeri esas alındı (yaklaşık).', 'ua'],
+    '6061': [3, '1,5 t (1,6 mm) · 2,5 t (3,2 mm) – 90°', 'T6 tablo değeri; pratikte 3–4 t önerilir. T4’te 1–1,5 t, O hâlinde 0–1 t.', 'ua'],
+    '6082': [3, '≈ 6061-T6: 1,5–2,5 t (yaklaşık)', 'Tabloda yok; dayanımı 6061-T6 ile benzer olduğundan aynı değer alındı. Sıkı bükümlerde T4’te bükülüp yaşlandırılabilir.', 'ua'],
+    '6060': [3, '≈ 6061-T6 ya da biraz daha iyi (yaklaşık)', 'Tabloda yok. Profil bükümünde T4/T5 hâli daha uygundur.', 'ua'],
+    '6063': [3, '≈ 6061-T6 ya da biraz daha iyi (yaklaşık)', 'Tabloda yok. Profil bükümünde T4/T5 hâli daha uygundur.', 'ua'],
+    '6005A': [3, '≈ 6061-T6 (yaklaşık)', 'Tabloda yok; benzer dayanımlı 6xxx.', 'ua'],
+    '2024': [2, '4 t (1,6 mm) · 5 t (3,2 mm) – 90°', '2024-T3 tablo değeri. O hâlinde 0–½ t: büküp sonra ısıl işlem yapın.', 'ua'],
+    '2017A': [2, '≈ 2024-T4: 4–5 t (yaklaşık)', 'Tabloda yok; benzer 2xxx T4 değeri esas alındı.', 'ua'],
+    '7075': [1, '5 t (1,6 mm) · 6 t (3,2 mm) – 90°', 'T6’da bükme pratik değildir; O hâlinde 1 t ile bükülüp ısıl işlem yapılır.', 'ua'],
+    '7020': [2, '6061-T6 ile 7075-T6 arası (yaklaşık)', 'Tabloda yok. Kaynaklı 7xxx; sıkı bükümden kaçının.', 'ua'],
+    '7050': [1, 'Bükme için uygun değil', 'Kalın plaka ürünü; yüksek dayanım, düşük süneklik.', 'ua'],
+    '2011': [1, 'Bükme için uygun değil', 'Otomat çubuk alaşımı (Bi/Pb katkılı).', 'ua'],
+    '2014': [1, 'Bükme için uygun değil (T6)', 'Yüksek dayanımlı 2xxx; 2024-T81 benzeri ≥ 6 t gerekir (yaklaşık).', 'ua'],
+    '4032': [1, 'Bükme için uygun değil', 'Dövme piston alaşımı; yüksek silisyum.', 'ua']
+  };
+  const DATS = 'datsko';
+  const CE_BUK = {
+    'DC01': [5, '≈ 0,6 t (doğal minimum); ince sacta üst üste katlanabilir', 'Bükme sacı olarak üretilir. Kalın sacta 1 t seçmek güvenlidir.', 'fab63'],
+    'S235JR': [4, '1 t (t ≤ 6 mm) · 1,5 t (6–8 mm) – 90°', 'Garanti için soğuk şekillendirme kalitesi S235JRC sipariş edin.', 'tkS235'],
+    'S275JR': [4, '≈ 1–1,5 t (C kalitesiyle)', 'Bükülecekse S275JRC sipariş edin; değerler EN 10025-2 tablosundadır.', 'gn504'],
+    'S355J2': [3, '1,5 t (≤ 30 mm, tüm yönler)', 'Yüksek akma nedeniyle geri yaylanma S235’ten fazladır.', 'ssab355'],
+    'C45': [2, 'Tablo değeri yok – Datsko–Yang ile hesaplayın', 'Normalize hâlde soğuk bükme sınırlıdır (%A ≈ 14). Kalın kesitte sıcak bükün; ıslah/sertleştirmeden sonra bükmeyin.', DATS],
+    '25CrMo4': [2, 'Tavlı / normalize hâlde orta – hesaplayın', 'Boru ve sac tavlı hâlde bükülür, sonra ıslah edilir; ıslahlı hâlde bükmeyin.', DATS],
+    '42CrMo4': [1, '+QT hâlde soğuk bükme önerilmez', 'Gerekiyorsa tavlı (+A) hâlde veya sıcak bükülüp sonra ıslah edilir.', DATS],
+    '34CrNiMo6': [1, '+QT hâlde soğuk bükme önerilmez', 'Büyük kesitli dövme/mil malzemesi; bükme parçası için seçilmez.', DATS],
+    '16MnCr5': [3, 'Sementasyondan ÖNCE bükün', 'Yumuşak tavlı hâlde bükülür; sertleştirilmiş yüzey bükülmez.', DATS],
+    '11SMnPb30': [1, 'Bükme için uygun değil', 'Kükürt/kurşun inklüzyonları dış lifte çatlar (%A ≈ 8).', DATS],
+    '51CrV4': [2, 'Tavlıda bükülür, ıslahlıda bükülmez', 'Küreselleştirme tavlı şerit (A80 ≥ %20) bükülüp sonra ıslah edilir; ıslahlı/haddelenmiş hâlde (A ≈ %9) bükmeyin.', 'tk51'],
+    '100Cr6': [1, 'Bükme için uygun değil', 'Yüksek karbonlu rulman çeliği; şekillendirme yerine talaşlı imalat.', DATS],
+    '1.2312': [1, 'Bükme için uygun değil', 'Ön sertleştirilmiş (~300 HB) kalıp çeliği.', DATS],
+    '1.2379': [1, 'Bükme için uygun değil', 'Ledeburitik takım çeliği; karbürler çatlar.', DATS],
+    '1.2344': [1, 'Bükme için uygun değil', 'Takım çeliği; şekli talaşlı imalat / erozyonla verilir.', DATS],
+    '1.4301': [5, '≈ 0,5 t (90°, tavlı) – pratikte 1–2 t', 'İnce sacta 180° katlanabilir. Geri yaylanma ve aynı kalıpta oluşan iç yarıçap yumuşak çelikten büyüktür.', 'oceanBend'],
+    '1.4307': [5, '≈ 0,5 t (90°, tavlı) – pratikte 1–2 t', '304 ile aynı davranış; kaynaklı-bükümlü parçalar için iyi seçim.', 'oceanBend'],
+    '1.4401': [5, '≈ 0,5 t (90°, tavlı) – pratikte 1–2 t', '304 ile benzer; biraz daha sert.', 'oceanBend'],
+    '1.4404': [5, '≈ 0,5 t (90°, tavlı) – pratikte 1–2 t', '304 ile benzer; biraz daha sert.', 'oceanBend'],
+    '1.4541': [4, '≈ 0,5–1 t (tavlı)', 'Ostenitik; 304’e yakın davranır.', 'oceanBend'],
+    '1.4305': [2, 'Bükme önerilmez', 'Çubuk ürünüdür; kükürt inklüzyonları bükmede çatlar.', DATS],
+    '1.4016': [3, '≈ 1–3 t (kaynaklar arasında fark var)', 'Ostenitiklerden zayıf; soğukta (< 0 °C) ve kalın sacta çatlamaya yatkın. Bükme hattını haddeleme yönüne dik koyun.', 'oceanBend'],
+    '1.4021': [1, 'Islahlı hâlde bükülmez', 'Martenzitik; ancak tavlı ince sac sınırlı bükülebilir.', DATS],
+    '1.4462': [3, 'Ostenitiklerden büyük yarıçap (≈ 2 t ve üstü, yaklaşık)', 'Akma 304’ün ~2 katı: daha fazla kuvvet ve geri yaylanma. Kesin değeri üreticiden alın.', DATS],
+    '1.4542': [1, 'Yaşlandırılmış hâlde bükülmez', 'Gerekirse Condition A’da (çözeltiye alınmış) sınırlı bükülüp sonra yaşlandırılır.', DATS],
+    'EN-GJS-400-15': [1, 'Bükülmez (döküm)', 'Döküm parçalar şekillendirilmez; düzeltme için bile soğuk bükme önerilmez.', 'dokmeEsd'],
+    'EN-GJS-500-7': [1, 'Bükülmez (döküm)', 'Döküm parçalar şekillendirilmez.', 'dokmeEsd'],
+    'EN-GJL-250': [1, 'Bükülmez (gevrek)', 'Gri dökme demir çekmede gevrektir (%A < 1).', 'dokmeEsd']
+  };
+  const bukAta = (L, M) => L.forEach(m => { const b = M[m.kod]; if (b) { m.buk = { p: b[0], r: b[1], n: b[2], ref: b[3] }; m.p.buk = b[0]; } });
+  bukAta(ALUMINYUM, AL_BUK); bukAta(CELIK, CE_BUK);
+
   const out = { REF2, ALUMINYUM, AL_SERI, TEMPER, CELIK, CELIK_GRUP, KAPLAMA, ISTEK, TORK, SINIF, SURTUNME, VIDA_TIP, KILIT };
   g.MVERI = out;
   if (g.DATA) Object.assign(g.DATA.REF, REF2);

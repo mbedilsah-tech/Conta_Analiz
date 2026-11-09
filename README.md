@@ -53,6 +53,12 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
 
+## v1.6
+- **Daha fazla çelik (28):** DC01 (sac), 25CrMo4 (AISI 4130), 51CrV4 (6150), 100Cr6 (52100), 1.2344 (H13), 1.4401 (316), 1.4541 (321), 1.4016 (430), EN-GJL-250, EN-GJS-500-7. Yeni gruplar: Yay ve rulman çelikleri, Ferritik paslanmaz. Seçim düğmelerinde ve kart başlığında AISI/ASTM karşılığı yazıyor.
+- **Bükülebilirlik:** Her alüminyum ve çelik kartında 1–5 puan, minimum iç bükme yarıçapı (t cinsinden) ve not; her biri kaynaklı (United Aluminum tablosu, thyssenkrupp S235JR, SSAB S355J2+N, EN 10130 DC01, The Fabricator, Datsko–Yang). “Karşılaştır”da bükülebilirlik seçilebilir.
+- **Bükme yarıçapı hesabı:** Kesit daralmasından (Z) Datsko–Yang formülüyle minimum iç yarıçap tahmini.
+- Kod çözücüde 52100, 6150, 1008 eklendi; “4041” gibi hatalı yazımlarda öneri verir.
+
 ## v1.5
 - **Kaplama spesifikasyonu sınıflandırması:** Kaplama kartlarında Tip / Class / Method / SC seçimi; çizim notu seçime göre oluşur ve hatalı çağrılarda uyarı verir.
   - AMS 2700 Method 1 (Type 1–8) / Method 2 (sitrik, Type yok), ASTM A967 Nitric 1–5 / Citric 1–5
