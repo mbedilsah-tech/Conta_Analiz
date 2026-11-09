@@ -53,6 +53,14 @@ Kolay moddaki **"İkisi de var – uyuyor mu?"** seçeneğine O-ring kalınlığ
 - **İşleme yöntemi ve IT** – hangi işlemle hangi kaliteye ulaşılır
 - **GD&T sembolleri** – ISO 1101 sembolleri ve anlamları
 
+## v1.5
+- **Kaplama spesifikasyonu sınıflandırması:** Kaplama kartlarında Tip / Class / Method / SC seçimi; çizim notu seçime göre oluşur ve hatalı çağrılarda uyarı verir.
+  - AMS 2700 Method 1 (Type 1–8) / Method 2 (sitrik, Type yok), ASTM A967 Nitric 1–5 / Citric 1–5
+  - MIL-PRF-8625 Tip I, IB, IC, II, IIB, III · Class 1/2 · seal; MIL-DTL-5541 Tip I/II · Class 1A/3
+  - ASTM B733 Tip I–V · SC0–SC4 · Class 1–6; ASTM B633 SC1–SC4 · Tip I–VI; MIL-DTL-13924 Class 1–4
+- **ASTM / UNS kod çözücü:** “ASTM A645/A645M-10”, “A240 316L”, “S31603”, “1.4404”, “A193 B7” gibi kodları çözer; kod yapısını (M, revizyon yılı, yeniden onay) açıklar, EN / W.Nr karşılığını verir ve ilgili malzeme kartına bağlar. 40 ASTM standardı ve ~35 kalite listelenir.
+- Çelik kartlarına ASTM / UNS karşılığı satırı eklendi.
+
 ## v1.4
 
 - **Sızdırmazlık modülü (yeni katalog)** – genel kurallar (sızıntı yolları, basınç dengeleme, yoğuşma, yüzey hazırlığı…), ürün seçimi (RTV silikon, sıvı conta, diş sızdırmazlık, konformal kaplama, dolgu, vent membranı, MIL astar/boya – kullanım ve sıcaklığa göre), IP kodu seçici (IEC 60529), desikant hesabı için DESIC hesaplayıcısına yönlendirme (https://utkubayram.com/desic/), tedarikçiler (+ ekleme) ve eğitim

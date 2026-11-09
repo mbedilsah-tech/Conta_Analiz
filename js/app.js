@@ -90,7 +90,8 @@
   // ---------------- Bağlama ----------------
   const YAPISAL = ['dHareket', 'dKonum', 'tip', 'sekil', 'emi', 'mod', 'hareket', 'yon', 'malz', 'kanalda', 'spec', 'notDil', 'oYol', 'ozelOring', 'ayarDetay', 'arayuz', 'kolayMod', 'tedSekme', 'kkTip',
     'modul', 'mSekme', 'alSeri', 'celikGrup', 'alSec', 'celikSec', 'alOzellik', 'celikOzellik', 'agSekil', 'kTaban', 'ist_iletken', 'ist_asinma', 'ist_disOrtam', 'ist_renk', 'ist_boyut', 'ist_ucuz',
-    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civSekme', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil', 'tSekme', 'szSekme', 'grSekil', 'grSeviye', 'tTip', 'tHarf', 'tKalite', 'gelSinif', 'gelGeo'];
+    'notMalz', 'notUrun', 'notKap', 'notMaske', 'notSonra', 'notTol', 'notKenar', 'notRohs', 'notDil2', 'civSekme', 'civM', 'civSinif', 'civMu', 'civKarsi', 'civTip', 'civKap', 'civKilit', 'civDil', 'tSekme', 'szSekme', 'grSekil', 'grSeviye', 'tTip', 'tHarf', 'tKalite', 'gelSinif', 'gelGeo', 'astmGrup'];
+  const yapisalMi = k => YAPISAL.includes(k) || String(k).startsWith('sp_');
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-bind] > button');
     if (!btn || btn.disabled) return;
@@ -103,7 +104,7 @@
       if (S.sekil === 'D' && !(S.gw <= 2 * S.gt)) S.gw = S.gt;
       if ((S.sekil === 'duz' || S.sekil === 'sunger') && !(S.gw > S.gt)) S.gw = 10;
     }
-    changed(YAPISAL.includes(key));
+    changed(yapisalMi(key));
   });
   document.addEventListener('input', e => {
     const el = e.target;
@@ -111,8 +112,8 @@
   });
   document.addEventListener('change', e => {
     const el = e.target;
-    if (el.dataset.sel) { S[el.dataset.sel] = el.value; changed(YAPISAL.includes(el.dataset.sel)); }
-    if (el.dataset.chk) { S[el.dataset.chk] = el.checked; changed(YAPISAL.includes(el.dataset.chk)); }
+    if (el.dataset.sel) { S[el.dataset.sel] = el.value; changed(yapisalMi(el.dataset.sel)); }
+    if (el.dataset.chk) { S[el.dataset.chk] = el.checked; changed(yapisalMi(el.dataset.chk)); }
     if (el.dataset.ortam) { const k = el.dataset.ortam; S.ortam = el.checked ? [...new Set([...S.ortam, k])] : S.ortam.filter(x => x !== k); changed(false); }
   });
   // Aynı değişkene bağlı diğer alanları güncelle (yazılan alan hariç)

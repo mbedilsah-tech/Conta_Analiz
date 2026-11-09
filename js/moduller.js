@@ -98,6 +98,7 @@
           <p class="mt"><b>Nerede kullanılır?</b> ${esc(m.kullanim)}</p>
           <p><b>Bilinmesi gereken:</b> ${esc(m.not)}</p>
           ${m.sicak ? `<p><b>Sıcaklık:</b> ${esc(m.sicak)}</p>` : ''}
+          ${!al && g.KSPEC ? g.KSPEC.celikSatir(m) : ''}
           ${al ? '' : `<p><b>Manyetik:</b> ${m.manyetik ? 'Evet' : 'Hayır (ostenitik)'}</p>`}
         </div>
         <div>
@@ -211,13 +212,14 @@
         </tbody></table>
       </div>
       <h3>${istek.length ? 'İsteklerinize göre sıralı öneriler' : 'Kaplamalar (yukarıdan istek seçerseniz sıralanır)'}</h3>
-      ${sirali.map((x, i) => `<div class="card mat ${istek.length && x.p < 0 ? 'dim' : ''}"><div>
+      ${sirali.map((x, i) => `<div class="card mat ${istek.length && x.p < 0 ? 'dim' : ''}" id="kc_${x.k.id}"><div>
         <div class="name">${istek.length && i < 2 && x.p >= 0 ? `<span class="badge ok">Öneri ${i + 1}</span> ` : ''}${esc(x.k.ad)} <span class="small">· ${esc(x.k.std)}</span></div>
         <div class="pill-row small"><span class="chip">${esc(x.k.kal)}</span><span class="chip">${x.k.iletken ? 'İletken' : 'Yalıtkan'}</span><span class="chip">${esc(x.k.renk)}</span></div>
         ${x.neden.length ? `<div class="okbox">✔ ${esc(x.neden.join(' · '))}</div>` : ''}${x.sorun.length ? `<div class="warnbox">⚠ ${esc(x.sorun.join(' · '))}</div>` : ''}
         <p class="small"><b>Ne zaman:</b> ${esc(x.k.ne)}</p>
         <p class="small"><b>Dikkat:</b> ${esc(x.k.dikkat)}</p>
-        <pre class="notbox kisa" id="kn_${x.k.id}">${esc(x.k.notTR)}</pre>
+        ${g.KSPEC ? g.KSPEC.blok(x.k, taban) : ''}
+        <pre class="notbox kisa" id="kn_${x.k.id}">${esc(g.KSPEC ? g.KSPEC.not(x.k, false) : x.k.notTR)}</pre>
         ${refs(x.k.ref)}
       </div><div class="mat-actions"><button class="mini" data-kopya="kn_${x.k.id}">Notu kopyala</button></div></div>`).join('')}
       ${taban === 'al' ? `<div class="card info"><h3>Kısaca: alüminyumda hangisi?</h3><ul>
@@ -254,7 +256,7 @@
   function malzemeNotMetni(sec, kap, s) {
     const en = s.notDil2 === 'en';
     const L = [malzemeNot(sec.m, sec.al, s.notUrun || 'cubuk', s.notDil2)];
-    if (kap) L.push(en ? kap.notEN : kap.notTR);
+    if (kap) L.push((g.KSPEC ? g.KSPEC.not(kap, en) : (en ? kap.notEN : kap.notTR)).replace(/^(FINISH|YÜZEY İŞLEMİ): /, en ? 'FINISH: ' : 'YÜZEY İŞLEMİ: '));
     if (kap && s.notMaske) L.push(en ? 'MASK SURFACES MARKED ▽M FROM COATING' + (sec.al && !kap.iletken ? '; APPLY MIL-DTL-5541 TYPE II CLASS 3 ON MASKED AREAS.' : '.') : 'İŞARETLİ (▽M) YÜZEYLER KAPLAMADAN MASKELENECEK' + (sec.al && !kap.iletken ? '; MASKELİ BÖLGELERE MIL-DTL-5541 TİP II CLASS 3 UYGULANACAKTIR.' : '.'));
     if (kap && s.notSonra) L.push(en ? 'ALL DIMENSIONS APPLY AFTER SURFACE TREATMENT.' : 'TÜM ÖLÇÜLER YÜZEY İŞLEMİ SONRASI İÇİNDİR.');
     if (s.notTol) L.push(en ? 'GENERAL TOLERANCES PER ISO 2768-mK.' : 'GENEL TOLERANSLAR ISO 2768-mK.');
@@ -269,8 +271,8 @@
     const sekme = s.mSekme || 'al';
     $('#modulAlan').innerHTML = `<div class="mmodul">
       <div class="modbaslik"><button class="ghost" data-modul-git="ana">← Ana menü</button><h2>Malzeme seçimi ve kaplama/boya <span class="gelis">(geliştirme aşamasında)</span></h2></div>
-      <div class="seg" data-bind="mSekme"><button data-v="al">Alüminyum</button><button data-v="celik">Çelik</button><button data-v="kaplama">Kaplama ve boya</button><button data-v="not">Teknik resim notu</button><button data-v="egitim">📘 Eğitim</button></div>
-      <div class="mt">${sekme === 'egitim' ? g.EGITIM.html('malzeme') : sekme === 'al' ? malzemeSekme(true) : sekme === 'celik' ? malzemeSekme(false) : sekme === 'kaplama' ? kaplamaSekme() : notSekme()}</div>
+      <div class="seg" data-bind="mSekme"><button data-v="al">Alüminyum</button><button data-v="celik">Çelik</button><button data-v="kaplama">Kaplama ve boya</button><button data-v="not">Teknik resim notu</button><button data-v="kod">🔎 ASTM / UNS kod çözücü</button><button data-v="egitim">📘 Eğitim</button></div>
+      <div class="mt">${sekme === 'kod' ? g.KSPEC.kodSekme() : sekme === 'egitim' ? g.EGITIM.html('malzeme') : sekme === 'al' ? malzemeSekme(true) : sekme === 'celik' ? malzemeSekme(false) : sekme === 'kaplama' ? kaplamaSekme() : notSekme()}</div>
     </div>`;
     syncControls();
     agSonuc();
